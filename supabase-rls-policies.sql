@@ -46,18 +46,18 @@ DROP POLICY IF EXISTS "assessment_criteria_select_all" ON "assessment_criteria";
 -- Users can view their own record
 CREATE POLICY "users_select_own" ON "users"
   FOR SELECT
-  USING (auth.uid() = "openId");
+  USING (auth.uid()::text = "openId");
 
 -- Users can insert their own record (for first-time signup)
 CREATE POLICY "users_insert_own" ON "users"
   FOR INSERT
-  WITH CHECK (auth.uid() = "openId");
+  WITH CHECK (auth.uid()::text = "openId");
 
 -- Users can update their own record
 CREATE POLICY "users_update_own" ON "users"
   FOR UPDATE
-  USING (auth.uid() = "openId")
-  WITH CHECK (auth.uid() = "openId");
+  USING (auth.uid()::text = "openId")
+  WITH CHECK (auth.uid()::text = "openId");
 
 -- =====================================================
 -- 4. PROJECTS TABLE POLICIES
@@ -70,7 +70,7 @@ CREATE POLICY "projects_select_own" ON "projects"
     EXISTS (
       SELECT 1 FROM "users"
       WHERE "users"."id" = "projects"."userId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   );
 
@@ -81,7 +81,7 @@ CREATE POLICY "projects_insert_own" ON "projects"
     EXISTS (
       SELECT 1 FROM "users"
       WHERE "users"."id" = "projects"."userId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   );
 
@@ -92,14 +92,14 @@ CREATE POLICY "projects_update_own" ON "projects"
     EXISTS (
       SELECT 1 FROM "users"
       WHERE "users"."id" = "projects"."userId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   )
   WITH CHECK (
     EXISTS (
       SELECT 1 FROM "users"
       WHERE "users"."id" = "projects"."userId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   );
 
@@ -110,7 +110,7 @@ CREATE POLICY "projects_delete_own" ON "projects"
     EXISTS (
       SELECT 1 FROM "users"
       WHERE "users"."id" = "projects"."userId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   );
 
@@ -126,7 +126,7 @@ CREATE POLICY "files_select_own" ON "files"
       SELECT 1 FROM "projects"
       INNER JOIN "users" ON "users"."id" = "projects"."userId"
       WHERE "projects"."id" = "files"."projectId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   );
 
@@ -138,7 +138,7 @@ CREATE POLICY "files_insert_own" ON "files"
       SELECT 1 FROM "projects"
       INNER JOIN "users" ON "users"."id" = "projects"."userId"
       WHERE "projects"."id" = "files"."projectId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   );
 
@@ -150,7 +150,7 @@ CREATE POLICY "files_update_own" ON "files"
       SELECT 1 FROM "projects"
       INNER JOIN "users" ON "users"."id" = "projects"."userId"
       WHERE "projects"."id" = "files"."projectId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   )
   WITH CHECK (
@@ -158,7 +158,7 @@ CREATE POLICY "files_update_own" ON "files"
       SELECT 1 FROM "projects"
       INNER JOIN "users" ON "users"."id" = "projects"."userId"
       WHERE "projects"."id" = "files"."projectId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   );
 
@@ -170,7 +170,7 @@ CREATE POLICY "files_delete_own" ON "files"
       SELECT 1 FROM "projects"
       INNER JOIN "users" ON "users"."id" = "projects"."userId"
       WHERE "projects"."id" = "files"."projectId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   );
 
@@ -186,7 +186,7 @@ CREATE POLICY "assessments_select_own" ON "assessments"
       SELECT 1 FROM "projects"
       INNER JOIN "users" ON "users"."id" = "projects"."userId"
       WHERE "projects"."id" = "assessments"."projectId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   );
 
@@ -199,7 +199,7 @@ CREATE POLICY "assessments_insert_own" ON "assessments"
       SELECT 1 FROM "projects"
       INNER JOIN "users" ON "users"."id" = "projects"."userId"
       WHERE "projects"."id" = "assessments"."projectId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   );
 
@@ -211,7 +211,7 @@ CREATE POLICY "assessments_update_own" ON "assessments"
       SELECT 1 FROM "projects"
       INNER JOIN "users" ON "users"."id" = "projects"."userId"
       WHERE "projects"."id" = "assessments"."projectId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   )
   WITH CHECK (
@@ -219,7 +219,7 @@ CREATE POLICY "assessments_update_own" ON "assessments"
       SELECT 1 FROM "projects"
       INNER JOIN "users" ON "users"."id" = "projects"."userId"
       WHERE "projects"."id" = "assessments"."projectId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   );
 
@@ -231,7 +231,7 @@ CREATE POLICY "assessments_delete_own" ON "assessments"
       SELECT 1 FROM "projects"
       INNER JOIN "users" ON "users"."id" = "projects"."userId"
       WHERE "projects"."id" = "assessments"."projectId"
-        AND "users"."openId" = auth.uid()
+        AND "users"."openId" = auth.uid()::text
     )
   );
 
