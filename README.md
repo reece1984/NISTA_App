@@ -13,6 +13,7 @@ An AI-powered web application that assesses UK government project documents agai
 - **User Authentication**: Secure email/password authentication via Supabase
 - **Project Management**: Create, view, edit, and delete projects
 - **Responsive Design**: Works on desktop, tablet, and mobile devices
+- **Programme Insights Branding**: Professional blue and orange color scheme with consistent brand identity
 
 ## Tech Stack
 
@@ -51,7 +52,47 @@ The app will be available at `http://localhost:5173`
 
 ### 1. Database Setup
 
-Go to your Supabase project's SQL Editor and run the complete database schema (see Database Schema section below).
+**Step 1: Create Database Schema**
+
+Go to your Supabase project's SQL Editor and run the complete database schema from your PRD to create all tables and ENUMs.
+
+**Step 2: Add Foreign Key Constraints**
+
+Run this SQL to establish relationships between tables:
+
+```sql
+-- Add foreign key from projects.userId to users.id
+ALTER TABLE "projects"
+ADD CONSTRAINT "projects_userId_fkey"
+FOREIGN KEY ("userId")
+REFERENCES "users"("id")
+ON DELETE CASCADE;
+
+-- Add foreign key from files.projectId to projects.id
+ALTER TABLE "files"
+ADD CONSTRAINT "files_projectId_fkey"
+FOREIGN KEY ("projectId")
+REFERENCES "projects"("id")
+ON DELETE CASCADE;
+
+-- Add foreign key from assessments.projectId to projects.id
+ALTER TABLE "assessments"
+ADD CONSTRAINT "assessments_projectId_fkey"
+FOREIGN KEY ("projectId")
+REFERENCES "projects"("id")
+ON DELETE CASCADE;
+
+-- Add foreign key from assessments.criterionId to assessment_criteria.id
+ALTER TABLE "assessments"
+ADD CONSTRAINT "assessments_criterionId_fkey"
+FOREIGN KEY ("criterionId")
+REFERENCES "assessment_criteria"("id")
+ON DELETE CASCADE;
+```
+
+**Step 3: Apply Row Level Security (RLS) Policies**
+
+Run the complete `supabase-rls-policies.sql` file from the project root to enable RLS and create security policies. This ensures users can only access their own data.
 
 ### 2. Storage Setup
 
@@ -98,19 +139,26 @@ VITE_N8N_RUN_ASSESSMENT_WEBHOOK=your_n8n_webhook_url
 
 ## Database Schema
 
-Run this SQL in your Supabase SQL Editor:
+The database consists of 5 main tables:
 
-```sql
--- Create ENUMs
-CREATE TYPE "public"."file_status" AS ENUM('uploaded', 'processing', 'completed', 'error');
-CREATE TYPE "public"."project_status" AS ENUM('draft', 'processing', 'completed');
-CREATE TYPE "public"."rag_rating" AS ENUM('green', 'amber', 'red', 'pending');
-CREATE TYPE "public"."role" AS ENUM('user', 'admin');
+1. **users** - User accounts (linked to Supabase Auth via openId)
+2. **projects** - Infrastructure projects created by users
+3. **files** - Uploaded documents (Business Case, PEP, Risk Register)
+4. **assessments** - AI-generated assessment results with RAG ratings
+5. **assessment_criteria** - Static reference data for NISTA/PAR criteria
 
--- Tables and constraints (see full schema in PRD)
-```
+### Security Model
 
-For the complete database schema, refer to the Product Requirements Document.
+The application uses Row Level Security (RLS) to ensure data isolation:
+- Users can only see their own projects, files, and assessments
+- Foreign keys with CASCADE DELETE ensure data integrity
+- Assessment criteria is public (read-only for all users)
+
+All RLS policies are defined in `supabase-rls-policies.sql` in the project root. See the Database Setup section above for installation instructions.
+
+### N8N Integration
+
+N8N workflows should use the **Supabase Service Role Key** (not the anon key) to bypass RLS when inserting assessment results. This allows the AI system to write assessment data to user projects.
 
 ## Deployment to Vercel
 
@@ -211,10 +259,14 @@ For detailed N8N workflow configuration, refer to the Product Requirements Docum
 
 ## Security Considerations
 
-- Never commit `.env` file to version control
-- Use Row Level Security (RLS) policies in Supabase
-- Implement rate limiting for production
-- Validate all file uploads
+- **Environment Variables**: Never commit `.env` file to version control - it's in `.gitignore`
+- **Row Level Security**: RLS is enabled on all tables with proper policies implemented
+- **Authentication**: Supabase Auth handles secure user sessions with JWT tokens
+- **Data Isolation**: Users can only access their own projects and files via RLS policies
+- **Foreign Key Constraints**: CASCADE DELETE ensures data integrity when deleting projects
+- **N8N Service Role**: Use Supabase Service Role Key in N8N to bypass RLS for system operations
+- **File Validation**: Upload validation limits files to PDF format, max 50MB
+- **Rate Limiting**: Consider implementing rate limiting for production deployments
 
 ## Future Enhancements
 
