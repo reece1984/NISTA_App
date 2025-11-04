@@ -56,10 +56,7 @@ export default function SignUpPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
-                <span className="text-white font-bold text-sm">PI</span>
-              </div>
-              <span className="text-xl font-semibold text-text-primary">Programme Insights</span>
+              <span className="text-xl font-semibold text-text-primary">Gateway Success</span>
             </Link>
             <Link to="/login" className="text-text-secondary hover:text-primary transition-colors">
               Sign In

@@ -56,11 +56,8 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <Link to="/dashboard" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
-                <span className="text-white font-bold text-sm">PI</span>
-              </div>
               <div>
-                <div className="text-xl font-semibold text-text-primary">Programme Insights</div>
+                <div className="text-xl font-semibold text-text-primary">Gateway Success</div>
                 <div className="text-xs text-text-secondary">NISTA/PAR Assessment</div>
               </div>
             </Link>

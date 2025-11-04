@@ -1,15 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAuth } from '../contexts/AuthContext'
-import { supabase } from '../lib/supabase'
+import { supabase, type AssessmentTemplate } from '../lib/supabase'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
 import Input from './ui/Input'
 import Label from './ui/Label'
 
 const projectSchema = z.object({
+  templateId: z.coerce.number().min(1, 'Assessment template is required'),
   projectName: z.string().min(1, 'Project name is required'),
   projectValue: z.coerce
     .number()
@@ -46,6 +47,7 @@ export default function CreateProjectModal({
 }: CreateProjectModalProps) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [templates, setTemplates] = useState<AssessmentTemplate[]>([])
   const { user } = useAuth()
 
   const {
@@ -56,6 +58,23 @@ export default function CreateProjectModal({
   } = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
   })
+
+  // Fetch templates on mount
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      const { data, error } = await supabase
+        .from('assessment_templates')
+        .select('*')
+        .eq('is_active', true)
+        .order('id')
+
+      if (!error && data) {
+        setTemplates(data)
+      }
+    }
+
+    fetchTemplates()
+  }, [])
 
   const onSubmit = async (data: ProjectFormData) => {
     if (!user) {
@@ -99,6 +118,7 @@ export default function CreateProjectModal({
       // Create the project
       const { error: projectError } = await supabase.from('projects').insert({
         userId: userId,
+        template_id: data.templateId,
         projectName: data.projectName,
         projectValue: data.projectValue || null,
         projectSector: data.projectSector,
@@ -132,7 +152,7 @@ export default function CreateProjectModal({
         )}
 
         <div>
-          <Label htmlFor="projectName">Project Name *</Label>
+          <Label htmlFor="projectName">Project Name</Label>
           <Input
             id="projectName"
             type="text"
@@ -140,6 +160,27 @@ export default function CreateProjectModal({
             error={errors.projectName?.message}
             {...register('projectName')}
           />
+        </div>
+
+        <div>
+          <Label htmlFor="templateId">Assessment Template</Label>
+          <select
+            id="templateId"
+            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-colors"
+            {...register('templateId')}
+          >
+            <option value="">Select an assessment template</option>
+            {templates.map((template) => (
+              <option key={template.id} value={template.id}>
+                {template.name}
+              </option>
+            ))}
+          </select>
+          {errors.templateId && (
+            <p className="mt-1 text-sm text-error">
+              {errors.templateId.message}
+            </p>
+          )}
         </div>
 
         <div>
@@ -154,7 +195,7 @@ export default function CreateProjectModal({
         </div>
 
         <div>
-          <Label htmlFor="projectSector">Project Sector *</Label>
+          <Label htmlFor="projectSector">Project Sector</Label>
           <select
             id="projectSector"
             className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-colors"

@@ -80,17 +80,25 @@ export default function FileUpload({
       const webhookUrl = import.meta.env.VITE_N8N_DOCUMENT_UPLOAD_WEBHOOK
       if (webhookUrl) {
         try {
-          await fetch(webhookUrl, {
+          const payload = {
+            identifier: 'document_upload',
+            projectId,
+            fileName: file.name,
+            fileUrl: publicUrl,
+            fileKey,
+          }
+          console.log('🔔 Calling N8N webhook:', webhookUrl)
+          console.log('📦 Payload:', payload)
+
+          const response = await fetch(webhookUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              identifier: 'document_upload',
-              projectId,
-              fileName: file.name,
-              fileUrl: publicUrl,
-              fileKey,
-            }),
+            body: JSON.stringify(payload),
           })
+
+          console.log('✅ N8N Response Status:', response.status)
+          const responseData = await response.text()
+          console.log('📥 N8N Response:', responseData)
         } catch (webhookError) {
           console.warn('N8N webhook failed (this is ok if N8N is not configured):', webhookError)
         }
