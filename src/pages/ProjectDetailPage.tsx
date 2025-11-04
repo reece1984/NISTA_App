@@ -117,7 +117,7 @@ export default function ProjectDetailPage() {
       // Trigger N8N webhook for assessment
       const webhookUrl = import.meta.env.VITE_N8N_RUN_ASSESSMENT_WEBHOOK
       if (!webhookUrl) {
-        throw new Error('Assessment webhook URL not configured')
+        throw new Error('Assessment webhook URL not configured. Please add VITE_N8N_RUN_ASSESSMENT_WEBHOOK to your environment variables.')
       }
 
       const payload = {
@@ -135,18 +135,26 @@ export default function ProjectDetailPage() {
       console.log('🔔 Calling N8N webhook:', webhookUrl)
       console.log('📦 Payload:', payload)
 
-      const response = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
+      let response
+      try {
+        response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        })
+      } catch (fetchError: any) {
+        console.error('❌ Fetch error:', fetchError)
+        throw new Error(`Failed to connect to N8N: ${fetchError.message}. Check that N8N is running and the webhook URL is correct.`)
+      }
 
       console.log('✅ N8N Response Status:', response.status)
       const responseData = await response.text()
       console.log('📥 N8N Response:', responseData)
 
       if (!response.ok) {
-        throw new Error('Failed to trigger assessment')
+        throw new Error(`N8N webhook failed with status ${response.status}: ${responseData}`)
       }
 
       // Poll for completion - check every 3 seconds for up to 10 minutes (for 50 criteria)
