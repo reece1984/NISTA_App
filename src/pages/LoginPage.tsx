@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import Label from '../components/ui/Label'
@@ -20,6 +21,9 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showResetPassword, setShowResetPassword] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
+  const [resetMessage, setResetMessage] = useState('')
   const { signIn } = useAuth()
   const navigate = useNavigate()
 
@@ -39,6 +43,35 @@ export default function LoginPage() {
       navigate('/dashboard')
     } catch (err: any) {
       setError(err.message || 'Failed to sign in')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      setResetMessage('')
+      setError('')
+      setLoading(true)
+
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+        resetEmail,
+        {
+          redirectTo: `${window.location.origin}/reset-password`,
+        }
+      )
+
+      if (resetError) throw resetError
+
+      setResetMessage('Password reset email sent! Check your inbox.')
+      setTimeout(() => {
+        setShowResetPassword(false)
+        setResetEmail('')
+        setResetMessage('')
+      }, 3000)
+    } catch (err: any) {
+      setError(err.message || 'Failed to send reset email')
     } finally {
       setLoading(false)
     }
@@ -120,12 +153,13 @@ export default function LoginPage() {
 
             <div className="flex items-center justify-between">
               <div className="text-sm">
-                <a
-                  href="#"
+                <button
+                  type="button"
+                  onClick={() => setShowResetPassword(true)}
                   className="font-medium text-secondary hover:text-secondary/80"
                 >
                   Forgot your password?
-                </a>
+                </button>
               </div>
             </div>
 
@@ -148,6 +182,71 @@ export default function LoginPage() {
             </Link>
           </div>
         </div>
+
+        {/* Password Reset Modal */}
+        {showResetPassword && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full">
+              <h3 className="text-xl font-bold text-text-primary mb-4">
+                Reset Password
+              </h3>
+
+              {resetMessage && (
+                <div className="bg-success/10 border border-success text-success px-4 py-3 rounded-lg mb-4">
+                  {resetMessage}
+                </div>
+              )}
+
+              {error && (
+                <div className="bg-error/10 border border-error text-error px-4 py-3 rounded-lg mb-4">
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handlePasswordReset}>
+                <div className="mb-4">
+                  <Label htmlFor="reset-email">Email address</Label>
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    required
+                  />
+                  <p className="mt-2 text-sm text-text-secondary">
+                    We'll send you a link to reset your password
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => {
+                      setShowResetPassword(false)
+                      setResetEmail('')
+                      setError('')
+                      setResetMessage('')
+                    }}
+                    className="flex-1"
+                    disabled={loading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    className="flex-1"
+                    disabled={loading || !resetEmail}
+                  >
+                    {loading ? 'Sending...' : 'Send Reset Link'}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
         </div>
       </div>
     </div>
