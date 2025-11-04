@@ -62,6 +62,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/programmeinsights" element={<LandingPage />} />
       <Route
         path="/signup"
         element={

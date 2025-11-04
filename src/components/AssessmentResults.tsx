@@ -57,7 +57,8 @@ export default function AssessmentResults({
     const margin = 20
 
     // Professional Color Palette
-    const colors = {
+    type Color = [number, number, number]
+    const colors: Record<string, Color> = {
       primary: [41, 128, 185],      // Professional blue
       primaryDark: [21, 67, 96],    // Dark blue
       accent: [52, 152, 219],        // Light blue accent
@@ -891,7 +892,6 @@ export default function AssessmentResults({
       'Code': assessment.assessment_criteria.criterionCode,
       'Criterion Title': assessment.assessment_criteria.title,
       'Dimension': assessment.assessment_criteria.dimension,
-      'Category': assessment.assessment_criteria.category || 'N/A',
       'Weight (%)': assessment.assessment_criteria.weight || '-',
       'Critical': assessment.assessment_criteria.is_critical ? 'YES' : 'NO',
       'RAG Rating': assessment.ragRating.toUpperCase(),

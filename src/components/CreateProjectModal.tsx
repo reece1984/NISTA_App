@@ -10,16 +10,24 @@ import Input from './ui/Input'
 import Label from './ui/Label'
 
 const projectSchema = z.object({
-  templateId: z.coerce.number().min(1, 'Assessment template is required'),
+  templateId: z.preprocess(
+    (val) => (val === '' || val === undefined ? undefined : Number(val)),
+    z.number().min(1, 'Assessment template is required')
+  ),
   projectName: z.string().min(1, 'Project name is required'),
-  projectValue: z.coerce
-    .number()
-    .positive('Project value must be positive')
-    .optional(),
+  projectValue: z.preprocess(
+    (val) => (val === '' || val === undefined ? undefined : Number(val)),
+    z.number().positive('Project value must be positive').optional()
+  ),
   projectSector: z.string().min(1, 'Project sector is required'),
 })
 
-type ProjectFormData = z.infer<typeof projectSchema>
+type ProjectFormData = {
+  templateId: number
+  projectName: string
+  projectValue?: number
+  projectSector: string
+}
 
 interface CreateProjectModalProps {
   isOpen: boolean
@@ -55,7 +63,7 @@ export default function CreateProjectModal({
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<ProjectFormData>({
+  } = useForm({
     resolver: zodResolver(projectSchema),
   })
 
