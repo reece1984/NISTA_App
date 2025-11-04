@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Button from "../components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/Card";
 import {
@@ -37,9 +38,9 @@ export default function Landing() {
             <a href="#demo" className="text-sm text-slate-600 hover:text-slate-900 transition">
               Demo
             </a>
-            <a href="/login" className="text-sm text-slate-600 hover:text-slate-900 transition">
+            <Link to="/login" className="text-sm text-slate-600 hover:text-slate-900 transition">
               Sign In
-            </a>
+            </Link>
             <Button onClick={scrollToDemo} className="bg-blue-600 hover:bg-blue-700">
               Get Started
             </Button>
