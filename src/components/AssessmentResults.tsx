@@ -1069,11 +1069,39 @@ export default function AssessmentResults({
     return 'Low'
   }
 
+  // Sort assessments by dimension and then by criterionCode
+  const sortedAssessments = [...assessments].sort((a, b) => {
+    // Define dimension order
+    const dimensionOrder: Record<string, number> = {
+      'Strategic': 1,
+      'Governance': 2,
+      'Financial': 3,
+      'Commercial': 4,
+      'Management': 5,
+      'Delivery': 6
+    }
+
+    const dimA = a.assessment_criteria.dimension
+    const dimB = b.assessment_criteria.dimension
+    const orderA = dimensionOrder[dimA] || 999
+    const orderB = dimensionOrder[dimB] || 999
+
+    // First sort by dimension
+    if (orderA !== orderB) {
+      return orderA - orderB
+    }
+
+    // Then sort by criterion code within the same dimension
+    const codeA = a.assessment_criteria.criterionCode
+    const codeB = b.assessment_criteria.criterionCode
+    return codeA.localeCompare(codeB, undefined, { numeric: true })
+  })
+
   // Filter by RAG rating
   let filteredAssessments =
     filter === 'all'
-      ? assessments
-      : assessments.filter((a) => a.ragRating === filter)
+      ? sortedAssessments
+      : sortedAssessments.filter((a) => a.ragRating === filter)
 
   // Filter by search query
   if (searchQuery.trim()) {

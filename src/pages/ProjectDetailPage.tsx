@@ -109,6 +109,7 @@ export default function ProjectDetailPage() {
       })
 
       // Update project status to processing
+      // Note: N8N workflow will delete old assessments before inserting new ones
       await supabase
         .from('projects')
         .update({ status: 'processing' })
@@ -172,6 +173,8 @@ export default function ProjectDetailPage() {
 
         const completed = completedCount || 0
 
+        console.log(`📊 Poll ${pollCount}: ${completed}/${total} assessments completed`)
+
         // Update progress
         setAssessmentProgress({ current: completed, total })
 
@@ -189,14 +192,15 @@ export default function ProjectDetailPage() {
           .eq('id', id!)
           .single()
 
-        // Check if completed or timed out
-        if (updatedProject?.status === 'completed' || pollCount >= maxPolls) {
+        console.log(`🔍 Project status: ${updatedProject?.status}, All complete: ${completed >= total}`)
+
+        // Check if completed (either status is 'completed', all criteria done, or timed out)
+        const allCriteriaComplete = completed >= total
+        if (updatedProject?.status === 'completed' || allCriteriaComplete || pollCount >= maxPolls) {
+          console.log('✅ Assessment complete! Stopping polling...')
           clearInterval(pollInterval)
           setRunningAssessment(false)
           setAssessmentProgress(null)
-
-          // Refetch all data to show results
-          await refetch()
 
           // Update project status to completed if still processing
           if (updatedProject?.status === 'processing') {
@@ -205,6 +209,9 @@ export default function ProjectDetailPage() {
               .update({ status: 'completed' })
               .eq('id', id!)
           }
+
+          // Refetch all data to show results
+          await refetch()
 
           setToast({
             message: `Assessment completed! ${completed} criteria assessed.`,
