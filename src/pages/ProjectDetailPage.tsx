@@ -205,10 +205,16 @@ export default function ProjectDetailPage() {
 
           // Update project status to completed if still processing
           if (updatedProject?.status === 'processing') {
-            await supabase
+            const { error: updateError } = await supabase
               .from('projects')
-              .update({ status: 'completed' })
+              .update({ status: 'completed', updatedAt: new Date().toISOString() })
               .eq('id', id!)
+
+            if (updateError) {
+              console.error('Failed to update project status:', updateError)
+            } else {
+              console.log('✅ Project status updated to completed')
+            }
           }
 
           // Refetch all data to show results
