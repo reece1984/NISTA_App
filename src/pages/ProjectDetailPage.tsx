@@ -54,18 +54,19 @@ export default function ProjectDetailPage() {
         console.error('Assessments error:', assessmentsError)
       }
 
-      // Fetch project summary
-      const { data: projectSummary, error: summaryError } = await supabase
+      // Fetch project summary (most recent one)
+      const { data: projectSummaries, error: summaryError } = await supabase
         .from('project_summaries')
         .select('*')
         .eq('project_id', id!)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single()
 
       if (summaryError && summaryError.code !== 'PGRST116') {
         console.error('Project summary error:', summaryError)
       }
+
+      const projectSummary = projectSummaries?.[0] || null
 
       return {
         ...project,
