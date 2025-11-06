@@ -1,9 +1,14 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, Search, X, FileDown, FileSpreadsheet } from 'lucide-react'
+import { Search, X, FileDown, FileSpreadsheet } from 'lucide-react'
 import { cn } from '../lib/utils'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import * as XLSX from 'xlsx'
+import OverallRatingCard from './dashboard/OverallRatingCard'
+import RAGDonutChart from './dashboard/RAGDonutChart'
+import DimensionBarChart from './dashboard/DimensionBarChart'
+import PriorityActionsCard from './dashboard/PriorityActionsCard'
+import InteractiveCriteriaTable from './dashboard/InteractiveCriteriaTable'
 
 interface Assessment {
   id: number
@@ -49,6 +54,7 @@ export default function AssessmentResults({
   const [filter, setFilter] = useState<'all' | 'green' | 'amber' | 'red'>('all')
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [dimensionFilter, setDimensionFilter] = useState<string | null>(null)
 
   const exportToPDF = () => {
     const doc = new jsPDF()
@@ -1037,20 +1043,6 @@ export default function AssessmentResults({
     XLSX.writeFile(workbook, filename)
   }
 
-  const getRagBadge = (rating: string) => {
-    const badges = {
-      green: 'bg-rag-green text-white',
-      amber: 'bg-rag-amber text-white',
-      red: 'bg-rag-red text-white',
-      pending: 'bg-gray-300 text-gray-700',
-    }
-    return badges[rating as keyof typeof badges] || badges.pending
-  }
-
-  const getRagLabel = (rating: string) => {
-    return rating.charAt(0).toUpperCase() + rating.slice(1)
-  }
-
   const getSatisfactionPercentage = (rating: string) => {
     const satisfactionMap = {
       green: 90,
@@ -1102,6 +1094,13 @@ export default function AssessmentResults({
     filter === 'all'
       ? sortedAssessments
       : sortedAssessments.filter((a) => a.ragRating === filter)
+
+  // Filter by dimension
+  if (dimensionFilter) {
+    filteredAssessments = filteredAssessments.filter(
+      (a) => a.assessment_criteria.dimension === dimensionFilter
+    )
+  }
 
   // Filter by search query
   if (searchQuery.trim()) {
@@ -1185,61 +1184,46 @@ export default function AssessmentResults({
         </div>
       )}
 
-      {/* Summary Section */}
+      {/* Overall Rating Card */}
       {totalAssessments > 0 && (
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-5 gap-4">
-          {/* Overall Rating Card */}
-          <div className="md:col-span-2 card bg-gradient-to-br from-secondary/10 to-secondary/5">
-            <h3 className="text-sm font-medium text-text-secondary mb-2">
-              Overall Assessment
-            </h3>
-            <div className="flex items-center gap-3">
-              <span
-                className={cn(
-                  'px-4 py-2 rounded-lg font-bold text-lg',
-                  getRagBadge(overallRag)
-                )}
-              >
-                {getRagLabel(overallRag)}
-              </span>
-              <div className="text-sm text-text-secondary">
-                Based on {totalAssessments} criteria
-              </div>
-            </div>
-          </div>
+        <div className="mb-8">
+          <OverallRatingCard
+            overallRating={overallRag as 'green' | 'amber' | 'red' | 'pending'}
+            readinessPercentage={Math.round((ragCounts.green / totalAssessments) * 100)}
+            executiveSummary={projectSummary?.executive_summary || null}
+            totalCriteria={totalAssessments}
+          />
+        </div>
+      )}
 
-          {/* Green Count */}
-          <div className="card border-l-4 border-rag-green">
-            <div className="text-2xl font-bold text-text-primary">
-              {ragCounts.green}
-            </div>
-            <div className="text-sm text-text-secondary">Green</div>
-            <div className="text-xs text-text-secondary mt-1">
-              {totalAssessments > 0 ? Math.round((ragCounts.green / totalAssessments) * 100) : 0}%
-            </div>
-          </div>
-
-          {/* Amber Count */}
-          <div className="card border-l-4 border-rag-amber">
-            <div className="text-2xl font-bold text-text-primary">
-              {ragCounts.amber}
-            </div>
-            <div className="text-sm text-text-secondary">Amber</div>
-            <div className="text-xs text-text-secondary mt-1">
-              {totalAssessments > 0 ? Math.round((ragCounts.amber / totalAssessments) * 100) : 0}%
-            </div>
-          </div>
-
-          {/* Red Count */}
-          <div className="card border-l-4 border-rag-red">
-            <div className="text-2xl font-bold text-text-primary">
-              {ragCounts.red}
-            </div>
-            <div className="text-sm text-text-secondary">Red</div>
-            <div className="text-xs text-text-secondary mt-1">
-              {totalAssessments > 0 ? Math.round((ragCounts.red / totalAssessments) * 100) : 0}%
-            </div>
-          </div>
+      {/* Dashboard Statistics - Charts and Priority Actions */}
+      {totalAssessments > 0 && (
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <RAGDonutChart
+            ragCounts={ragCounts}
+            onFilterChange={(newFilter) => {
+              setFilter(newFilter)
+              setDimensionFilter(null)
+            }}
+          />
+          <DimensionBarChart
+            assessments={assessments}
+            onDimensionClick={(dimension) => {
+              setDimensionFilter(dimension)
+              setFilter('all')
+            }}
+          />
+          <PriorityActionsCard
+            assessments={assessments}
+            onViewDetails={(id) => {
+              setExpandedId(id)
+              // Scroll to the assessment
+              setTimeout(() => {
+                const element = document.getElementById(`assessment-${id}`)
+                element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              }, 100)
+            }}
+          />
         </div>
       )}
 
@@ -1280,195 +1264,115 @@ export default function AssessmentResults({
       </div>
 
       {/* Filter Buttons */}
-      <div className="flex gap-3 mb-6">
-        <button
-          onClick={() => setFilter('all')}
-          className={cn(
-            'px-4 py-2 rounded-lg font-medium transition-colors',
-            filter === 'all'
-              ? 'bg-secondary text-white'
-              : 'bg-card border-2 border-border text-text-primary hover:border-secondary/30'
-          )}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setFilter('green')}
-          className={cn(
-            'px-4 py-2 rounded-lg font-medium transition-colors',
-            filter === 'green'
-              ? 'bg-rag-green text-white'
-              : 'bg-card border-2 border-border text-text-primary hover:border-rag-green/30'
-          )}
-        >
-          Green
-        </button>
-        <button
-          onClick={() => setFilter('amber')}
-          className={cn(
-            'px-4 py-2 rounded-lg font-medium transition-colors',
-            filter === 'amber'
-              ? 'bg-rag-amber text-white'
-              : 'bg-card border-2 border-border text-text-primary hover:border-rag-amber/30'
-          )}
-        >
-          Amber
-        </button>
-        <button
-          onClick={() => setFilter('red')}
-          className={cn(
-            'px-4 py-2 rounded-lg font-medium transition-colors',
-            filter === 'red'
-              ? 'bg-rag-red text-white'
-              : 'bg-card border-2 border-border text-text-primary hover:border-rag-red/30'
-          )}
-        >
-          Red
-        </button>
-      </div>
+      <div className="mb-6">
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => setFilter('all')}
+            className={cn(
+              'px-4 py-2 rounded-lg font-medium transition-colors',
+              filter === 'all'
+                ? 'bg-secondary text-white'
+                : 'bg-card border-2 border-border text-text-primary hover:border-secondary/30'
+            )}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilter('green')}
+            className={cn(
+              'px-4 py-2 rounded-lg font-medium transition-colors',
+              filter === 'green'
+                ? 'bg-rag-green text-white'
+                : 'bg-card border-2 border-border text-text-primary hover:border-rag-green/30'
+            )}
+          >
+            Green
+          </button>
+          <button
+            onClick={() => setFilter('amber')}
+            className={cn(
+              'px-4 py-2 rounded-lg font-medium transition-colors',
+              filter === 'amber'
+                ? 'bg-rag-amber text-white'
+                : 'bg-card border-2 border-border text-text-primary hover:border-rag-amber/30'
+            )}
+          >
+            Amber
+          </button>
+          <button
+            onClick={() => setFilter('red')}
+            className={cn(
+              'px-4 py-2 rounded-lg font-medium transition-colors',
+              filter === 'red'
+                ? 'bg-rag-red text-white'
+                : 'bg-card border-2 border-border text-text-primary hover:border-rag-red/30'
+            )}
+          >
+            Red
+          </button>
 
-      {/* Results Table */}
-      <div className="space-y-4">
-        {filteredAssessments.length === 0 ? (
-          <div className="card text-center py-12">
-            <p className="text-text-secondary">
-              {searchQuery
-                ? `No assessments found matching "${searchQuery}"`
-                : 'No assessments found for the selected filter.'
-              }
-            </p>
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="mt-4 text-secondary hover:text-secondary/80 font-medium"
-              >
-                Clear search
-              </button>
+          {/* Clear Filters Button */}
+          {(dimensionFilter || filter !== 'all' || searchQuery) && (
+            <button
+              onClick={() => {
+                setFilter('all')
+                setDimensionFilter(null)
+                setSearchQuery('')
+              }}
+              className="px-4 py-2 rounded-lg font-medium bg-gray-100 text-text-secondary hover:bg-gray-200 transition-colors border-2 border-gray-200"
+            >
+              Clear All Filters
+            </button>
+          )}
+        </div>
+
+        {/* Active Filters Display */}
+        {(dimensionFilter || filter !== 'all') && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {dimensionFilter && (
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm">
+                <span>Dimension: {dimensionFilter}</span>
+                <button
+                  onClick={() => setDimensionFilter(null)}
+                  className="hover:text-secondary/80"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+            {filter !== 'all' && (
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm">
+                <span>Status: {filter.charAt(0).toUpperCase() + filter.slice(1)}</span>
+                <button
+                  onClick={() => setFilter('all')}
+                  className="hover:text-secondary/80"
+                >
+                  <X size={14} />
+                </button>
+              </div>
             )}
           </div>
-        ) : (
-          filteredAssessments.map((assessment) => (
-            <div key={assessment.id} className="card">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-4">
-                    <span className="font-mono text-sm text-text-secondary">
-                      {assessment.assessment_criteria.criterionCode}
-                    </span>
-                    <h3 className="text-lg font-semibold text-text-primary">
-                      {assessment.assessment_criteria.title}
-                    </h3>
-                  </div>
-                  <p className="text-sm text-text-secondary mt-1">
-                    {assessment.assessment_criteria.dimension}
-                  </p>
-                  {assessment.summary && (
-                    <p className="text-sm text-text-primary mt-2 italic">
-                      {assessment.summary}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-4">
-                  {/* Critical Badge */}
-                  {assessment.assessment_criteria.is_critical && (
-                    <span className="px-2 py-1 rounded-md text-xs font-bold bg-rag-red/10 text-rag-red border border-rag-red/30">
-                      CRITICAL
-                    </span>
-                  )}
-
-                  {/* Weight */}
-                  {assessment.assessment_criteria.weight !== null && (
-                    <div className="flex items-center gap-1 text-sm">
-                      <span className="text-text-secondary">Weight:</span>
-                      <span className="font-semibold text-text-primary">
-                        {assessment.assessment_criteria.weight}%
-                      </span>
-                    </div>
-                  )}
-
-                  {/* RAG Rating */}
-                  <span
-                    className={cn(
-                      'px-3 py-1 rounded-lg font-semibold text-sm',
-                      getRagBadge(assessment.ragRating)
-                    )}
-                  >
-                    {getRagLabel(assessment.ragRating)}
-                  </span>
-
-                  {/* Satisfaction and Confidence */}
-                  <div className="flex items-center gap-1 text-sm">
-                    <span className="text-text-secondary">|</span>
-                    <span className="text-text-secondary">Satisfaction:</span>
-                    <span className="font-semibold text-text-primary">
-                      {assessment.satisfactionScore !== null ? assessment.satisfactionScore : getSatisfactionPercentage(assessment.ragRating)}%
-                    </span>
-                    <span className="text-text-secondary">|</span>
-                    <span className="text-text-secondary">Confidence:</span>
-                    <span className="font-semibold text-text-primary">
-                      {getConfidenceLabel(assessment.confidence)}
-                    </span>
-                  </div>
-
-                  {/* Expand Button */}
-                  <button
-                    onClick={() =>
-                      setExpandedId(
-                        expandedId === assessment.id ? null : assessment.id
-                      )
-                    }
-                    className="text-text-secondary hover:text-text-primary transition-colors"
-                  >
-                    {expandedId === assessment.id ? (
-                      <ChevronUp size={24} />
-                    ) : (
-                      <ChevronDown size={24} />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Expanded Details */}
-              {expandedId === assessment.id && (
-                <div className="mt-6 space-y-4 pt-4 border-t border-border">
-                  {assessment.finding && (
-                    <div>
-                      <h4 className="font-semibold text-text-primary mb-2">
-                        Finding
-                      </h4>
-                      <p className="text-text-secondary bg-gray-50 p-4 rounded-lg">
-                        {assessment.finding}
-                      </p>
-                    </div>
-                  )}
-
-                  {assessment.evidence && (
-                    <div>
-                      <h4 className="font-semibold text-text-primary mb-2">
-                        Evidence
-                      </h4>
-                      <p className="text-text-secondary bg-blue-50 p-4 rounded-lg italic border-l-4 border-secondary">
-                        {assessment.evidence}
-                      </p>
-                    </div>
-                  )}
-
-                  {assessment.recommendation && (
-                    <div>
-                      <h4 className="font-semibold text-text-primary mb-2">
-                        Recommendation
-                      </h4>
-                      <p className="text-text-secondary bg-green-50 p-4 rounded-lg">
-                        {assessment.recommendation}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))
         )}
+      </div>
+
+      {/* Detailed Criteria Table */}
+      <div>
+        <h2 className="text-xl font-semibold text-text-primary mb-4">
+          Detailed Assessment Criteria
+          {filteredAssessments.length !== totalAssessments && (
+            <span className="text-sm font-normal text-text-secondary ml-2">
+              ({filteredAssessments.length} of {totalAssessments})
+            </span>
+          )}
+        </h2>
+        <InteractiveCriteriaTable
+          assessments={filteredAssessments.map(a => ({
+            ...a,
+            id: a.id
+          }))}
+          expandedId={expandedId}
+          onExpandToggle={setExpandedId}
+        />
       </div>
     </div>
   )
