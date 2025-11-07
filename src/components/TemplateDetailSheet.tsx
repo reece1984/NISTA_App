@@ -3,6 +3,9 @@ import { ChevronDown, ChevronUp, AlertCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Sheet from './ui/Sheet'
 
+// Define the correct dimension order for UK government assessments
+const DIMENSION_ORDER = ['Strategic', 'Economic', 'Commercial', 'Financial', 'Management']
+
 interface AssessmentCriterion {
   id: number
   criterionCode: string
@@ -57,7 +60,6 @@ export default function TemplateDetailSheet({
           'id, criterionCode, dimension, category, title, description, assessmentQuestion, weight, is_critical'
         )
         .eq('template_id', templateId)
-        .order('dimension')
         .order('criterionCode')
 
       if (fetchError) throw fetchError
@@ -74,15 +76,24 @@ export default function TemplateDetailSheet({
     }
   }
 
-  const groupedCriteria: DimensionGroup[] = criteria.reduce((groups, criterion) => {
-    const existingGroup = groups.find((g) => g.dimension === criterion.dimension)
-    if (existingGroup) {
-      existingGroup.criteria.push(criterion)
-    } else {
-      groups.push({ dimension: criterion.dimension, criteria: [criterion] })
-    }
-    return groups
-  }, [] as DimensionGroup[])
+  const groupedCriteria: DimensionGroup[] = criteria
+    .reduce((groups, criterion) => {
+      const existingGroup = groups.find((g) => g.dimension === criterion.dimension)
+      if (existingGroup) {
+        existingGroup.criteria.push(criterion)
+      } else {
+        groups.push({ dimension: criterion.dimension, criteria: [criterion] })
+      }
+      return groups
+    }, [] as DimensionGroup[])
+    .sort((a, b) => {
+      const indexA = DIMENSION_ORDER.indexOf(a.dimension)
+      const indexB = DIMENSION_ORDER.indexOf(b.dimension)
+      // If dimension not found in order, put it at the end
+      if (indexA === -1) return 1
+      if (indexB === -1) return -1
+      return indexA - indexB
+    })
 
   const toggleDimension = (dimension: string) => {
     setExpandedDimensions((prev) => {

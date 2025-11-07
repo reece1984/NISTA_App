@@ -1,19 +1,21 @@
 import { useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Play, Trash2, Loader2, ClipboardList } from 'lucide-react'
+import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Button from '../components/ui/Button'
 import FileUpload from '../components/FileUpload'
 import AssessmentResults from '../components/AssessmentResults'
 import Modal from '../components/ui/Modal'
 import Toast, { type ToastType } from '../components/ui/Toast'
+import TemplateDetailSheet from '../components/TemplateDetailSheet'
 
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [runningAssessment, setRunningAssessment] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showCriteriaSheet, setShowCriteriaSheet] = useState(false)
   const [assessmentError, setAssessmentError] = useState('')
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null)
   const [assessmentProgress, setAssessmentProgress] = useState<{ current: number; total: number } | null>(null)
@@ -369,10 +371,17 @@ export default function ProjectDetailPage() {
                     {projectData.assessment_templates.name}
                   </h3>
                   {projectData.assessment_templates.description && (
-                    <p className="text-sm text-text-secondary">
+                    <p className="text-sm text-text-secondary mb-3">
                       {projectData.assessment_templates.description}
                     </p>
                   )}
+                  <button
+                    onClick={() => setShowCriteriaSheet(true)}
+                    className="inline-flex items-center gap-2 text-sm text-secondary hover:text-secondary/80 transition-colors font-medium"
+                  >
+                    <Eye size={16} />
+                    View Template Criteria
+                  </button>
                 </div>
               </div>
             </div>
@@ -608,6 +617,16 @@ export default function ProjectDetailPage() {
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}
+        />
+      )}
+
+      {/* Template Criteria Sheet */}
+      {projectData.assessment_templates && (
+        <TemplateDetailSheet
+          isOpen={showCriteriaSheet}
+          onClose={() => setShowCriteriaSheet(false)}
+          templateId={projectData.assessment_templates.id}
+          templateName={projectData.assessment_templates.name}
         />
       )}
     </div>

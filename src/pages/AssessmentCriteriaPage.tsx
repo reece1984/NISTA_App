@@ -5,6 +5,9 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase, type AssessmentTemplate } from '../lib/supabase'
 import Button from '../components/ui/Button'
 
+// Define the correct dimension order for UK government assessments
+const DIMENSION_ORDER = ['Strategic', 'Economic', 'Commercial', 'Financial', 'Management']
+
 interface AssessmentCriterion {
   id: number
   criterionCode: string
@@ -53,7 +56,6 @@ export default function AssessmentCriteriaPage() {
       const { data: criteriaData, error: criteriaError } = await supabase
         .from('assessment_criteria')
         .select('*')
-        .order('dimension')
         .order('criterionCode')
 
       if (criteriaError) throw criteriaError
@@ -123,8 +125,14 @@ export default function AssessmentCriteriaPage() {
           return a.criterionCode.localeCompare(b.criterionCode, undefined, { numeric: true })
         case 'title':
           return a.title.localeCompare(b.title)
-        case 'dimension':
-          return a.dimension.localeCompare(b.dimension) || a.criterionCode.localeCompare(b.criterionCode)
+        case 'dimension': {
+          const indexA = DIMENSION_ORDER.indexOf(a.dimension)
+          const indexB = DIMENSION_ORDER.indexOf(b.dimension)
+          // If dimension not found in order, put it at the end
+          const orderA = indexA === -1 ? 999 : indexA
+          const orderB = indexB === -1 ? 999 : indexB
+          return orderA - orderB || a.criterionCode.localeCompare(b.criterionCode)
+        }
         default:
           return 0
       }
@@ -157,9 +165,17 @@ export default function AssessmentCriteriaPage() {
     }
   }, [filteredCriteria])
 
-  // Get unique dimensions
+  // Get unique dimensions in correct order
   const allDimensions = useMemo(() => {
-    return Array.from(new Set(criteria.map((c) => c.dimension))).sort()
+    const uniqueDimensions = Array.from(new Set(criteria.map((c) => c.dimension)))
+    return uniqueDimensions.sort((a, b) => {
+      const indexA = DIMENSION_ORDER.indexOf(a)
+      const indexB = DIMENSION_ORDER.indexOf(b)
+      // If dimension not found in order, put it at the end
+      const orderA = indexA === -1 ? 999 : indexA
+      const orderB = indexB === -1 ? 999 : indexB
+      return orderA - orderB
+    })
   }, [criteria])
 
   return (
