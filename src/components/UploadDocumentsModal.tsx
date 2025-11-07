@@ -6,8 +6,9 @@ import { useDocumentTypes } from '../hooks/useDocumentTypes'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
 
-interface FileWithType extends File {
+interface FileQueueItem {
   id: string
+  file: File
   selectedType: string | null
   uploading: boolean
   error: string | null
@@ -28,7 +29,7 @@ export default function UploadDocumentsModal({
   currentDocumentCount,
   onUploadComplete,
 }: UploadDocumentsModalProps) {
-  const [fileQueue, setFileQueue] = useState<FileWithType[]>([])
+  const [fileQueue, setFileQueue] = useState<FileQueueItem[]>([])
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   const { data: documentTypesData, isLoading: loadingTypes } = useDocumentTypes()
@@ -62,14 +63,13 @@ export default function UploadDocumentsModal({
       }
 
       // Add accepted files to queue
-      const newFiles: FileWithType[] = acceptedFiles.map((file) => {
-        const fileWithType = file as FileWithType
-        fileWithType.id = Math.random().toString(36).substring(7)
-        fileWithType.selectedType = null
-        fileWithType.uploading = false
-        fileWithType.error = null
-        return fileWithType
-      })
+      const newFiles: FileQueueItem[] = acceptedFiles.map((file) => ({
+        id: Math.random().toString(36).substring(7),
+        file: file,
+        selectedType: null,
+        uploading: false,
+        error: null,
+      }))
 
       setFileQueue((prev) => [...prev, ...newFiles])
     },
@@ -99,19 +99,21 @@ export default function UploadDocumentsModal({
     setFileQueue([])
   }
 
-  const uploadFile = async (file: FileWithType) => {
-    if (!file.selectedType) {
+  const uploadFile = async (queueItem: FileQueueItem) => {
+    const file = queueItem.file
+
+    if (!queueItem.selectedType) {
       return
     }
 
     // Mark as uploading
     setFileQueue((prev) =>
-      prev.map((f) => (f.id === file.id ? { ...f, uploading: true, error: null } : f))
+      prev.map((f) => (f.id === queueItem.id ? { ...f, uploading: true, error: null } : f))
     )
 
     try {
       // Get document category
-      const typeData = documentTypesData?.types.find((t) => t.name === file.selectedType)
+      const typeData = documentTypesData?.types.find((t) => t.name === queueItem.selectedType)
       if (!typeData) {
         throw new Error('Document type not found')
       }
@@ -151,19 +153,21 @@ export default function UploadDocumentsModal({
         .insert({
           projectId: projectId,
           fileName: file.name,
-          fileType: file.selectedType,
+          fileType: queueItem.selectedType,
           fileUrl: publicUrl,
           fileKey: filePath,
-          document_type: file.selectedType,
+          document_type: queueItem.selectedType,
           document_category: typeData.category,
           display_order: nextDisplayOrder,
           status: 'uploaded',
-          uploadedAt: new Date().toISOString(),
         })
         .select()
         .single()
 
-      if (dbError) throw dbError
+      if (dbError) {
+        console.error('Database insert error:', dbError)
+        throw new Error(dbError.message || 'Failed to save file to database')
+      }
 
       // Trigger N8N webhook
       const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL || import.meta.env.VITE_N8N_RUN_ASSESSMENT_WEBHOOK
@@ -190,7 +194,7 @@ export default function UploadDocumentsModal({
       }
 
       // Remove from queue
-      setFileQueue((prev) => prev.filter((f) => f.id !== file.id))
+      setFileQueue((prev) => prev.filter((f) => f.id !== queueItem.id))
       setToast({
         message: `${file.name} uploaded successfully`,
         type: 'success',
@@ -199,7 +203,7 @@ export default function UploadDocumentsModal({
       console.error('Upload error:', error)
       setFileQueue((prev) =>
         prev.map((f) =>
-          f.id === file.id
+          f.id === queueItem.id
             ? { ...f, uploading: false, error: error.message || 'Upload failed' }
             : f
         )
@@ -293,21 +297,21 @@ export default function UploadDocumentsModal({
             </div>
 
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {fileQueue.map((file) => (
-                <div key={file.id} className="border border-border rounded-lg p-4">
+              {fileQueue.map((queueItem) => (
+                <div key={queueItem.id} className="border border-border rounded-lg p-4">
                   <div className="flex items-start gap-3 mb-3">
                     <FileText size={20} className="text-rag-red flex-shrink-0 mt-0.5" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-text-primary truncate">
-                        {file.name}
+                        {queueItem.file.name}
                       </p>
                       <p className="text-xs text-text-secondary">
-                        {(file.size / (1024 * 1024)).toFixed(2)} MB
+                        {(queueItem.file.size / (1024 * 1024)).toFixed(2)} MB
                       </p>
                     </div>
-                    {!file.uploading && (
+                    {!queueItem.uploading && (
                       <button
-                        onClick={() => removeFile(file.id)}
+                        onClick={() => removeFile(queueItem.id)}
                         className="flex-shrink-0 p-1 hover:bg-gray-100 rounded"
                       >
                         <X size={16} className="text-text-secondary" />
@@ -321,9 +325,9 @@ export default function UploadDocumentsModal({
                       Document Type *
                     </label>
                     <select
-                      value={file.selectedType || ''}
-                      onChange={(e) => updateFileType(file.id, e.target.value)}
-                      disabled={file.uploading || loadingTypes}
+                      value={queueItem.selectedType || ''}
+                      onChange={(e) => updateFileType(queueItem.id, e.target.value)}
+                      disabled={queueItem.uploading || loadingTypes}
                       className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:border-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <option value="">Select document type...</option>
@@ -342,17 +346,17 @@ export default function UploadDocumentsModal({
 
                   {/* Status */}
                   <div className="flex items-center gap-2">
-                    {file.uploading ? (
+                    {queueItem.uploading ? (
                       <span className="text-xs text-blue-600 flex items-center gap-1">
                         <Loader2 size={14} className="animate-spin" />
                         Uploading...
                       </span>
-                    ) : file.error ? (
+                    ) : queueItem.error ? (
                       <span className="text-xs text-error flex items-center gap-1">
                         <AlertCircle size={14} />
-                        {file.error}
+                        {queueItem.error}
                       </span>
-                    ) : file.selectedType ? (
+                    ) : queueItem.selectedType ? (
                       <span className="text-xs text-rag-green">Ready to upload</span>
                     ) : (
                       <span className="text-xs text-text-secondary">
