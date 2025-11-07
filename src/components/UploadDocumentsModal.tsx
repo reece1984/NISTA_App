@@ -158,12 +158,14 @@ export default function UploadDocumentsModal({
           document_category: typeData.category,
           display_order: nextDisplayOrder,
           status: 'uploaded',
-          uploadedAt: new Date().toISOString(),
         })
         .select()
         .single()
 
-      if (dbError) throw dbError
+      if (dbError) {
+        console.error('Database insert error:', dbError)
+        throw new Error(dbError.message || 'Failed to save file to database')
+      }
 
       // Trigger N8N webhook
       const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL || import.meta.env.VITE_N8N_RUN_ASSESSMENT_WEBHOOK
