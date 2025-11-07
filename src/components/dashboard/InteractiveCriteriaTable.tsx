@@ -94,6 +94,7 @@ export default function InteractiveCriteriaTable({
         assessments.map((assessment) => (
           <div
             key={assessment.id}
+            id={`assessment-${assessment.id}`}
             className={cn(
               'card transition-all',
               expandedId === assessment.id && 'ring-2 ring-secondary'

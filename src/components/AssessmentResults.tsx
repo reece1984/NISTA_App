@@ -1217,11 +1217,15 @@ export default function AssessmentResults({
             assessments={assessments}
             onViewDetails={(id) => {
               setExpandedId(id)
-              // Scroll to the assessment
+              // Scroll to the assessment after expansion animation
               setTimeout(() => {
                 const element = document.getElementById(`assessment-${id}`)
-                element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-              }, 100)
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  // Add extra offset to account for fixed headers
+                  window.scrollBy({ top: -20, behavior: 'smooth' })
+                }
+              }, 300)
             }}
           />
         </div>
