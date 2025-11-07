@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Plus, LogOut } from 'lucide-react'
+import { Plus, LogOut, ClipboardList } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase, type Project } from '../lib/supabase'
 import Button from '../components/ui/Button'
@@ -55,14 +55,31 @@ export default function DashboardPage() {
       <header className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <Link to="/dashboard" className="flex items-center gap-2">
-              <div>
-                <div className="text-xl font-semibold text-text-primary">Gateway Success</div>
-                <div className="text-xs text-text-secondary">NISTA/PAR Assessment</div>
-              </div>
-            </Link>
+            <div className="flex items-center gap-6">
+              <Link to="/dashboard" className="flex items-center gap-2">
+                <div>
+                  <div className="text-xl font-semibold text-text-primary">Gateway Success</div>
+                  <div className="text-xs text-text-secondary">NISTA/PAR Assessment</div>
+                </div>
+              </Link>
+              <nav className="hidden md:flex items-center gap-4">
+                <Link
+                  to="/dashboard"
+                  className="text-sm text-secondary font-medium"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/criteria"
+                  className="text-sm text-text-secondary hover:text-text-primary transition-colors flex items-center gap-2"
+                >
+                  <ClipboardList size={16} />
+                  Criteria
+                </Link>
+              </nav>
+            </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-text-secondary">
+              <span className="text-sm text-text-secondary hidden sm:inline">
                 {user?.email}
               </span>
               <Button
@@ -72,7 +89,7 @@ export default function DashboardPage() {
                 className="flex items-center gap-2"
               >
                 <LogOut size={16} />
-                Sign Out
+                <span className="hidden sm:inline">Sign Out</span>
               </Button>
             </div>
           </div>
