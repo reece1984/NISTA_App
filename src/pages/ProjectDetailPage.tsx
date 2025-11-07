@@ -409,7 +409,7 @@ export default function ProjectDetailPage() {
                 </p>
               </div>
               <Button
-                variant="accent"
+                variant="primary"
                 size="lg"
                 onClick={handleRunAssessment}
                 disabled={!hasFiles || runningAssessment}
