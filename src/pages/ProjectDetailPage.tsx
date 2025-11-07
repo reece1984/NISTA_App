@@ -1,14 +1,17 @@
 import { useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye } from 'lucide-react'
+import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye, Upload } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Button from '../components/ui/Button'
-import FileUpload from '../components/FileUpload'
 import AssessmentResults from '../components/AssessmentResults'
 import Modal from '../components/ui/Modal'
 import Toast, { type ToastType } from '../components/ui/Toast'
 import TemplateDetailSheet from '../components/TemplateDetailSheet'
+import DocumentGuidancePanel from '../components/DocumentGuidancePanel'
+import DocumentsList from '../components/DocumentsList'
+import UploadDocumentsModal from '../components/UploadDocumentsModal'
+import { useDocuments } from '../hooks/useDocuments'
 
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -16,6 +19,8 @@ export default function ProjectDetailPage() {
   const [runningAssessment, setRunningAssessment] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showCriteriaSheet, setShowCriteriaSheet] = useState(false)
+  const [showUploadModal, setShowUploadModal] = useState(false)
+  const [deletingDocumentId, setDeletingDocumentId] = useState<number | null>(null)
   const [assessmentError, setAssessmentError] = useState('')
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null)
   const [assessmentProgress, setAssessmentProgress] = useState<{ current: number; total: number } | null>(null)
@@ -80,8 +85,33 @@ export default function ProjectDetailPage() {
     enabled: !!id,
   })
 
+  // Use documents hook for multi-document management
+  const {
+    documents,
+    deleteDocument,
+    refetch: refetchDocuments,
+  } = useDocuments(parseInt(id!))
+
+  const handleDeleteDocument = async (document: any) => {
+    setDeletingDocumentId(document.id)
+    try {
+      await deleteDocument.mutateAsync(document)
+      setToast({
+        message: 'Document deleted successfully',
+        type: 'success',
+      })
+    } catch (error: any) {
+      setToast({
+        message: `Failed to delete document: ${error.message}`,
+        type: 'error',
+      })
+    } finally {
+      setDeletingDocumentId(null)
+    }
+  }
+
   const handleRunAssessment = async () => {
-    if (!projectData || !projectData.files || projectData.files.length === 0) {
+    if (!documents || documents.length === 0) {
       setAssessmentError('Please upload at least one document before running assessment')
       setToast({
         message: 'Please upload at least one document before running assessment',
@@ -127,7 +157,7 @@ export default function ProjectDetailPage() {
       const payload = {
         identifier: 'run_assessment',
         projectId: parseInt(id!),
-        files: projectData.files.map((f: any) => ({
+        files: documents.map((f: any) => ({
           fileId: f.id,
           fileName: f.fileName,
           fileType: f.fileType,
@@ -273,12 +303,12 @@ export default function ProjectDetailPage() {
     )
   }
 
-  const files = projectData.files || []
-  const businessCase = files.find((f: any) => f.fileType === 'business_case')
-  const pep = files.find((f: any) => f.fileType === 'pep')
-  const riskRegister = files.find((f: any) => f.fileType === 'risk_register')
-  const hasFiles = files.length > 0
+  const hasFiles = documents.length > 0
   const hasAssessments = projectData.assessments && projectData.assessments.length > 0
+
+  // Get template code for document guidance
+  const templateCode = projectData.assessment_templates?.code || null
+  const templateName = projectData.assessment_templates?.name || null
 
   return (
     <div className="min-h-screen bg-background">
@@ -390,32 +420,36 @@ export default function ProjectDetailPage() {
 
         {/* Document Upload Section */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-text-primary mb-6">
-            Project Documents
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <FileUpload
-              projectId={parseInt(id!)}
-              fileType="business_case"
-              label="Business Case"
-              onUploadSuccess={refetch}
-              existingFile={businessCase}
-            />
-            <FileUpload
-              projectId={parseInt(id!)}
-              fileType="pep"
-              label="Project Execution Plan (PEP)"
-              onUploadSuccess={refetch}
-              existingFile={pep}
-            />
-            <FileUpload
-              projectId={parseInt(id!)}
-              fileType="risk_register"
-              label="Risk Register"
-              onUploadSuccess={refetch}
-              existingFile={riskRegister}
-            />
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-text-primary">
+                Project Documents ({documents.length})
+              </h2>
+              <p className="text-sm text-text-secondary mt-1">
+                Upload up to 50 PDF documents for comprehensive assessment
+              </p>
+            </div>
+            <Button
+              variant="primary"
+              onClick={() => setShowUploadModal(true)}
+              className="flex items-center gap-2"
+              disabled={documents.length >= 50}
+            >
+              <Upload size={18} />
+              Add Documents
+            </Button>
           </div>
+
+          {/* Document Guidance Panel */}
+          <DocumentGuidancePanel templateCode={templateCode} templateName={templateName} />
+
+          {/* Documents List */}
+          <DocumentsList
+            documents={documents}
+            onDelete={handleDeleteDocument}
+            deletingId={deletingDocumentId}
+            onUploadClick={() => setShowUploadModal(true)}
+          />
         </section>
 
         {/* Run Assessment Button */}
@@ -629,6 +663,18 @@ export default function ProjectDetailPage() {
           templateName={projectData.assessment_templates.name}
         />
       )}
+
+      {/* Upload Documents Modal */}
+      <UploadDocumentsModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        projectId={parseInt(id!)}
+        currentDocumentCount={documents.length}
+        onUploadComplete={() => {
+          refetchDocuments()
+          refetch()
+        }}
+      />
     </div>
   )
 }
