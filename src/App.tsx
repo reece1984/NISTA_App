@@ -9,6 +9,7 @@ import SignUpPage from './pages/SignUpPage'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import ProjectDetailPage from './pages/ProjectDetailPage'
+import AssessmentCriteriaPage from './pages/AssessmentCriteriaPage'
 
 // Create a client
 const queryClient = new QueryClient({
@@ -92,6 +93,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <ProjectDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/criteria"
+        element={
+          <ProtectedRoute>
+            <AssessmentCriteriaPage />
           </ProtectedRoute>
         }
       />

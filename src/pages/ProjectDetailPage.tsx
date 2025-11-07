@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Play, Trash2, Loader2 } from 'lucide-react'
+import { ArrowLeft, Play, Trash2, Loader2, ClipboardList } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Button from '../components/ui/Button'
 import FileUpload from '../components/FileUpload'
@@ -291,9 +291,24 @@ export default function ProjectDetailPage() {
                   <div className="text-xs text-text-secondary">NISTA/PAR Assessment</div>
                 </div>
               </Link>
+              <nav className="hidden md:flex items-center gap-4">
+                <Link
+                  to="/dashboard"
+                  className="text-sm text-text-secondary hover:text-text-primary transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/criteria"
+                  className="text-sm text-text-secondary hover:text-text-primary transition-colors flex items-center gap-2"
+                >
+                  <ClipboardList size={16} />
+                  Criteria
+                </Link>
+              </nav>
               <Link
                 to="/dashboard"
-                className="flex items-center gap-2 text-text-secondary hover:text-primary transition-colors text-sm"
+                className="flex items-center gap-2 text-text-secondary hover:text-primary transition-colors text-sm md:hidden"
               >
                 <ArrowLeft size={16} />
                 Back
@@ -306,7 +321,7 @@ export default function ProjectDetailPage() {
               className="flex items-center gap-2"
             >
               <Trash2 size={16} />
-              Delete Project
+              <span className="hidden sm:inline">Delete Project</span>
             </Button>
           </div>
         </div>
