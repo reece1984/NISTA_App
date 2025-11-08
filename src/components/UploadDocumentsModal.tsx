@@ -170,27 +170,39 @@ export default function UploadDocumentsModal({
       }
 
       // Trigger N8N webhook
-      const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL || import.meta.env.VITE_N8N_RUN_ASSESSMENT_WEBHOOK
+      const webhookUrl = import.meta.env.VITE_N8N_DOCUMENT_UPLOAD_WEBHOOK
       if (webhookUrl) {
         try {
-          await fetch(webhookUrl, {
+          const payload = {
+            identifier: 'document_upload',
+            fileId: fileRecord.id,
+            projectId: projectId,
+            fileName: file.name,
+            fileUrl: publicUrl,
+            fileKey: filePath,
+          }
+
+          console.log('🔔 Triggering N8N webhook for fileId:', fileRecord.id, 'fileName:', file.name)
+          console.log('📦 Webhook URL:', webhookUrl)
+          console.log('📦 Payload:', payload)
+
+          const response = await fetch(webhookUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              identifier: 'document_upload',
-              fileId: fileRecord.id,
-              projectId: projectId,
-              fileName: file.name,
-              fileUrl: publicUrl,
-              fileKey: filePath,
-            }),
+            body: JSON.stringify(payload),
           })
+
+          console.log('✅ N8N Response Status:', response.status, 'for fileId:', fileRecord.id)
+          const responseData = await response.text()
+          console.log('📥 N8N Response:', responseData)
         } catch (webhookError) {
-          console.error('Webhook error:', webhookError)
+          console.error('❌ Webhook error for fileId:', fileRecord.id, webhookError)
           // Don't throw - file is uploaded, webhook failure is not critical
         }
+      } else {
+        console.warn('⚠️ No webhook URL configured - skipping N8N trigger for fileId:', fileRecord.id)
       }
 
       // Remove from queue
