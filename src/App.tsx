@@ -1,10 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import ScrollToTop from './components/ScrollToTop'
 
 // Pages
 import Landing from './pages/Landing'
-import LandingPage from './pages/LandingPage'
+import CorporateHomePage from './pages/CorporateHomePage'
+import GatewaySuccessPage from './pages/GatewaySuccessPage'
+import BaselineSuccessPage from './pages/BaselineSuccessPage'
+import TenderSuccessPage from './pages/TenderSuccessPage'
+import RiskSuccessPage from './pages/RiskSuccessPage'
+import BusinessCaseSuccessPage from './pages/BusinessCaseSuccessPage'
 import SignUpPage from './pages/SignUpPage'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
@@ -61,9 +67,16 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 
 function AppRoutes() {
   return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/programmeinsights" element={<LandingPage />} />
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<CorporateHomePage />} />
+      <Route path="/programmeinsights" element={<CorporateHomePage />} />
+      <Route path="/gateway-success" element={<GatewaySuccessPage />} />
+      <Route path="/baseline-success" element={<BaselineSuccessPage />} />
+      <Route path="/tender-success" element={<TenderSuccessPage />} />
+      <Route path="/risk-success" element={<RiskSuccessPage />} />
+      <Route path="/business-case-success" element={<BusinessCaseSuccessPage />} />
       <Route
         path="/signup"
         element={
@@ -104,7 +117,8 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-    </Routes>
+      </Routes>
+    </>
   )
 }
 

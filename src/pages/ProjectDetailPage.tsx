@@ -311,28 +311,28 @@ export default function ProjectDetailPage() {
   const templateName = projectData.assessment_templates?.name || null
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-card border-b border-border">
+      <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               <Link to="/dashboard" className="flex items-center gap-2">
                 <div>
-                  <div className="text-lg font-semibold text-text-primary">Gateway Success</div>
-                  <div className="text-xs text-text-secondary">NISTA/PAR Assessment</div>
+                  <div className="text-lg font-bold text-gray-900" style={{ fontFamily: 'Inter, sans-serif' }}>Gateway Success</div>
+                  <div className="text-xs text-gray-600">NISTA/PAR Assessment</div>
                 </div>
               </Link>
               <nav className="hidden md:flex items-center gap-4">
                 <Link
                   to="/dashboard"
-                  className="text-sm text-text-secondary hover:text-text-primary transition-colors"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors font-medium"
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/criteria"
-                  className="text-sm text-text-secondary hover:text-text-primary transition-colors flex items-center gap-2"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2 font-medium"
                 >
                   <ClipboardList size={16} />
                   Criteria
@@ -340,21 +340,19 @@ export default function ProjectDetailPage() {
               </nav>
               <Link
                 to="/dashboard"
-                className="flex items-center gap-2 text-text-secondary hover:text-primary transition-colors text-sm md:hidden"
+                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors text-sm md:hidden font-medium"
               >
                 <ArrowLeft size={16} />
                 Back
               </Link>
             </div>
-            <Button
-              variant="danger"
-              size="sm"
+            <button
               onClick={() => setShowDeleteModal(true)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all"
             >
               <Trash2 size={16} />
               <span className="hidden sm:inline">Delete Project</span>
-            </Button>
+            </button>
           </div>
         </div>
       </header>
@@ -363,25 +361,25 @@ export default function ProjectDetailPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Project Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-text-primary mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
             {projectData.projectName}
           </h1>
-          <div className="flex gap-6 text-text-secondary">
+          <div className="flex gap-6 text-gray-700">
             {projectData.projectValue && (
               <div>
-                <span className="font-medium">Value:</span> £
+                <span className="font-semibold">Value:</span> £
                 {projectData.projectValue.toLocaleString()} million
               </div>
             )}
             {projectData.projectSector && (
               <div>
-                <span className="font-medium">Sector:</span>{' '}
+                <span className="font-semibold">Sector:</span>{' '}
                 {projectData.projectSector}
               </div>
             )}
             <div>
-              <span className="font-medium">Status:</span>{' '}
-              <span className="capitalize">{projectData.status}</span>
+              <span className="font-semibold">Status:</span>{' '}
+              <span className="capitalize font-bold text-blue-600">{projectData.status}</span>
             </div>
           </div>
         </div>
@@ -389,25 +387,25 @@ export default function ProjectDetailPage() {
         {/* Assessment Template Info */}
         {projectData.assessment_templates && (
           <section className="mb-8">
-            <div className="card bg-gradient-to-r from-secondary/5 to-accent/5 border-l-4 border-secondary">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-l-4 border-blue-600 shadow-sm">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
-                  <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-secondary text-white">
+                  <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-bold bg-blue-600 text-white">
                     Template
                   </span>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-text-primary mb-2">
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
                     {projectData.assessment_templates.name}
                   </h3>
                   {projectData.assessment_templates.description && (
-                    <p className="text-sm text-text-secondary mb-3">
+                    <p className="text-sm text-gray-700 mb-3">
                       {projectData.assessment_templates.description}
                     </p>
                   )}
                   <button
                     onClick={() => setShowCriteriaSheet(true)}
-                    className="inline-flex items-center gap-2 text-sm text-secondary hover:text-secondary/80 transition-colors font-medium"
+                    className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 transition-colors font-semibold"
                   >
                     <Eye size={16} />
                     View Template Criteria
@@ -422,22 +420,21 @@ export default function ProjectDetailPage() {
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-text-primary">
+              <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Inter, sans-serif' }}>
                 Project Documents ({documents.length})
               </h2>
-              <p className="text-sm text-text-secondary mt-1">
+              <p className="text-sm text-gray-600 mt-1">
                 Upload up to 50 PDF documents for comprehensive assessment
               </p>
             </div>
-            <Button
-              variant="primary"
+            <button
               onClick={() => setShowUploadModal(true)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-semibold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={documents.length >= 50}
             >
               <Upload size={18} />
               Add Documents
-            </Button>
+            </button>
           </div>
 
           {/* Document Guidance Panel */}
@@ -454,24 +451,22 @@ export default function ProjectDetailPage() {
 
         {/* Run Assessment Button */}
         <section className="mb-12">
-          <div className="card bg-secondary/5 border-secondary">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 border-2 border-blue-200 shadow-md">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-text-primary mb-2">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
                   Ready to assess your documents?
                 </h3>
-                <p className="text-text-secondary">
+                <p className="text-gray-700">
                   {hasFiles
                     ? 'Run the NISTA/PAR assessment to receive detailed feedback'
                     : 'Upload at least one document to run the assessment'}
                 </p>
               </div>
-              <Button
-                variant="primary"
-                size="lg"
+              <button
                 onClick={handleRunAssessment}
                 disabled={!hasFiles || runningAssessment}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {runningAssessment ? (
                   <>
@@ -484,7 +479,7 @@ export default function ProjectDetailPage() {
                     Run Assessment
                   </>
                 )}
-              </Button>
+              </button>
             </div>
 
             {/* Progress Bar */}

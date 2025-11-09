@@ -78,15 +78,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900">
       {/* Header */}
-      <nav className="bg-white border-b border-border">
+      <nav className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-xl font-semibold text-text-primary">Gateway Success</span>
+              <span className="text-xl font-bold text-gray-900">Gateway Success</span>
+              <span className="text-xs text-gray-500">NISTA/PAR Assessment</span>
             </Link>
-            <Link to="/signup" className="bg-secondary text-white px-5 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-colors">
+            <Link to="/signup" className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold hover:shadow-md transition-all">
               Get Started
             </Link>
           </div>
@@ -96,21 +97,21 @@ export default function LoginPage() {
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
           <div>
-            <h2 className="text-center text-3xl font-bold text-text-primary">
+            <h2 className="text-center text-3xl font-bold text-white" style={{ fontFamily: 'Inter, sans-serif' }}>
               Sign in to your account
             </h2>
-            <p className="mt-2 text-center text-sm text-text-secondary">
+            <p className="mt-2 text-center text-sm text-blue-100">
               Don't have an account?{' '}
               <Link
                 to="/signup"
-                className="font-medium text-secondary hover:text-secondary/80"
+                className="font-semibold text-blue-400 hover:text-blue-300 transition-colors"
               >
                 Sign up
               </Link>
             </p>
           </div>
 
-        <div className="mt-8 card">
+        <div className="mt-8 bg-white rounded-xl shadow-2xl p-8">
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {error && (
               <div className="bg-error/10 border border-error text-error px-4 py-3 rounded-lg">
@@ -156,27 +157,26 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowResetPassword(true)}
-                  className="font-medium text-secondary hover:text-secondary/80"
+                  className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
                 >
                   Forgot your password?
                 </button>
               </div>
             </div>
 
-            <Button
+            <button
               type="submit"
-              variant="primary"
-              className="w-full"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
               {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
+            </button>
           </form>
 
           <div className="mt-6">
             <Link
               to="/"
-              className="text-sm text-text-secondary hover:text-secondary text-center block"
+              className="text-sm text-gray-600 hover:text-blue-600 text-center block font-medium transition-colors"
             >
               ← Back to home
             </Link>
@@ -186,8 +186,8 @@ export default function LoginPage() {
         {/* Password Reset Modal */}
         {showResetPassword && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full">
-              <h3 className="text-xl font-bold text-text-primary mb-4">
+            <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
                 Reset Password
               </h3>
 
@@ -220,28 +220,26 @@ export default function LoginPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button
+                  <button
                     type="button"
-                    variant="secondary"
                     onClick={() => {
                       setShowResetPassword(false)
                       setResetEmail('')
                       setError('')
                       setResetMessage('')
                     }}
-                    className="flex-1"
+                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-lg transition-all disabled:opacity-50"
                     disabled={loading}
                   >
                     Cancel
-                  </Button>
-                  <Button
+                  </button>
+                  <button
                     type="submit"
-                    variant="primary"
-                    className="flex-1"
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading || !resetEmail}
                   >
                     {loading ? 'Sending...' : 'Send Reset Link'}
-                  </Button>
+                  </button>
                 </div>
               </form>
             </div>
