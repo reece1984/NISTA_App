@@ -4,7 +4,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import ScrollToTop from './components/ScrollToTop'
 
 // Pages
-import Landing from './pages/Landing'
 import CorporateHomePage from './pages/CorporateHomePage'
 import GatewaySuccessPage from './pages/GatewaySuccessPage'
 import BaselineSuccessPage from './pages/BaselineSuccessPage'

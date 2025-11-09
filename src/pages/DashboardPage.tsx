@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query'
 import { Plus, LogOut, ClipboardList } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase, type Project } from '../lib/supabase'
-import Button from '../components/ui/Button'
 import CreateProjectModal from '../components/CreateProjectModal'
 
 export default function DashboardPage() {
