@@ -3,10 +3,10 @@ import { cn } from '../../lib/utils'
 
 interface Assessment {
   id: number
-  ragRating: 'green' | 'amber' | 'red' | 'pending'
+  rag_rating: 'green' | 'amber' | 'red' | 'pending'
   finding: string | null
   assessment_criteria: {
-    criterionCode: string
+    criterion_code: string
     title: string
     is_critical: boolean
   }
@@ -80,7 +80,7 @@ export default function PriorityActionsCard({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-mono text-xs text-text-secondary">
-                      {assessment.assessment_criteria.criterionCode}
+                      {assessment.assessment_criteria.criterion_code}
                     </span>
                     {assessment.assessment_criteria.is_critical && (
                       <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-rag-red/10 text-rag-red border border-rag-red/30">
@@ -90,10 +90,10 @@ export default function PriorityActionsCard({
                     <span
                       className={cn(
                         'px-2 py-0.5 rounded text-xs font-semibold',
-                        getRagBadge(assessment.ragRating)
+                        getRagBadge(assessment.rag_rating)
                       )}
                     >
-                      {assessment.ragRating.toUpperCase()}
+                      {assessment.rag_rating.toUpperCase()}
                     </span>
                   </div>
                   <p className="text-sm font-medium text-text-primary mb-1 truncate">

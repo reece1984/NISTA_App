@@ -151,11 +151,11 @@ export default function UploadDocumentsModal({
       const { data: fileRecord, error: dbError } = await supabase
         .from('files')
         .insert({
-          projectId: projectId,
-          fileName: file.name,
-          fileType: queueItem.selectedType,
-          fileUrl: publicUrl,
-          fileKey: filePath,
+          project_id: projectId,
+          file_name: file.name,
+          file_type: queueItem.selectedType,
+          file_url: publicUrl,
+          file_key: filePath,
           document_type: queueItem.selectedType,
           document_category: typeData.category,
           display_order: nextDisplayOrder,

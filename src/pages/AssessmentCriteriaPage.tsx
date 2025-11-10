@@ -86,7 +86,7 @@ export default function AssessmentCriteriaPage() {
         .from('assessment_criteria')
         .select('*')
         .eq('template_id', templateId)
-        .order('criterionCode')
+        .order('criterion_code')
 
       if (criteriaError) throw criteriaError
       setCriteria(criteriaData || [])

@@ -239,7 +239,7 @@ export default function ProjectDetailPage() {
           if (updatedProject?.status === 'processing') {
             const { error: updateError } = await supabase
               .from('projects')
-              .update({ status: 'completed', updatedAt: new Date().toISOString() })
+              .update({ status: 'completed', updated_at: new Date().toISOString() })
               .eq('id', id!)
 
             if (updateError) {

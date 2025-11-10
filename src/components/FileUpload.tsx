@@ -66,11 +66,11 @@ export default function FileUpload({
 
       // Save file metadata to database
       const { error: dbError } = await supabase.from('files').insert({
-        projectId,
-        fileName: file.name,
-        fileType,
-        fileUrl: publicUrl,
-        fileKey,
+        project_id: projectId,
+        file_name: file.name,
+        file_type: fileType,
+        file_url: publicUrl,
+        file_key: fileKey,
         status: 'uploaded',
       })
 

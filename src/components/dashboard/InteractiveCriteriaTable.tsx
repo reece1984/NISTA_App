@@ -4,15 +4,15 @@ import { cn } from '../../lib/utils'
 
 interface Assessment {
   id: number
-  ragRating: 'green' | 'amber' | 'red' | 'pending'
+  rag_rating: 'green' | 'amber' | 'red' | 'pending'
   finding: string | null
   evidence: string | null
   recommendation: string | null
   summary: string | null
   confidence: number | null
-  satisfactionScore: number | null
+  satisfaction_score: number | null
   assessment_criteria: {
-    criterionCode: string
+    criterion_code: string
     title: string
     dimension: string
     weight: number | null
@@ -105,7 +105,7 @@ export default function InteractiveCriteriaTable({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-2">
                   <span className="font-mono text-sm font-semibold text-secondary bg-secondary/10 px-2 py-1 rounded">
-                    {assessment.assessment_criteria.criterionCode}
+                    {assessment.assessment_criteria.criterion_code}
                   </span>
                   <span className="px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-text-secondary">
                     {assessment.assessment_criteria.dimension}
@@ -132,10 +132,10 @@ export default function InteractiveCriteriaTable({
                 <span
                   className={cn(
                     'px-4 py-2 rounded-lg font-bold text-base',
-                    getRagBadge(assessment.ragRating)
+                    getRagBadge(assessment.rag_rating)
                   )}
                 >
-                  {getRagLabel(assessment.ragRating)}
+                  {getRagLabel(assessment.rag_rating)}
                 </span>
 
                 {/* Confidence Bar */}
@@ -189,7 +189,7 @@ export default function InteractiveCriteriaTable({
                     <div className="text-lg font-bold text-text-primary">
                       {assessment.satisfactionScore !== null
                         ? assessment.satisfactionScore
-                        : getSatisfactionPercentage(assessment.ragRating)}%
+                        : getSatisfactionPercentage(assessment.rag_rating)}%
                     </div>
                   </div>
                   <div>

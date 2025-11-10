@@ -132,11 +132,11 @@ export default function CreateProjectModal({
 
       // Create the project
       const { error: projectError } = await supabase.from('projects').insert({
-        userId: userId,
+        user_id: userId,
         template_id: data.templateId,
-        projectName: data.projectName,
-        projectValue: data.projectValue || null,
-        projectSector: data.projectSector,
+        project_name: data.projectName,
+        project_value: data.projectValue || null,
+        project_sector: data.projectSector,
         status: 'draft',
       })
 

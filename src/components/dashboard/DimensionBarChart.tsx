@@ -10,7 +10,7 @@ import {
 } from 'recharts'
 
 interface Assessment {
-  ragRating: 'green' | 'amber' | 'red' | 'pending'
+  rag_rating: 'green' | 'amber' | 'red' | 'pending'
   assessment_criteria: {
     dimension: string
   }
@@ -36,9 +36,9 @@ export default function DimensionBarChart({
       dimensionStats[dim] = { green: 0, amber: 0, red: 0, total: 0 }
     }
     dimensionStats[dim].total++
-    if (a.ragRating === 'green') dimensionStats[dim].green++
-    else if (a.ragRating === 'amber') dimensionStats[dim].amber++
-    else if (a.ragRating === 'red') dimensionStats[dim].red++
+    if (a.rag_rating === 'green') dimensionStats[dim].green++
+    else if (a.rag_rating === 'amber') dimensionStats[dim].amber++
+    else if (a.rag_rating === 'red') dimensionStats[dim].red++
   })
 
   // Convert to array format for recharts

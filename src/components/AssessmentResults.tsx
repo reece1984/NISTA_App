@@ -1,5 +1,7 @@
-import { useState } from 'react'
-import { Search, X, FileDown, FileSpreadsheet } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Search, X, FileDown, FileSpreadsheet, Sparkles, ClipboardList } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { supabase } from '../lib/supabase'
 import { cn } from '../lib/utils'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
@@ -9,18 +11,20 @@ import RAGDonutChart from './dashboard/RAGDonutChart'
 import DimensionBarChart from './dashboard/DimensionBarChart'
 import PriorityActionsCard from './dashboard/PriorityActionsCard'
 import InteractiveCriteriaTable from './dashboard/InteractiveCriteriaTable'
+import ActionPlanDraftWorkspace from './ActionPlan/ActionPlanDraftWorkspace'
+import AssessmentComparisonBanner from './ActionPlan/AssessmentComparisonBanner'
 
 interface Assessment {
   id: number
-  ragRating: 'green' | 'amber' | 'red' | 'pending'
+  rag_rating: 'green' | 'amber' | 'red' | 'pending'
   finding: string | null
   evidence: string | null
   recommendation: string | null
   summary: string | null
   confidence: number | null
-  satisfactionScore: number | null
+  satisfaction_score: number | null
   assessment_criteria: {
-    criterionCode: string
+    criterion_code: string
     title: string
     dimension: string
     weight: number | null
@@ -44,17 +48,38 @@ interface AssessmentResultsProps {
   assessments: Assessment[]
   projectSummary?: ProjectSummary | null
   projectData?: any
+  assessmentRunId?: number
 }
 
 export default function AssessmentResults({
   assessments,
   projectSummary,
   projectData,
+  assessmentRunId,
 }: AssessmentResultsProps) {
   const [filter, setFilter] = useState<'all' | 'green' | 'amber' | 'red'>('all')
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [dimensionFilter, setDimensionFilter] = useState<string | null>(null)
+  const [showActionPlanWorkspace, setShowActionPlanWorkspace] = useState(false)
+
+  // Check if action plan draft exists
+  const { data: existingDraft } = useQuery({
+    queryKey: ['action-plan-draft-exists', assessmentRunId],
+    queryFn: async () => {
+      if (!assessmentRunId) return null
+      const { data, error } = await supabase
+        .from('action_plan_drafts')
+        .select('id')
+        .eq('assessment_run_id', assessmentRunId)
+        .limit(1)
+        .maybeSingle()
+
+      if (error) return null
+      return data
+    },
+    enabled: !!assessmentRunId
+  })
 
   const exportToPDF = () => {
     const doc = new jsPDF()
@@ -122,9 +147,9 @@ export default function AssessmentResults({
 
     // Calculate summary statistics
     const ragCounts = {
-      green: assessments.filter((a) => a.ragRating === 'green').length,
-      amber: assessments.filter((a) => a.ragRating === 'amber').length,
-      red: assessments.filter((a) => a.ragRating === 'red').length,
+      green: assessments.filter((a) => a.rag_rating === 'green').length,
+      amber: assessments.filter((a) => a.rag_rating === 'amber').length,
+      red: assessments.filter((a) => a.rag_rating === 'red').length,
     }
 
     // Overall RAG calculation
@@ -421,11 +446,11 @@ export default function AssessmentResults({
     summaryStartY += 18
 
     const summaryTableData = assessments.map((a) => [
-      a.assessment_criteria.criterionCode,
+      a.assessment_criteria.criterion_code,
       a.assessment_criteria.title,
       a.assessment_criteria.weight !== null ? `${a.assessment_criteria.weight}%` : '-',
       a.assessment_criteria.is_critical ? 'YES' : 'NO',
-      a.ragRating.toUpperCase(),
+      a.rag_rating.toUpperCase(),
     ])
 
     autoTable(doc, {
@@ -502,7 +527,7 @@ export default function AssessmentResults({
 
       doc.setFontSize(16)
       doc.setFont('helvetica', 'bold')
-      doc.text(assessment.assessment_criteria.criterionCode, margin, 32)
+      doc.text(assessment.assessment_criteria.criterion_code, margin, 32)
 
       // Criterion title with modern styling
       let yPos = 60
@@ -536,7 +561,7 @@ export default function AssessmentResults({
       doc.setTextColor(...colors.darkGray)
       doc.text('Assessment Status', margin + 15, yPos + 12)
 
-      const ragColor = ragColors[assessment.ragRating] || ragColors.pending
+      const ragColor = ragColors[assessment.rag_rating] || ragColors.pending
 
       // Shadow effect
       doc.setFillColor(0, 0, 0, 0.1)
@@ -548,7 +573,7 @@ export default function AssessmentResults({
       doc.setTextColor(...colors.white)
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(10)
-      doc.text(assessment.ragRating.toUpperCase(), margin + 101, yPos + 13, { align: 'center' })
+      doc.text(assessment.rag_rating.toUpperCase(), margin + 101, yPos + 13, { align: 'center' })
 
       // Metrics row
       yPos += 24
@@ -562,7 +587,7 @@ export default function AssessmentResults({
       doc.setFontSize(14)
       doc.setFont('helvetica', 'bold')
       doc.setTextColor(...colors.darkGray)
-      doc.text(`${assessment.satisfactionScore !== null ? assessment.satisfactionScore : getSatisfactionPercentage(assessment.ragRating)}%`, metricsX, yPos + 8)
+      doc.text(`${assessment.satisfaction_score !== null ? assessment.satisfaction_score : getSatisfactionPercentage(assessment.rag_rating)}%`, metricsX, yPos + 8)
 
       // Confidence metric
       doc.setFontSize(8)
@@ -729,9 +754,9 @@ export default function AssessmentResults({
 
     // Calculate statistics
     const ragCounts = {
-      green: assessments.filter((a) => a.ragRating === 'green').length,
-      amber: assessments.filter((a) => a.ragRating === 'amber').length,
-      red: assessments.filter((a) => a.ragRating === 'red').length,
+      green: assessments.filter((a) => a.rag_rating === 'green').length,
+      amber: assessments.filter((a) => a.rag_rating === 'amber').length,
+      red: assessments.filter((a) => a.rag_rating === 'red').length,
     }
     const totalAssessments = assessments.length
     const overallRag = projectSummary?.overall_rating || getOverallRag()
@@ -806,13 +831,13 @@ export default function AssessmentResults({
 
     // ===== SHEET 3: ASSESSMENT OVERVIEW (Summary Table) =====
     const overviewTableData = assessments.map((a) => ({
-      'Code': a.assessment_criteria.criterionCode,
+      'Code': a.assessment_criteria.criterion_code,
       'Criterion': a.assessment_criteria.title,
       'Dimension': a.assessment_criteria.dimension,
       'Weight (%)': a.assessment_criteria.weight || '-',
       'Critical': a.assessment_criteria.is_critical ? 'YES' : 'NO',
-      'RAG': a.ragRating.toUpperCase(),
-      'Satisfaction (%)': a.satisfactionScore !== null ? a.satisfactionScore : getSatisfactionPercentage(a.ragRating),
+      'RAG': a.rag_rating.toUpperCase(),
+      'Satisfaction (%)': a.satisfaction_score !== null ? a.satisfaction_score : getSatisfactionPercentage(a.rag_rating),
       'Confidence': getConfidenceLabel(a.confidence),
     }))
 
@@ -895,13 +920,13 @@ export default function AssessmentResults({
 
     // ===== SHEET 4: DETAILED ASSESSMENTS =====
     const detailedData = assessments.map((assessment) => ({
-      'Code': assessment.assessment_criteria.criterionCode,
+      'Code': assessment.assessment_criteria.criterion_code,
       'Criterion Title': assessment.assessment_criteria.title,
       'Dimension': assessment.assessment_criteria.dimension,
       'Weight (%)': assessment.assessment_criteria.weight || '-',
       'Critical': assessment.assessment_criteria.is_critical ? 'YES' : 'NO',
-      'RAG Rating': assessment.ragRating.toUpperCase(),
-      'Satisfaction (%)': (assessment.satisfactionScore !== null ? assessment.satisfactionScore : getSatisfactionPercentage(assessment.ragRating)),
+      'RAG Rating': assessment.rag_rating.toUpperCase(),
+      'Satisfaction (%)': (assessment.satisfaction_score !== null ? assessment.satisfaction_score : getSatisfactionPercentage(assessment.rag_rating)),
       'Confidence': getConfidenceLabel(assessment.confidence),
       'Summary': assessment.summary || '',
       'Finding': assessment.finding || '',
@@ -1010,9 +1035,9 @@ export default function AssessmentResults({
     assessments.forEach(a => {
       const dim = a.assessment_criteria.dimension
       if (!dimensionStats[dim]) dimensionStats[dim] = { green: 0, amber: 0, red: 0 }
-      if (a.ragRating === 'green') dimensionStats[dim].green++
-      else if (a.ragRating === 'amber') dimensionStats[dim].amber++
-      else if (a.ragRating === 'red') dimensionStats[dim].red++
+      if (a.rag_rating === 'green') dimensionStats[dim].green++
+      else if (a.rag_rating === 'amber') dimensionStats[dim].amber++
+      else if (a.rag_rating === 'red') dimensionStats[dim].red++
     })
 
     statsData.push(['Dimension', 'Green', 'Amber', 'Red', 'Total'])
@@ -1024,9 +1049,9 @@ export default function AssessmentResults({
     statsData.push([''])
     statsData.push(['CRITICAL CRITERIA BREAKDOWN'])
     const criticalCount = assessments.filter(a => a.assessment_criteria.is_critical).length
-    const criticalGreen = assessments.filter(a => a.assessment_criteria.is_critical && a.ragRating === 'green').length
-    const criticalAmber = assessments.filter(a => a.assessment_criteria.is_critical && a.ragRating === 'amber').length
-    const criticalRed = assessments.filter(a => a.assessment_criteria.is_critical && a.ragRating === 'red').length
+    const criticalGreen = assessments.filter(a => a.assessment_criteria.is_critical && a.rag_rating === 'green').length
+    const criticalAmber = assessments.filter(a => a.assessment_criteria.is_critical && a.rag_rating === 'amber').length
+    const criticalRed = assessments.filter(a => a.assessment_criteria.is_critical && a.rag_rating === 'red').length
 
     statsData.push(['Total Critical Criteria', criticalCount])
     statsData.push(['Critical - Green', criticalGreen])
@@ -1084,8 +1109,8 @@ export default function AssessmentResults({
     }
 
     // Then sort by criterion code within the same dimension
-    const codeA = a.assessment_criteria.criterionCode
-    const codeB = b.assessment_criteria.criterionCode
+    const codeA = a.assessment_criteria.criterion_code
+    const codeB = b.assessment_criteria.criterion_code
     return codeA.localeCompare(codeB, undefined, { numeric: true })
   })
 
@@ -1093,7 +1118,7 @@ export default function AssessmentResults({
   let filteredAssessments =
     filter === 'all'
       ? sortedAssessments
-      : sortedAssessments.filter((a) => a.ragRating === filter)
+      : sortedAssessments.filter((a) => a.rag_rating === filter)
 
   // Filter by dimension
   if (dimensionFilter) {
@@ -1111,7 +1136,7 @@ export default function AssessmentResults({
       const recommendation = assessment.recommendation?.toLowerCase() || ''
       const summary = assessment.summary?.toLowerCase() || ''
       const title = assessment.assessment_criteria.title.toLowerCase()
-      const code = assessment.assessment_criteria.criterionCode.toLowerCase()
+      const code = assessment.assessment_criteria.criterion_code.toLowerCase()
 
       return (
         finding.includes(query) ||
@@ -1126,10 +1151,10 @@ export default function AssessmentResults({
 
   // Calculate summary statistics
   const ragCounts = {
-    green: assessments.filter((a) => a.ragRating === 'green').length,
-    amber: assessments.filter((a) => a.ragRating === 'amber').length,
-    red: assessments.filter((a) => a.ragRating === 'red').length,
-    pending: assessments.filter((a) => a.ragRating === 'pending').length,
+    green: assessments.filter((a) => a.rag_rating === 'green').length,
+    amber: assessments.filter((a) => a.rag_rating === 'amber').length,
+    red: assessments.filter((a) => a.rag_rating === 'red').length,
+    pending: assessments.filter((a) => a.rag_rating === 'pending').length,
   }
 
   const totalAssessments = assessments.length
@@ -1161,11 +1186,36 @@ export default function AssessmentResults({
 
   return (
     <div>
+      {/* Assessment Comparison Banner */}
+      {assessmentRunId && projectData?.id && (
+        <AssessmentComparisonBanner
+          assessmentRunId={assessmentRunId}
+          projectId={projectData.id}
+          onGenerateActionPlan={() => setShowActionPlanWorkspace(true)}
+        />
+      )}
+
       {/* Header with Export Buttons */}
       {totalAssessments > 0 && (
         <div className="mb-6 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-text-primary">Assessment Results</h2>
           <div className="flex gap-3">
+            <button
+              onClick={() => setShowActionPlanWorkspace(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              {existingDraft ? (
+                <>
+                  <ClipboardList size={18} />
+                  View Action Plan
+                </>
+              ) : (
+                <>
+                  <Sparkles size={18} />
+                  Generate Action Plan
+                </>
+              )}
+            </button>
             <button
               onClick={exportToExcel}
               className="flex items-center gap-2 px-4 py-2 bg-rag-green text-white rounded-lg hover:bg-rag-green/90 transition-colors font-medium"
@@ -1378,6 +1428,20 @@ export default function AssessmentResults({
           onExpandToggle={setExpandedId}
         />
       </div>
+
+      {/* Action Plan Draft Workspace Modal */}
+      {showActionPlanWorkspace && assessmentRunId && projectData?.id && (
+        <ActionPlanDraftWorkspace
+          assessmentRunId={assessmentRunId}
+          projectId={projectData.id}
+          onClose={() => setShowActionPlanWorkspace(false)}
+          onConfirm={(result) => {
+            console.log('Action plan confirmed:', result)
+            setShowActionPlanWorkspace(false)
+            // Optionally redirect to action board or show success message
+          }}
+        />
+      )}
     </div>
   )
 }

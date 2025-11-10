@@ -8,12 +8,12 @@ const DIMENSION_ORDER = ['Strategic', 'Economic', 'Commercial', 'Financial', 'Ma
 
 interface AssessmentCriterion {
   id: number
-  criterionCode: string
+  criterion_code: string
   dimension: string
   category: string
   title: string
   description: string
-  assessmentQuestion: string
+  assessment_question: string
   weight: number | null
   is_critical: boolean
 }
@@ -57,10 +57,10 @@ export default function TemplateDetailSheet({
       const { data, error: fetchError } = await supabase
         .from('assessment_criteria')
         .select(
-          'id, criterionCode, dimension, category, title, description, assessmentQuestion, weight, is_critical'
+          'id, criterion_code, dimension, category, title, description, assessment_question, weight, is_critical'
         )
         .eq('template_id', templateId)
-        .order('criterionCode')
+        .order('criterion_code')
 
       if (fetchError) throw fetchError
 
@@ -190,7 +190,7 @@ export default function TemplateDetailSheet({
                           {/* Criterion Header */}
                           <div className="flex items-start gap-3 mb-2">
                             <span className="font-mono text-xs font-semibold text-secondary bg-secondary/10 px-2 py-1 rounded flex-shrink-0">
-                              {criterion.criterionCode}
+                              {criterion.criterion_code}
                             </span>
                             <div className="flex-1">
                               <h4 className="font-semibold text-text-primary mb-1">
@@ -223,7 +223,7 @@ export default function TemplateDetailSheet({
                               Assessment Question
                             </div>
                             <p className="text-sm text-text-primary leading-relaxed italic">
-                              {criterion.assessmentQuestion}
+                              {criterion.assessment_question}
                             </p>
                           </div>
                         </div>
