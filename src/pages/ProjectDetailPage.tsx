@@ -45,7 +45,7 @@ export default function ProjectDetailPage() {
       const { data: files, error: filesError } = await supabase
         .from('files')
         .select('*')
-        .eq('projectId', id!)
+        .eq('project_id', id!)
 
       if (filesError && filesError.code !== 'PGRST116') {
         console.error('Files error:', filesError)
@@ -55,7 +55,7 @@ export default function ProjectDetailPage() {
       const { data: assessments, error: assessmentsError } = await supabase
         .from('assessments')
         .select('*, assessment_criteria (*)')
-        .eq('projectId', id!)
+        .eq('project_id', id!)
 
       if (assessmentsError && assessmentsError.code !== 'PGRST116') {
         console.error('Assessments error:', assessmentsError)
@@ -159,10 +159,10 @@ export default function ProjectDetailPage() {
         projectId: parseInt(id!),
         files: documents.map((f: any) => ({
           fileId: f.id,
-          fileName: f.fileName,
-          fileType: f.fileType,
-          fileUrl: f.fileUrl,
-          fileKey: f.fileKey,
+          fileName: f.file_name,
+          fileType: f.file_type,
+          fileUrl: f.file_url,
+          fileKey: f.file_key,
         })),
       }
 
@@ -202,7 +202,7 @@ export default function ProjectDetailPage() {
         const { count: completedCount } = await supabase
           .from('assessments')
           .select('*', { count: 'exact', head: true })
-          .eq('projectId', id!)
+          .eq('project_id', id!)
 
         const completed = completedCount || 0
 
@@ -606,6 +606,7 @@ export default function ProjectDetailPage() {
               assessments={projectData.assessments}
               projectSummary={projectData.projectSummary}
               projectData={projectData}
+              assessmentRunId={projectData.projectSummary?.id || 1}
             />
           </section>
         )}

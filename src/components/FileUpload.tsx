@@ -173,10 +173,10 @@ export default function FileUpload({
               <FileText className="text-success flex-shrink-0" size={24} />
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-text-primary break-words">
-                  {existingFile.fileName}
+                  {existingFile.file_name}
                 </p>
                 <p className="text-sm text-text-secondary">
-                  Uploaded {new Date(existingFile.uploadedAt).toLocaleDateString()}
+                  Uploaded {new Date(existingFile.uploaded_at).toLocaleDateString()}
                 </p>
               </div>
             </div>

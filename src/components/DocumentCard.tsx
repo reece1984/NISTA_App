@@ -88,7 +88,7 @@ export default function DocumentCard({ document, onDelete, deleting }: DocumentC
 
           <div className="flex-1 min-w-0">
             <h3 className="text-base font-semibold text-text-primary mb-2 truncate">
-              {document.fileName}
+              {document.file_name}
             </h3>
 
             <div className="flex flex-wrap items-center gap-3 text-sm text-text-secondary mb-2">
@@ -97,7 +97,7 @@ export default function DocumentCard({ document, onDelete, deleting }: DocumentC
                   {document.document_type}
                 </span>
               )}
-              <span>Uploaded {formatRelativeTime(document.uploadedAt)}</span>
+              <span>Uploaded {formatRelativeTime(document.uploaded_at)}</span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -106,9 +106,9 @@ export default function DocumentCard({ document, onDelete, deleting }: DocumentC
           </div>
 
           <div className="flex-shrink-0 flex items-center gap-2">
-            {document.fileUrl && (
+            {document.file_url && (
               <a
-                href={document.fileUrl}
+                href={document.file_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -141,7 +141,7 @@ export default function DocumentCard({ document, onDelete, deleting }: DocumentC
         size="sm"
       >
         <p className="text-text-secondary mb-6">
-          Are you sure you want to delete <strong>{document.fileName}</strong>? This will remove all
+          Are you sure you want to delete <strong>{document.file_name}</strong>? This will remove all
           embeddings and cannot be undone.
         </p>
         <div className="flex gap-4">

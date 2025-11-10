@@ -122,7 +122,7 @@ export default function UploadDocumentsModal({
       const { data: maxOrderData } = await supabase
         .from('files')
         .select('display_order')
-        .eq('projectId', projectId)
+        .eq('project_id', projectId)
         .order('display_order', { ascending: false })
         .limit(1)
         .maybeSingle()

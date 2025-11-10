@@ -3,14 +3,14 @@ import { supabase } from '../lib/supabase'
 
 export interface ProjectDocument {
   id: number
-  projectId: number
-  fileName: string
-  fileType: string | null
-  fileUrl: string
-  fileKey: string
+  project_id: number
+  file_name: string
+  file_type: string | null
+  file_url: string
+  file_key: string
   status: string | null
-  uploadedAt: string
-  processedAt: string | null
+  uploaded_at: string
+  processed_at: string | null
   document_type: string | null
   document_category: string | null
   display_order: number | null
@@ -25,9 +25,9 @@ export function useDocuments(projectId: number) {
       const { data, error } = await supabase
         .from('files')
         .select('*')
-        .eq('projectId', projectId)
+        .eq('project_id', projectId)
         .order('display_order', { ascending: true })
-        .order('uploadedAt', { ascending: false })
+        .order('uploaded_at', { ascending: false })
 
       if (error) throw error
       return data as ProjectDocument[]

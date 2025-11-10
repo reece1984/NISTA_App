@@ -39,7 +39,7 @@ export default function DocumentsList({
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase()
         const matchesSearch =
-          doc.fileName.toLowerCase().includes(query) ||
+          doc.file_name.toLowerCase().includes(query) ||
           doc.document_type?.toLowerCase().includes(query) ||
           doc.document_category?.toLowerCase().includes(query)
         if (!matchesSearch) return false
