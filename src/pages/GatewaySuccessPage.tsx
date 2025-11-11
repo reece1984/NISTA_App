@@ -119,7 +119,7 @@ export default function GatewaySuccessPage() {
             <div className="inline-block bg-orange-500 px-4 py-2 rounded-lg text-sm font-semibold mb-6">
               AI-Powered NISTA Assessments
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
               Pass Your NISTA Gate Review.<br />First Time.
             </h1>
             <p className="text-lg md:text-xl mb-8 opacity-95 max-w-3xl mx-auto">

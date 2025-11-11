@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Search, X, FileDown, FileSpreadsheet, Sparkles, ClipboardList } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'

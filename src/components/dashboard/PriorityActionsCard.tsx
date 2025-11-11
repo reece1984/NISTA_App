@@ -23,15 +23,15 @@ export default function PriorityActionsCard({
 }: PriorityActionsCardProps) {
   // Get red and amber assessments, prioritizing critical ones and red ratings
   const priorityAssessments = assessments
-    .filter((a) => a.ragRating === 'red' || a.ragRating === 'amber')
+    .filter((a) => a.rag_rating === 'red' || a.rag_rating === 'amber')
     .sort((a, b) => {
       // Critical items first
       if (a.assessment_criteria.is_critical && !b.assessment_criteria.is_critical) return -1
       if (!a.assessment_criteria.is_critical && b.assessment_criteria.is_critical) return 1
 
       // Then red before amber
-      if (a.ragRating === 'red' && b.ragRating !== 'red') return -1
-      if (a.ragRating !== 'red' && b.ragRating === 'red') return 1
+      if (a.rag_rating === 'red' && b.rag_rating !== 'red') return -1
+      if (a.rag_rating !== 'red' && b.rag_rating === 'red') return 1
 
       return 0
     })

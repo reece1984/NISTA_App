@@ -10,8 +10,8 @@ interface FileUploadProps {
   onUploadSuccess: () => void
   existingFile?: {
     id: number
-    fileName: string
-    uploadedAt: string
+    file_name: string
+    uploaded_at: string
   }
 }
 

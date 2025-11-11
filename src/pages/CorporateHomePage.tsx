@@ -73,7 +73,7 @@ export default function CorporateHomePage() {
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
               The AI Platform for Major UK Infrastructure Programmes
             </h1>
             <p className="text-lg md:text-xl mb-4 opacity-95 max-w-4xl mx-auto leading-relaxed">

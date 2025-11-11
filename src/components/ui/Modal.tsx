@@ -7,7 +7,7 @@ interface ModalProps {
   onClose: () => void
   children: ReactNode
   title?: string
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
 }
 
 export default function Modal({
@@ -23,6 +23,7 @@ export default function Modal({
     sm: 'max-w-md',
     md: 'max-w-2xl',
     lg: 'max-w-4xl',
+    xl: 'max-w-6xl',
   }
 
   return (

@@ -229,7 +229,7 @@ export default function BusinessCaseSuccessPage() {
                 Coming Q4 2025
               </div>
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
               Compelling Business Cases.<br />Evidence-Based.
             </h1>
             <p className="text-lg md:text-xl mb-8 opacity-95 max-w-3xl mx-auto">

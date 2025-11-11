@@ -15,7 +15,6 @@ import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import ProjectDetailPage from './pages/ProjectDetailPage'
 import AssessmentCriteriaPage from './pages/AssessmentCriteriaPage'
-import ActionPlanDemoPage from './pages/ActionPlanDemoPage'
 
 // Create a client
 const queryClient = new QueryClient({
@@ -117,7 +116,6 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route path="/demo/action-plan" element={<ActionPlanDemoPage />} />
       </Routes>
     </>
   )

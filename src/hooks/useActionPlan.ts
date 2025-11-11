@@ -30,7 +30,7 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
   const [isSaving, setIsSaving] = useState(false)
 
   // Fetch existing action plan draft
-  const { data: existingDraft, isLoading: isLoadingDraft, error: draftError } = useQuery({
+  const { data: existingDraft, isLoading: isLoadingDraft } = useQuery({
     queryKey: ['action-plan-draft', assessmentRunId],
     queryFn: async () => {
       const { data, error } = await supabase

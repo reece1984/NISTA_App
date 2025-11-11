@@ -50,7 +50,7 @@ export function useDocuments(projectId: number) {
       // Delete from storage
       const { error: storageError } = await supabase.storage
         .from('project-documents')
-        .remove([document.fileKey])
+        .remove([document.file_key])
 
       if (storageError) {
         console.error('Storage deletion error:', storageError)

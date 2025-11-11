@@ -187,8 +187,8 @@ export default function InteractiveCriteriaTable({
                   <div>
                     <div className="text-xs text-text-secondary mb-1">Satisfaction</div>
                     <div className="text-lg font-bold text-text-primary">
-                      {assessment.satisfactionScore !== null
-                        ? assessment.satisfactionScore
+                      {assessment.satisfaction_score !== null
+                        ? assessment.satisfaction_score
                         : getSatisfactionPercentage(assessment.rag_rating)}%
                     </div>
                   </div>
