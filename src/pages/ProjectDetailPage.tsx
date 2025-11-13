@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye, Upload, LayoutGrid, FileText, BarChart3, Target, Activity } from 'lucide-react'
+import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye, Upload, LayoutGrid, FileText, BarChart3, Target, Activity, Sparkles } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Button from '../components/ui/Button'
 import AssessmentResults from '../components/AssessmentResults'
@@ -772,16 +772,60 @@ export default function ProjectDetailPage() {
             <div className="p-8">
               {hasAssessments ? (
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-4">Action Plan</h2>
-                  <p className="text-slate-600 mb-6">
-                    View and manage actions generated from your assessment results.
-                  </p>
-                  <AssessmentResults
-                    assessments={projectData.assessments}
-                    projectSummary={projectData.projectSummary}
-                    projectData={projectData}
-                    assessmentRunId={projectData.assessmentRunId}
-                  />
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Action Plan Management</h2>
+                    <p className="text-slate-600">
+                      Create and manage actions from your assessment results.
+                    </p>
+                  </div>
+
+                  {/* Action Plan CTA */}
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-900 mb-1">
+                          Generate Action Plan
+                        </h3>
+                        <p className="text-sm text-slate-700">
+                          Use AI to automatically generate actionable tasks from your assessment results
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setActiveTab('assessment')}
+                        className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30"
+                      >
+                        <Sparkles size={18} />
+                        Go to Assessment
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Action Plan Features */}
+                  <div className="text-center py-12 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border border-slate-200">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Target className="text-blue-600" size={32} />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">
+                      Action Plan Features
+                    </h3>
+                    <p className="text-slate-600 max-w-lg mx-auto mb-6">
+                      Generate action plans from your assessment, assign owners, set due dates, and track progress through completion.
+                    </p>
+                    <div className="flex flex-wrap gap-3 justify-center">
+                      <div className="px-4 py-2 bg-white rounded-lg border border-slate-200 text-sm text-slate-700">
+                        <span className="font-semibold">AI-Generated</span> Actions
+                      </div>
+                      <div className="px-4 py-2 bg-white rounded-lg border border-slate-200 text-sm text-slate-700">
+                        <span className="font-semibold">Priority</span> Tracking
+                      </div>
+                      <div className="px-4 py-2 bg-white rounded-lg border border-slate-200 text-sm text-slate-700">
+                        <span className="font-semibold">Due Date</span> Management
+                      </div>
+                      <div className="px-4 py-2 bg-white rounded-lg border border-slate-200 text-sm text-slate-700">
+                        <span className="font-semibold">Progress</span> Monitoring
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
