@@ -3,13 +3,13 @@ import { MessageSquare, Reply } from 'lucide-react'
 
 interface Comment {
   id: number
-  userId: {
+  user_id: {
     id: number
     name?: string
     email: string
   }
   commentText: string
-  createdAt: string
+  created_at: string
   mentions?: number[]
   replies?: Comment[]
 }
@@ -42,7 +42,7 @@ export default function CommentThread({
             {/* Avatar */}
             <div className="flex-shrink-0">
               <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-sm">
-                {comment.userId.email[0].toUpperCase()}
+                {comment.user_id.email[0].toUpperCase()}
               </div>
             </div>
 
@@ -51,10 +51,10 @@ export default function CommentThread({
               <div className="bg-gray-50 rounded-lg p-3">
                 <div className="flex items-baseline justify-between mb-1">
                   <span className="text-sm font-semibold text-gray-900">
-                    {comment.userId.name || comment.userId.email}
+                    {comment.user_id.name || comment.user_id.email}
                   </span>
                   <span className="text-xs text-gray-500 ml-2">
-                    {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                   </span>
                 </div>
                 <p className="text-sm text-gray-700 whitespace-pre-wrap">

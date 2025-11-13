@@ -105,7 +105,7 @@ export default function CreateProjectModal({
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('id')
-        .eq('openId', user.id)
+        .eq('open_id', user.id)
         .single()
 
       let userId: number
@@ -115,9 +115,9 @@ export default function CreateProjectModal({
         const { data: newUser, error: createUserError } = await supabase
           .from('users')
           .insert({
-            openId: user.id,
+            open_id: user.id,
             email: user.email,
-            loginMethod: 'email',
+            login_method: 'email',
           })
           .select('id')
           .single()

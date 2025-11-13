@@ -175,11 +175,11 @@ export default function UploadDocumentsModal({
         try {
           const payload = {
             identifier: 'document_upload',
-            fileId: fileRecord.id,
-            projectId: projectId,
-            fileName: file.name,
-            fileUrl: publicUrl,
-            fileKey: filePath,
+            file_id: fileRecord.id,
+            project_id: projectId,
+            file_name: file.name,
+            file_url: publicUrl,
+            file_key: filePath,
           }
 
           console.log('🔔 Triggering N8N webhook for fileId:', fileRecord.id, 'fileName:', file.name)

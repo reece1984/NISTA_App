@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { n8nApi } from '../services/n8nApi'
+import { apiAdapter } from '../services/apiAdapter'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 
@@ -51,7 +52,17 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
     if (existingDraft) {
       setDraftId(existingDraft.id)
       if (existingDraft.draft_data?.proposedActions) {
-        setActions(existingDraft.draft_data.proposedActions)
+        // Transform snake_case from database to camelCase for frontend
+        const transformedActions = existingDraft.draft_data.proposedActions.map((action: any) => ({
+          title: action.title,
+          description: action.description,
+          priority: action.priority,
+          suggestedDueDate: action.suggested_due_date || action.suggestedDueDate,
+          linkedAssessmentIds: action.linked_assessment_ids || action.linkedAssessmentIds || [],
+          criteriaCategory: action.criteria_category || action.criteriaCategory,
+          assignedTo: action.assigned_to || action.assignedTo
+        }))
+        setActions(transformedActions)
       }
       if (existingDraft.conversation_history) {
         setConversationHistory(existingDraft.conversation_history)
@@ -63,7 +74,19 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
   const generateMutation = useMutation({
     mutationFn: async () => {
       setIsGenerating(true)
-      return n8nApi.generateActionPlan(projectId, assessmentRunId, user?.id ? parseInt(user.id) : undefined)
+
+      // Get the database user ID from the users table
+      let dbUserId: number | undefined
+      if (user?.id) {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('id')
+          .eq('open_id', user.id)
+          .single()
+        dbUserId = userData?.id
+      }
+
+      return n8nApi.generateActionPlan(projectId, assessmentRunId, dbUserId)
     },
     onSuccess: (data) => {
       setDraftId(data.draftId)
@@ -80,6 +103,12 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
     mutationFn: async (userMessage: string) => {
       if (!draftId) throw new Error('No draft ID available')
 
+      // Add user message to history immediately for UI feedback
+      setConversationHistory(prev => [
+        ...prev,
+        { role: 'user', content: userMessage }
+      ])
+
       const newConversation = [
         ...conversationHistory,
         { role: 'user' as const, content: userMessage }
@@ -87,35 +116,43 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
 
       return n8nApi.refineActionPlan(draftId, userMessage, newConversation)
     },
-    onSuccess: (data, userMessage) => {
+    onSuccess: (data) => {
       setActions(data.refinedActions || actions)
+      // Only add AI response (user message already added in mutationFn)
       setConversationHistory(prev => [
         ...prev,
-        { role: 'user', content: userMessage },
-        { role: 'assistant', content: data.aiResponse }
+        { role: 'assistant', content: data.aiResponse || 'Action plan has been updated.' }
       ])
+    },
+    onError: (error, userMessage) => {
+      // Remove the user message that was optimistically added
+      setConversationHistory(prev => prev.slice(0, -1))
     }
   })
 
   // Confirm action plan mutation
   const confirmMutation = useMutation({
     mutationFn: async () => {
-      if (!draftId || !user?.id) throw new Error('Missing draft ID or user')
+      if (!draftId) throw new Error('Missing draft ID')
 
-      return n8nApi.confirmActionPlan(
-        draftId,
-        parseInt(user.id),
-        actions.map(action => ({
-          title: action.title,
-          description: action.description,
-          priority: action.priority,
-          assignedTo: action.assignedTo,
-          dueDate: action.suggestedDueDate,
-          linkedAssessmentIds: action.linkedAssessmentIds
-        }))
-      )
+      // Get the database user ID from the users table
+      let dbUserId: number | undefined
+      if (user?.id) {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('id')
+          .eq('open_id', user.id)
+          .single()
+        dbUserId = userData?.id
+      }
+
+      if (!dbUserId) throw new Error('User not found in database')
+
+      // Call Express API instead of N8N for database transaction
+      return apiAdapter.confirmActionPlan(draftId, dbUserId)
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log(`Successfully created ${data.createdActionCount} actions`)
       // Invalidate actions query to refresh the list
       queryClient.invalidateQueries({ queryKey: ['actions'] })
     }

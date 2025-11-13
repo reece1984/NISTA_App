@@ -137,7 +137,8 @@ export default function ActionPlanDraftWorkspace({
           </div>
           <button
             onClick={handleAddManualAction}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            title="Add a new action manually"
           >
             <Plus size={16} />
             Add Action Manually
@@ -199,71 +200,72 @@ export default function ActionPlanDraftWorkspace({
           )}
         </div>
 
-        {/* AI Refinement Chat */}
+        {/* AI Refinement Chat - Compact */}
         {!isGenerating && actions.length > 0 && (
-          <div className="mt-6 pt-4 border-t border-gray-200 space-y-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-              <Sparkles size={16} className="text-blue-600" />
-              Refine this action plan
+          <div className="mt-4 pt-3 border-t border-gray-200 bg-gray-50 -mx-6 px-6 pb-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles size={14} className="text-blue-600" />
+              <h4 className="text-xs font-semibold text-gray-700">Refine with AI</h4>
             </div>
 
-            {/* Conversation History */}
+            {/* Compact Chat History - Only last 2 messages */}
             {conversationHistory.length > 0 && (
-              <div className="max-h-32 overflow-y-auto space-y-2 mb-3">
-                {conversationHistory.map((msg, idx) => (
-                  <div
-                    key={idx}
-                    className={`text-sm p-2 rounded ${
-                      msg.role === 'user'
-                        ? 'bg-blue-50 text-blue-900 ml-8'
-                        : 'bg-gray-50 text-gray-900 mr-8'
-                    }`}
-                  >
-                    <span className="font-semibold">
-                      {msg.role === 'user' ? 'You' : 'AI'}:
-                    </span>{' '}
-                    {msg.content}
+              <div className="space-y-1 mb-2">
+                {conversationHistory.slice(-2).map((msg, idx) => (
+                  <div key={idx} className="flex gap-2 text-xs">
+                    <span className="font-semibold text-gray-600 min-w-[45px] flex-shrink-0">
+                      {msg.role === 'user' ? 'You:' : 'AI:'}
+                    </span>
+                    <span className="text-gray-500 line-clamp-1">{msg.content}</span>
                   </div>
                 ))}
                 <div ref={chatEndRef} />
               </div>
             )}
 
-            {/* Quick Prompts */}
-            <div className="flex flex-wrap gap-2">
-              {quickPrompts.map((prompt, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setUserMessage(prompt)}
-                  className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-
-            {/* Message Input */}
-            <div className="flex gap-2">
+            {/* Compact Input */}
+            <div className="flex gap-2 mb-2">
               <input
                 type="text"
                 value={userMessage}
                 onChange={(e) => setUserMessage(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                placeholder="Type your refinement request..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                placeholder="Ask AI to refine..."
+                className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 disabled={isRefining}
               />
               <button
                 onClick={handleSendMessage}
                 disabled={!userMessage.trim() || isRefining}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition-colors"
+                title="Send message"
               >
                 {isRefining ? (
-                  <Loader2 size={16} className="animate-spin" />
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    <span className="text-xs">Refining...</span>
+                  </>
                 ) : (
-                  <Send size={16} />
+                  <>
+                    <Send size={14} />
+                    <span className="text-xs">Send</span>
+                  </>
                 )}
               </button>
+            </div>
+
+            {/* Compact Quick Prompts */}
+            <div className="flex flex-wrap gap-1">
+              {quickPrompts.map((prompt, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setUserMessage(prompt)}
+                  disabled={isRefining}
+                  className="px-2 py-1 text-xs bg-white border border-gray-300 hover:border-blue-400 hover:bg-blue-50 text-gray-600 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {prompt}
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -282,26 +284,19 @@ export default function ActionPlanDraftWorkspace({
               variant="secondary"
               onClick={() => saveDraft()}
               disabled={isSaving || !draftId}
+              title="Save current draft"
             >
               {isSaving ? 'Saving...' : 'Save Draft'}
             </Button>
             <Button
               variant="primary"
               onClick={() => setShowConfirmDialog(true)}
-              disabled={actions.length === 0 || isConfirming}
+              disabled={isConfirming || actions.length === 0}
               className="flex items-center gap-2"
+              title="Confirm and create actions from this draft"
             >
-              {isConfirming ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  Creating Actions...
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 size={16} />
-                  Confirm & Create Actions
-                </>
-              )}
+              <CheckCircle2 size={16} />
+              Confirm & Create Actions
             </Button>
           </div>
         </div>

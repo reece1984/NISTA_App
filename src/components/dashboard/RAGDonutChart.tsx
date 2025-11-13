@@ -15,9 +15,9 @@ export default function RAGDonutChart({ ragCounts, onFilterChange }: RAGDonutCha
   const total = ragCounts.green + ragCounts.amber + ragCounts.red
 
   const data = [
-    { name: 'Green', value: ragCounts.green, color: '#00703c' },
-    { name: 'Amber', value: ragCounts.amber, color: '#f47738' },
-    { name: 'Red', value: ragCounts.red, color: '#d4351c' },
+    { name: 'Green', value: ragCounts.green, color: '#10b981' }, // Modern emerald
+    { name: 'Amber', value: ragCounts.amber, color: '#f59e0b' }, // Modern amber
+    { name: 'Red', value: ragCounts.red, color: '#ef4444' }, // Modern red
   ].filter(item => item.value > 0) // Only show segments with values
 
   const renderCustomLabel = ({
@@ -55,10 +55,11 @@ export default function RAGDonutChart({ ragCounts, onFilterChange }: RAGDonutCha
   }
 
   return (
-    <div className="card h-full">
-      <h3 className="text-lg font-semibold text-text-primary mb-4">
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/50 h-full">
+      <h3 className="text-lg font-bold text-slate-900 mb-1">
         RAG Distribution
       </h3>
+      <p className="text-sm text-slate-600 mb-4">Assessment breakdown by status</p>
       <ResponsiveContainer width="100%" height={240}>
         <PieChart>
           <Pie
@@ -90,8 +91,9 @@ export default function RAGDonutChart({ ragCounts, onFilterChange }: RAGDonutCha
             contentStyle={{
               backgroundColor: 'white',
               border: '1px solid #e5e7eb',
-              borderRadius: '8px',
+              borderRadius: '12px',
               padding: '8px 12px',
+              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
           />
           <Legend
@@ -105,7 +107,7 @@ export default function RAGDonutChart({ ragCounts, onFilterChange }: RAGDonutCha
           />
         </PieChart>
       </ResponsiveContainer>
-      <div className="mt-4 text-center text-sm text-text-secondary">
+      <div className="mt-4 text-center text-xs text-slate-500 font-medium">
         Click on a segment to filter
       </div>
     </div>

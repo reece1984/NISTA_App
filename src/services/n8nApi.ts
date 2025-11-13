@@ -1,7 +1,10 @@
 /**
  * N8N API Service
- * Handles all webhook calls to N8N backend for action plan management
+ * Handles AI-powered operations via N8N webhooks
+ * CRUD operations now use Express API via apiAdapter
  */
+
+import { apiAdapter } from './apiAdapter'
 
 const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL ||
   import.meta.env.VITE_N8N_DOCUMENT_UPLOAD_WEBHOOK
@@ -41,10 +44,10 @@ export const n8nApi = {
   generateActionPlan: async (projectId: number, assessmentRunId: number, userId?: number) => {
     return callN8N({
       identifier: 'generate_action_plan',
-      projectId,
-      assessmentRunId,
-      userId,
-      selectedFindings: [] // Empty array means "all RED/AMBER findings"
+      project_id: projectId,
+      assessment_run_id: assessmentRunId,
+      user_id: userId,
+      selected_findings: [] // Empty array means "all RED/AMBER findings"
     })
   },
 
@@ -58,9 +61,9 @@ export const n8nApi = {
   ) => {
     return callN8N({
       identifier: 'refine_action_plan',
-      draftId,
-      userMessage,
-      conversationHistory
+      draft_id: draftId,
+      user_message: userMessage,
+      conversation_history: conversationHistory
     })
   },
 
@@ -81,14 +84,15 @@ export const n8nApi = {
   ) => {
     return callN8N({
       identifier: 'confirm_action_plan',
-      draftId,
-      userId,
-      finalActions
+      draft_id: draftId,
+      user_id: userId,
+      final_actions: finalActions
     })
   },
 
   /**
    * Get actions for a project with optional filters
+   * Now uses Express API instead of N8N
    */
   getActions: async (
     projectId: number,
@@ -98,15 +102,12 @@ export const n8nApi = {
       priority?: string
     } = {}
   ) => {
-    return callN8N({
-      identifier: 'get_actions',
-      projectId,
-      filters
-    })
+    return apiAdapter.getActions(projectId, filters)
   },
 
   /**
    * Update a single action
+   * Now uses Express API instead of N8N
    */
   updateAction: async (
     actionId: number,
@@ -121,16 +122,12 @@ export const n8nApi = {
     },
     changedBy: number
   ) => {
-    return callN8N({
-      identifier: 'update_action',
-      actionId,
-      updates,
-      changedBy
-    })
+    return apiAdapter.updateAction(actionId, updates, changedBy)
   },
 
   /**
    * Bulk update multiple actions
+   * Now uses Express API instead of N8N
    */
   bulkUpdateActions: async (
     actionIds: number[],
@@ -142,26 +139,20 @@ export const n8nApi = {
     },
     changedBy: number
   ) => {
-    return callN8N({
-      identifier: 'bulk_update_actions',
-      actionIds,
-      updates,
-      changedBy
-    })
+    return apiAdapter.bulkUpdateActions(actionIds, updates, changedBy)
   },
 
   /**
    * Get detailed action information including history and comments
+   * Now uses Express API instead of N8N
    */
   getActionDetails: async (actionId: number) => {
-    return callN8N({
-      identifier: 'get_action_details',
-      actionId
-    })
+    return apiAdapter.getActionDetails(actionId)
   },
 
   /**
    * Add a comment to an action
+   * Now uses Express API instead of N8N
    */
   addComment: async (
     actionId: number,
@@ -170,14 +161,7 @@ export const n8nApi = {
     mentions: number[] = [],
     parentCommentId: number | null = null
   ) => {
-    return callN8N({
-      identifier: 'add_comment',
-      actionId,
-      userId,
-      commentText,
-      mentions,
-      parentCommentId
-    })
+    return apiAdapter.addComment(actionId, userId, commentText, mentions, parentCommentId)
   },
 
   /**
@@ -186,8 +170,8 @@ export const n8nApi = {
   compareAssessments: async (newAssessmentRunId: number, projectId: number) => {
     return callN8N({
       identifier: 'compare_assessments',
-      newAssessmentRunId,
-      projectId
+      new_assessment_run_id: newAssessmentRunId,
+      project_id: projectId
     })
   }
 }

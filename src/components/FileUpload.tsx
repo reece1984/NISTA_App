@@ -82,10 +82,10 @@ export default function FileUpload({
         try {
           const payload = {
             identifier: 'document_upload',
-            projectId,
-            fileName: file.name,
-            fileUrl: publicUrl,
-            fileKey,
+            project_id: projectId,
+            file_name: file.name,
+            file_url: publicUrl,
+            file_key: fileKey,
           }
           console.log('🔔 Calling N8N webhook:', webhookUrl)
           console.log('📦 Payload:', payload)

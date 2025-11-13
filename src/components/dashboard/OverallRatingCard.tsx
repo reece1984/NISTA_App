@@ -15,10 +15,10 @@ export default function OverallRatingCard({
 }: OverallRatingCardProps) {
   const getRagBadge = (rating: string) => {
     const badges = {
-      green: 'bg-rag-green text-white',
-      amber: 'bg-rag-amber text-white',
-      red: 'bg-rag-red text-white',
-      pending: 'bg-gray-300 text-gray-700',
+      green: 'bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30',
+      amber: 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/30',
+      red: 'bg-gradient-to-br from-red-500 to-rose-600 text-white shadow-lg shadow-red-500/30',
+      pending: 'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-700 shadow-lg',
     }
     return badges[rating as keyof typeof badges] || badges.pending
   }
@@ -28,40 +28,40 @@ export default function OverallRatingCard({
   }
 
   return (
-    <div className="card bg-gradient-to-br from-secondary/10 via-secondary/5 to-accent/5 border-l-4 border-secondary">
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h3 className="text-sm font-medium text-text-secondary mb-2">
+    <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200/50">
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex-1">
+          <h3 className="text-sm font-medium text-slate-500 mb-4 uppercase tracking-wider">
             Overall Assessment Rating
           </h3>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <span
               className={cn(
-                'px-6 py-3 rounded-xl font-bold text-2xl shadow-lg',
+                'px-8 py-4 rounded-2xl font-bold text-3xl',
                 getRagBadge(overallRating)
               )}
             >
               {getRagLabel(overallRating)}
             </span>
             <div>
-              <div className="text-4xl font-bold text-text-primary">
+              <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 {readinessPercentage}%
               </div>
-              <div className="text-sm text-text-secondary">Ready</div>
+              <div className="text-sm text-slate-600 font-medium mt-1">Ready</div>
             </div>
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-3xl font-bold text-secondary">
+        <div className="text-right bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl px-6 py-4 border border-blue-100">
+          <div className="text-4xl font-bold text-slate-900">
             {totalCriteria}
           </div>
-          <div className="text-sm text-text-secondary">Criteria Assessed</div>
+          <div className="text-sm text-slate-600 font-medium">Criteria Assessed</div>
         </div>
       </div>
 
       {executiveSummary && (
-        <div className="mt-4 pt-4 border-t border-border">
-          <p className="text-text-secondary leading-relaxed">
+        <div className="mt-6 pt-6 border-t border-slate-200">
+          <p className="text-slate-700 leading-relaxed">
             {executiveSummary}
           </p>
         </div>

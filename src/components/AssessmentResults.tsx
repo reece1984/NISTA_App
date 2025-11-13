@@ -13,6 +13,8 @@ import PriorityActionsCard from './dashboard/PriorityActionsCard'
 import InteractiveCriteriaTable from './dashboard/InteractiveCriteriaTable'
 import ActionPlanDraftWorkspace from './ActionPlan/ActionPlanDraftWorkspace'
 import AssessmentComparisonBanner from './ActionPlan/AssessmentComparisonBanner'
+import ActionKanbanBoard from './ActionPlan/ActionKanbanBoard'
+import ActionTableView from './ActionPlan/ActionTableView'
 
 interface Assessment {
   id: number
@@ -63,14 +65,14 @@ export default function AssessmentResults({
   const [dimensionFilter, setDimensionFilter] = useState<string | null>(null)
   const [showActionPlanWorkspace, setShowActionPlanWorkspace] = useState(false)
 
-  // Check if action plan draft exists
+  // Check if action plan draft exists and its status
   const { data: existingDraft } = useQuery({
     queryKey: ['action-plan-draft-exists', assessmentRunId],
     queryFn: async () => {
       if (!assessmentRunId) return null
       const { data, error } = await supabase
         .from('action_plan_drafts')
-        .select('id')
+        .select('id, draft_status')
         .eq('assessment_run_id', assessmentRunId)
         .limit(1)
         .maybeSingle()
@@ -80,6 +82,25 @@ export default function AssessmentResults({
     },
     enabled: !!assessmentRunId
   })
+
+  // Check if actions have been created from this assessment run
+  const { data: createdActions } = useQuery({
+    queryKey: ['actions-from-assessment', assessmentRunId],
+    queryFn: async () => {
+      if (!assessmentRunId) return null
+      const { data, error } = await supabase
+        .from('actions')
+        .select('id')
+        .eq('source_assessment_run_id', assessmentRunId)
+        .limit(1)
+
+      if (error) return null
+      return data && data.length > 0
+    },
+    enabled: !!assessmentRunId
+  })
+
+  const [showActionsView, setShowActionsView] = useState(false)
 
   const exportToPDF = () => {
     const doc = new jsPDF()
@@ -767,9 +788,9 @@ export default function AssessmentResults({
       ['Generated: ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })],
       [''],
       ['PROJECT INFORMATION'],
-      ['Project Name', projectData?.projectName || 'N/A'],
-      ['Project Value', projectData?.projectValue ? `£${projectData.projectValue.toLocaleString()} million` : 'N/A'],
-      ['Project Sector', projectData?.projectSector || 'N/A'],
+      ['Project Name', projectData?.project_name || 'N/A'],
+      ['Project Value', projectData?.project_value ? `£${projectData.project_value.toLocaleString()} million` : 'N/A'],
+      ['Project Sector', projectData?.project_sector || 'N/A'],
       ['Status', projectData?.status ? projectData.status.toUpperCase() : 'N/A'],
       ['Assessment Template', projectData?.assessment_templates?.name || 'N/A'],
       [''],
@@ -1064,7 +1085,7 @@ export default function AssessmentResults({
     XLSX.utils.book_append_sheet(workbook, statsSheet, 'Statistics')
 
     // Save the Excel file with timestamp
-    const filename = `NISTA-Assessment-${projectData?.projectName?.replace(/[^a-z0-9]/gi, '-') || 'Report'}-${new Date().toISOString().split('T')[0]}.xlsx`
+    const filename = `NISTA-Assessment-${projectData?.project_name?.replace(/[^a-z0-9]/gi, '-') || 'Report'}-${new Date().toISOString().split('T')[0]}.xlsx`
     XLSX.writeFile(workbook, filename)
   }
 
@@ -1195,41 +1216,59 @@ export default function AssessmentResults({
         />
       )}
 
-      {/* Header with Export Buttons */}
+      {/* Modern Header with Export Buttons */}
       {totalAssessments > 0 && (
-        <div className="mb-6 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-text-primary">Assessment Results</h2>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setShowActionPlanWorkspace(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
-              {existingDraft ? (
-                <>
-                  <ClipboardList size={18} />
-                  View Action Plan
-                </>
-              ) : (
-                <>
-                  <Sparkles size={18} />
-                  Generate Action Plan
-                </>
-              )}
-            </button>
-            <button
-              onClick={exportToExcel}
-              className="flex items-center gap-2 px-4 py-2 bg-rag-green text-white rounded-lg hover:bg-rag-green/90 transition-colors font-medium"
-            >
-              <FileSpreadsheet size={18} />
-              Export to Excel
-            </button>
-            <button
-              onClick={exportToPDF}
-              className="flex items-center gap-2 px-4 py-2 bg-rag-red text-white rounded-lg hover:bg-rag-red/90 transition-colors font-medium"
-            >
-              <FileDown size={18} />
-              Export to PDF
-            </button>
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h2 className="text-3xl font-bold text-slate-900 mb-1">Assessment Results</h2>
+              <p className="text-slate-600">Comprehensive analysis of {totalAssessments} criteria</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  if (createdActions) {
+                    setShowActionsView(true)
+                  } else {
+                    setShowActionPlanWorkspace(true)
+                  }
+                }}
+                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl hover:shadow-lg shadow-blue-500/30 transition-all font-semibold"
+              >
+                {createdActions ? (
+                  <>
+                    <ClipboardList size={18} />
+                    View Actions
+                  </>
+                ) : existingDraft ? (
+                  <>
+                    <ClipboardList size={18} />
+                    View Draft
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={18} />
+                    Generate Action Plan
+                  </>
+                )}
+              </button>
+              <button
+                onClick={exportToExcel}
+                className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all font-medium shadow-sm"
+                title="Export to Excel"
+              >
+                <FileSpreadsheet size={18} />
+                <span className="hidden sm:inline">Excel</span>
+              </button>
+              <button
+                onClick={exportToPDF}
+                className="flex items-center gap-2 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl transition-all font-medium shadow-sm"
+                title="Export to PDF"
+              >
+                <FileDown size={18} />
+                <span className="hidden sm:inline">PDF</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1409,25 +1448,43 @@ export default function AssessmentResults({
         )}
       </div>
 
-      {/* Detailed Criteria Table */}
-      <div>
-        <h2 className="text-xl font-semibold text-text-primary mb-4">
-          Detailed Assessment Criteria
-          {filteredAssessments.length !== totalAssessments && (
-            <span className="text-sm font-normal text-text-secondary ml-2">
-              ({filteredAssessments.length} of {totalAssessments})
-            </span>
-          )}
-        </h2>
-        <InteractiveCriteriaTable
-          assessments={filteredAssessments.map(a => ({
-            ...a,
-            id: a.id
-          }))}
-          expandedId={expandedId}
-          onExpandToggle={setExpandedId}
-        />
-      </div>
+      {/* Detailed Criteria Table - Only show if not viewing actions */}
+      {!showActionsView && (
+        <div>
+          <h2 className="text-xl font-semibold text-text-primary mb-4">
+            Detailed Assessment Criteria
+            {filteredAssessments.length !== totalAssessments && (
+              <span className="text-sm font-normal text-text-secondary ml-2">
+                ({filteredAssessments.length} of {totalAssessments})
+              </span>
+            )}
+          </h2>
+          <InteractiveCriteriaTable
+            assessments={filteredAssessments.map(a => ({
+              ...a,
+              id: a.id
+            }))}
+            expandedId={expandedId}
+            onExpandToggle={setExpandedId}
+          />
+        </div>
+      )}
+
+      {/* Actions View - Show Kanban board when viewing actions */}
+      {showActionsView && projectData?.id && (
+        <div>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold text-text-primary">Actions</h2>
+            <button
+              onClick={() => setShowActionsView(false)}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Back to Assessment
+            </button>
+          </div>
+          <ActionKanbanBoard projectId={projectData.id} />
+        </div>
+      )}
 
       {/* Action Plan Draft Workspace Modal */}
       {showActionPlanWorkspace && assessmentRunId && projectData?.id && (
@@ -1438,7 +1495,8 @@ export default function AssessmentResults({
           onConfirm={(result) => {
             console.log('Action plan confirmed:', result)
             setShowActionPlanWorkspace(false)
-            // Optionally redirect to action board or show success message
+            // Switch to actions view to show the newly created actions
+            setShowActionsView(true)
           }}
         />
       )}

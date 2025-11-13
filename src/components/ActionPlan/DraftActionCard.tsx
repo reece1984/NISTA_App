@@ -34,6 +34,16 @@ export default function DraftActionCard({
     setIsEditing(false)
   }
 
+  const handleEdit = () => {
+    setIsEditing(true)
+  }
+
+  const handleDelete = () => {
+    if (confirm('Are you sure you want to delete this action?')) {
+      onDelete(index)
+    }
+  }
+
   const priorityOptions: Array<DraftAction['priority']> = ['low', 'medium', 'high', 'critical']
 
   return (
@@ -88,16 +98,16 @@ export default function DraftActionCard({
           ) : (
             <>
               <button
-                onClick={() => setIsEditing(true)}
+                onClick={handleEdit}
                 className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                title="Edit"
+                title="Edit action"
               >
                 <Edit2 size={16} />
               </button>
               <button
-                onClick={() => onDelete(index)}
+                onClick={handleDelete}
                 className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
-                title="Delete"
+                title="Delete action"
               >
                 <Trash2 size={16} />
               </button>

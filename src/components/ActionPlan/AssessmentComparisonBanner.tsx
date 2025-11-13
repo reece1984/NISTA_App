@@ -17,6 +17,9 @@ export default function AssessmentComparisonBanner({
   onGenerateActionPlan,
   onCloseActions
 }: AssessmentComparisonBannerProps) {
+  // Temporarily disabled to avoid CORS issues
+  return null
+
   const [isDismissed, setIsDismissed] = useState(false)
 
   const { data: comparison, isLoading } = useQuery({

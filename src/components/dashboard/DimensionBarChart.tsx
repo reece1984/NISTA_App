@@ -65,24 +65,24 @@ export default function DimensionBarChart({
     if (active && payload && payload.length) {
       const data = payload[0].payload
       return (
-        <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-          <p className="font-semibold text-text-primary mb-2">
+        <div className="bg-white p-3 rounded-xl shadow-xl border border-slate-200">
+          <p className="font-bold text-slate-900 mb-2">
             {data.fullDimension}
           </p>
-          <div className="space-y-1 text-sm">
+          <div className="space-y-1.5 text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-rag-green"></div>
-              <span>Green: {data.Green}</span>
+              <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+              <span className="text-slate-700">Green: <span className="font-semibold">{data.Green}</span></span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-rag-amber"></div>
-              <span>Amber: {data.Amber}</span>
+              <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+              <span className="text-slate-700">Amber: <span className="font-semibold">{data.Amber}</span></span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-rag-red"></div>
-              <span>Red: {data.Red}</span>
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <span className="text-slate-700">Red: <span className="font-semibold">{data.Red}</span></span>
             </div>
-            <div className="pt-1 mt-1 border-t border-gray-200 font-semibold">
+            <div className="pt-1.5 mt-1.5 border-t border-slate-200 font-bold text-slate-900">
               Total: {data.total}
             </div>
           </div>
@@ -93,10 +93,11 @@ export default function DimensionBarChart({
   }
 
   return (
-    <div className="card h-full">
-      <h3 className="text-lg font-semibold text-text-primary mb-4">
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/50 h-full">
+      <h3 className="text-lg font-bold text-slate-900 mb-1">
         Assessment by Dimension
       </h3>
+      <p className="text-sm text-slate-600 mb-4">Performance across key areas</p>
       <ResponsiveContainer width="100%" height={240}>
         <BarChart
           data={data}
@@ -104,44 +105,45 @@ export default function DimensionBarChart({
           margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis type="number" stroke="#6b7280" />
+          <XAxis type="number" stroke="#64748b" />
           <YAxis
             dataKey="dimension"
             type="category"
-            stroke="#6b7280"
+            stroke="#64748b"
             width={75}
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: 12, fill: '#475569' }}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend
             wrapperStyle={{ paddingTop: '10px' }}
             iconType="circle"
-            formatter={(value) => <span className="text-sm">{value}</span>}
+            formatter={(value) => <span className="text-sm font-medium text-slate-700">{value}</span>}
           />
           <Bar
             dataKey="Green"
             stackId="a"
-            fill="#00703c"
+            fill="#10b981"
             onClick={handleBarClick}
             className="cursor-pointer hover:opacity-80"
+            radius={[0, 4, 4, 0]}
           />
           <Bar
             dataKey="Amber"
             stackId="a"
-            fill="#f47738"
+            fill="#f59e0b"
             onClick={handleBarClick}
             className="cursor-pointer hover:opacity-80"
           />
           <Bar
             dataKey="Red"
             stackId="a"
-            fill="#d4351c"
+            fill="#ef4444"
             onClick={handleBarClick}
             className="cursor-pointer hover:opacity-80"
           />
         </BarChart>
       </ResponsiveContainer>
-      <div className="mt-4 text-center text-sm text-text-secondary">
+      <div className="mt-4 text-center text-xs text-slate-500 font-medium">
         Click on a bar to filter by dimension
       </div>
     </div>

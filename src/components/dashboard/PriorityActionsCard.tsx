@@ -39,10 +39,10 @@ export default function PriorityActionsCard({
 
   const getRagBadge = (rating: string) => {
     const badges = {
-      amber: 'bg-rag-amber text-white',
-      red: 'bg-rag-red text-white',
+      amber: 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm',
+      red: 'bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-sm',
     }
-    return badges[rating as keyof typeof badges] || 'bg-gray-300 text-gray-700'
+    return badges[rating as keyof typeof badges] || 'bg-slate-300 text-slate-700'
   }
 
   const truncateText = (text: string | null, maxLength: number) => {
@@ -52,58 +52,61 @@ export default function PriorityActionsCard({
   }
 
   return (
-    <div className="card h-full">
-      <div className="flex items-center gap-2 mb-4">
-        <AlertCircle className="text-rag-red" size={20} />
-        <h3 className="text-lg font-semibold text-text-primary">
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/50 h-full">
+      <div className="flex items-center gap-2 mb-1">
+        <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg flex items-center justify-center shadow-sm">
+          <AlertCircle className="text-white" size={18} />
+        </div>
+        <h3 className="text-lg font-bold text-slate-900">
           Priority Actions
         </h3>
       </div>
+      <p className="text-sm text-slate-600 mb-4">Critical items requiring attention</p>
 
       {priorityAssessments.length === 0 ? (
-        <div className="text-center py-8">
-          <div className="text-4xl mb-2">🎉</div>
-          <p className="text-text-secondary">No critical issues found!</p>
-          <p className="text-sm text-text-secondary mt-1">
-            All criteria are rated green.
+        <div className="text-center py-10 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border border-emerald-200">
+          <div className="text-5xl mb-3">🎉</div>
+          <p className="text-slate-900 font-semibold">No critical issues found!</p>
+          <p className="text-sm text-slate-600 mt-1">
+            All criteria are rated green
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {priorityAssessments.map((assessment) => (
             <div
               key={assessment.id}
-              className="p-3 rounded-lg border border-border hover:border-secondary/50 hover:bg-secondary/5 transition-all cursor-pointer"
+              className="p-3 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50/50 transition-all cursor-pointer group"
               onClick={() => onViewDetails && onViewDetails(assessment.id)}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-xs text-text-secondary">
+                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <span className="font-mono text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
                       {assessment.assessment_criteria.criterion_code}
                     </span>
                     {assessment.assessment_criteria.is_critical && (
-                      <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-rag-red/10 text-rag-red border border-rag-red/30">
+                      <span className="px-2 py-0.5 rounded-lg text-xs font-bold bg-red-100 text-red-700 border border-red-200">
                         CRITICAL
                       </span>
                     )}
                     <span
                       className={cn(
-                        'px-2 py-0.5 rounded text-xs font-semibold',
+                        'px-2 py-0.5 rounded-lg text-xs font-bold',
                         getRagBadge(assessment.rag_rating)
                       )}
                     >
                       {assessment.rag_rating.toUpperCase()}
                     </span>
                   </div>
-                  <p className="text-sm font-medium text-text-primary mb-1 truncate">
+                  <p className="text-sm font-semibold text-slate-900 mb-1 truncate">
                     {assessment.assessment_criteria.title}
                   </p>
-                  <p className="text-xs text-text-secondary line-clamp-2">
+                  <p className="text-xs text-slate-600 line-clamp-2">
                     {truncateText(assessment.finding, 100)}
                   </p>
                 </div>
-                <ChevronRight className="flex-shrink-0 text-text-secondary" size={16} />
+                <ChevronRight className="flex-shrink-0 text-slate-400 group-hover:text-blue-600 transition-colors" size={16} />
               </div>
             </div>
           ))}
@@ -111,8 +114,8 @@ export default function PriorityActionsCard({
       )}
 
       {priorityAssessments.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-border text-center">
-          <p className="text-xs text-text-secondary">
+        <div className="mt-4 pt-4 border-t border-slate-200 text-center">
+          <p className="text-xs text-slate-500 font-medium">
             Showing top {priorityAssessments.length} priority{' '}
             {priorityAssessments.length === 1 ? 'action' : 'actions'}
           </p>

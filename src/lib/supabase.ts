@@ -12,14 +12,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 // Types for our database tables
 export type User = {
   id: number
-  openId: string
+  open_id: string
   name: string | null
   email: string | null
-  loginMethod: string | null
+  login_method: string | null
   role: 'user' | 'admin'
-  createdAt: string
-  updatedAt: string
-  lastSignedIn: string
+  created_at: string
+  updated_at: string
+  last_signed_in: string
 }
 
 export type AssessmentTemplate = {
@@ -35,54 +35,54 @@ export type AssessmentTemplate = {
 
 export type Project = {
   id: number
-  userId: number
-  projectName: string
-  projectValue: number | null
-  projectSector: string | null
+  user_id: number
+  project_name: string
+  project_value: number | null
+  project_sector: string | null
   template_id: number | null
   status: 'draft' | 'processing' | 'completed'
-  createdAt: string
-  updatedAt: string
+  created_at: string
+  updated_at: string
 }
 
 export type File = {
   id: number
-  projectId: number
-  fileName: string
-  fileType: string
-  fileUrl: string | null
-  fileKey: string | null
+  project_id: number
+  file_name: string
+  file_type: string
+  file_url: string | null
+  file_key: string | null
   status: 'uploaded' | 'processing' | 'completed' | 'error'
-  uploadedAt: string
-  processedAt: string | null
+  uploaded_at: string
+  processed_at: string | null
 }
 
 export type AssessmentCriterion = {
   id: number
-  criterionCode: string
+  criterion_code: string
   dimension: string
   category: string
   title: string
   description: string
-  assessmentQuestion: string
+  assessment_question: string
   template_id: number | null
   weight: number | null
   is_critical: boolean
-  createdAt: string
+  created_at: string
 }
 
 export type Assessment = {
   id: number
-  projectId: number
-  criterionId: number
-  ragRating: 'green' | 'amber' | 'red' | 'pending'
+  project_id: number
+  criterion_id: number
+  rag_rating: 'green' | 'amber' | 'red' | 'pending'
   finding: string | null
   evidence: string | null
   recommendation: string | null
   confidence: number | null
-  satisfactionScore: number | null
-  createdAt: string
-  updatedAt: string
+  satisfaction_score: number | null
+  created_at: string
+  updated_at: string
 }
 
 export type ProjectSummary = {
