@@ -582,7 +582,28 @@ export default function ProjectDetailPage() {
                 </section>
               )}
 
-              {!projectData.projectSummary && (
+              {!projectData.projectSummary && hasAssessments && (
+                <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <BarChart3 className="text-blue-600" size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">
+                    No Executive Summary Yet
+                  </h3>
+                  <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                    View your assessment results in the Assessment Summary tab
+                  </p>
+                  <button
+                    onClick={() => setActiveTab('assessment-summary')}
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30"
+                  >
+                    <BarChart3 size={18} />
+                    View Assessment
+                  </button>
+                </div>
+              )}
+
+              {!projectData.projectSummary && !hasAssessments && (
                 <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <BarChart3 className="text-blue-600" size={32} />
@@ -591,14 +612,14 @@ export default function ProjectDetailPage() {
                     No Assessment Yet
                   </h3>
                   <p className="text-slate-600 mb-6 max-w-md mx-auto">
-                    Upload documents and run an assessment to see your executive summary
+                    Run an assessment to see your project overview
                   </p>
                   <button
-                    onClick={() => setActiveTab('documents')}
+                    onClick={() => setActiveTab('assessment-summary')}
                     className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30"
                   >
-                    <FileText size={18} />
-                    Go to Documents
+                    <BarChart3 size={18} />
+                    Go to Assessment
                   </button>
                 </div>
               )}
@@ -873,7 +894,7 @@ export default function ProjectDetailPage() {
                     Complete an assessment first to generate an action plan
                   </p>
                   <button
-                    onClick={() => setActiveTab('assessment')}
+                    onClick={() => setActiveTab('assessment-summary')}
                     className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30"
                   >
                     <BarChart3 size={18} />
