@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye, Upload, LayoutGrid, FileText, BarChart3, Target, Activity, Sparkles } from 'lucide-react'
+import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye, Upload, LayoutGrid, FileText, BarChart3, Target, Activity, Sparkles, FileBarChart } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Button from '../components/ui/Button'
 import AssessmentResults from '../components/AssessmentResults'
@@ -13,7 +13,7 @@ import DocumentsList from '../components/DocumentsList'
 import UploadDocumentsModal from '../components/UploadDocumentsModal'
 import { useDocuments } from '../hooks/useDocuments'
 
-type TabType = 'overview' | 'documents' | 'assessment' | 'actions'
+type TabType = 'overview' | 'documents' | 'assessment-summary' | 'assessment-detail' | 'actions'
 
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -331,7 +331,8 @@ export default function ProjectDetailPage() {
   const tabs = [
     { id: 'overview' as TabType, label: 'Overview', icon: LayoutGrid },
     { id: 'documents' as TabType, label: 'Documents', icon: FileText, badge: documents.length },
-    { id: 'assessment' as TabType, label: 'Assessment', icon: BarChart3, badge: hasAssessments ? projectData.assessments.length : undefined },
+    { id: 'assessment-summary' as TabType, label: 'Assessment Summary', icon: BarChart3, badge: hasAssessments ? projectData.assessments.length : undefined },
+    { id: 'assessment-detail' as TabType, label: 'Assessment Detail', icon: FileBarChart, badge: hasAssessments ? projectData.assessments.length : undefined },
     { id: 'actions' as TabType, label: 'Actions', icon: Target },
   ]
 
@@ -652,7 +653,7 @@ export default function ProjectDetailPage() {
                   </div>
                   <button
                     onClick={() => {
-                      setActiveTab('assessment')
+                      setActiveTab('assessment-summary')
                       setTimeout(() => {
                         window.scrollTo({ top: 0, behavior: 'smooth' })
                       }, 100)
@@ -668,8 +669,8 @@ export default function ProjectDetailPage() {
             </div>
           )}
 
-          {/* Assessment Tab */}
-          {activeTab === 'assessment' && (
+          {/* Assessment Summary Tab */}
+          {activeTab === 'assessment-summary' && (
             <div className="p-8">
               {/* Run Assessment Section */}
               <div className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 border-2 border-blue-200">
@@ -738,19 +739,14 @@ export default function ProjectDetailPage() {
                 )}
               </div>
 
-              {/* Assessment Results */}
+              {/* Assessment Summary Dashboard */}
               {hasAssessments ? (
-                <div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-6">
-                    Detailed Assessment Results
-                  </h2>
-                  <AssessmentResults
-                    assessments={projectData.assessments}
-                    projectSummary={projectData.projectSummary}
-                    projectData={projectData}
-                    assessmentRunId={projectData.assessmentRunId}
-                  />
-                </div>
+                <AssessmentResults
+                  assessments={projectData.assessments}
+                  projectSummary={projectData.projectSummary}
+                  projectData={projectData}
+                  assessmentRunId={projectData.assessmentRunId}
+                />
               ) : (
                 <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -761,6 +757,42 @@ export default function ProjectDetailPage() {
                   </h3>
                   <p className="text-slate-600 max-w-md mx-auto">
                     Upload documents and run an assessment to see detailed results here
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Assessment Detail Tab */}
+          {activeTab === 'assessment-detail' && (
+            <div className="p-8">
+              {hasAssessments ? (
+                <div>
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                      Detailed Assessment Criteria
+                    </h2>
+                    <p className="text-slate-600">
+                      View detailed findings, evidence, and recommendations for each criterion
+                    </p>
+                  </div>
+                  <AssessmentResults
+                    assessments={projectData.assessments}
+                    projectSummary={projectData.projectSummary}
+                    projectData={projectData}
+                    assessmentRunId={projectData.assessmentRunId}
+                  />
+                </div>
+              ) : (
+                <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <ClipboardList className="text-blue-600" size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">
+                    No Assessment Results Yet
+                  </h3>
+                  <p className="text-slate-600 max-w-md mx-auto">
+                    Upload documents and run an assessment to see detailed criteria here
                   </p>
                 </div>
               )}
@@ -791,7 +823,7 @@ export default function ProjectDetailPage() {
                         </p>
                       </div>
                       <button
-                        onClick={() => setActiveTab('assessment')}
+                        onClick={() => setActiveTab('assessment-summary')}
                         className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30"
                       >
                         <Sparkles size={18} />
