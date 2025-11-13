@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye, Upload } from 'lucide-react'
+import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye, Upload, LayoutGrid, FileText, BarChart3, Target, Activity } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Button from '../components/ui/Button'
 import AssessmentResults from '../components/AssessmentResults'
@@ -13,9 +13,12 @@ import DocumentsList from '../components/DocumentsList'
 import UploadDocumentsModal from '../components/UploadDocumentsModal'
 import { useDocuments } from '../hooks/useDocuments'
 
+type TabType = 'overview' | 'documents' | 'assessment' | 'actions'
+
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [runningAssessment, setRunningAssessment] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showCriteriaSheet, setShowCriteriaSheet] = useState(false)
@@ -75,11 +78,26 @@ export default function ProjectDetailPage() {
 
       const projectSummary = projectSummaries?.[0] || null
 
+      // Fetch the most recent assessment run ID
+      const { data: assessmentRuns, error: runError } = await supabase
+        .from('assessment_runs')
+        .select('id')
+        .eq('project_id', id!)
+        .order('created_at', { ascending: false })
+        .limit(1)
+
+      if (runError && runError.code !== 'PGRST116') {
+        console.error('Assessment runs error:', runError)
+      }
+
+      const assessmentRunId = assessmentRuns?.[0]?.id || null
+
       return {
         ...project,
         files: files || [],
         assessments: assessments || [],
         projectSummary: projectSummary || null,
+        assessmentRunId,
       }
     },
     enabled: !!id,
@@ -310,29 +328,41 @@ export default function ProjectDetailPage() {
   const templateCode = projectData.assessment_templates?.code || null
   const templateName = projectData.assessment_templates?.name || null
 
+  const tabs = [
+    { id: 'overview' as TabType, label: 'Overview', icon: LayoutGrid },
+    { id: 'documents' as TabType, label: 'Documents', icon: FileText, badge: documents.length },
+    { id: 'assessment' as TabType, label: 'Assessment', icon: BarChart3, badge: hasAssessments ? projectData.assessments.length : undefined },
+    { id: 'actions' as TabType, label: 'Actions', icon: Target },
+  ]
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
+      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/50 shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
-              <Link to="/dashboard" className="flex items-center gap-2">
+              <Link to="/dashboard" className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <Target className="text-white" size={22} />
+                </div>
                 <div>
-                  <div className="text-lg font-bold text-gray-900" style={{ fontFamily: 'Inter, sans-serif' }}>Gateway Success</div>
-                  <div className="text-xs text-gray-600">NISTA/PAR Assessment</div>
+                  <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    Gateway Success
+                  </div>
+                  <div className="text-xs text-slate-600 font-medium">NISTA/PAR Assessment</div>
                 </div>
               </Link>
-              <nav className="hidden md:flex items-center gap-4">
+              <nav className="hidden md:flex items-center gap-1 ml-4">
                 <Link
                   to="/dashboard"
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors font-medium"
+                  className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/criteria"
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2 font-medium"
+                  className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all flex items-center gap-2"
                 >
                   <ClipboardList size={16} />
                   Criteria
@@ -340,7 +370,7 @@ export default function ProjectDetailPage() {
               </nav>
               <Link
                 to="/dashboard"
-                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors text-sm md:hidden font-medium"
+                className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors text-sm md:hidden font-medium"
               >
                 <ArrowLeft size={16} />
                 Back
@@ -348,7 +378,7 @@ export default function ProjectDetailPage() {
             </div>
             <button
               onClick={() => setShowDeleteModal(true)}
-              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all"
+              className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all shadow-sm hover:shadow-md"
             >
               <Trash2 size={16} />
               <span className="hidden sm:inline">Delete Project</span>
@@ -360,256 +390,422 @@ export default function ProjectDetailPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Project Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {projectData.projectName}
+        <div className="mb-6">
+          <h1 className="text-4xl font-bold text-slate-900 mb-3">
+            {projectData.project_name}
           </h1>
-          <div className="flex gap-6 text-gray-700">
-            {projectData.projectValue && (
-              <div>
-                <span className="font-semibold">Value:</span> £
-                {projectData.projectValue.toLocaleString()} million
+          <div className="flex flex-wrap gap-4 text-slate-700">
+            {projectData.project_value && (
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-emerald-600 font-bold text-xs">£</span>
+                </div>
+                <span>
+                  <span className="font-semibold text-slate-900">
+                    £{projectData.project_value.toLocaleString()}M
+                  </span>
+                  {' '}value
+                </span>
               </div>
             )}
-            {projectData.projectSector && (
-              <div>
-                <span className="font-semibold">Sector:</span>{' '}
-                {projectData.projectSector}
+            {projectData.project_sector && (
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <LayoutGrid className="text-blue-600" size={14} />
+                </div>
+                <span>{projectData.project_sector}</span>
               </div>
             )}
-            <div>
-              <span className="font-semibold">Status:</span>{' '}
-              <span className="capitalize font-bold text-blue-600">{projectData.status}</span>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Activity className="text-indigo-600" size={14} />
+              </div>
+              <span>
+                <span className="font-semibold text-slate-900 capitalize">{projectData.status}</span>
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Assessment Template Info */}
-        {projectData.assessment_templates && (
-          <section className="mb-8">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-l-4 border-blue-600 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-bold bg-blue-600 text-white">
-                    Template
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    {projectData.assessment_templates.name}
-                  </h3>
-                  {projectData.assessment_templates.description && (
-                    <p className="text-sm text-gray-700 mb-3">
-                      {projectData.assessment_templates.description}
-                    </p>
-                  )}
+        {/* Tab Navigation */}
+        <div className="mb-8">
+          <div className="border-b border-slate-200 bg-white/50 backdrop-blur-sm rounded-t-2xl">
+            <div className="flex gap-1 p-2">
+              {tabs.map((tab) => {
+                const Icon = tab.icon
+                return (
                   <button
-                    onClick={() => setShowCriteriaSheet(true)}
-                    className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 transition-colors font-semibold"
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`
+                      flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all
+                      ${activeTab === tab.id
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      }
+                    `}
                   >
-                    <Eye size={16} />
-                    View Template Criteria
+                    <Icon size={18} />
+                    <span>{tab.label}</span>
+                    {tab.badge !== undefined && tab.badge > 0 && (
+                      <span className={`
+                        px-2 py-0.5 rounded-full text-xs font-bold min-w-[20px] text-center
+                        ${activeTab === tab.id
+                          ? 'bg-white/20 text-white'
+                          : 'bg-slate-200 text-slate-700'
+                        }
+                      `}>
+                        {tab.badge}
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <div className="bg-white rounded-b-2xl rounded-tr-2xl shadow-sm border border-slate-200/50 min-h-[500px]">
+          {/* Overview Tab */}
+          {activeTab === 'overview' && (
+            <div className="p-8">
+              {/* Assessment Template Info */}
+              {projectData.assessment_templates && (
+                <section className="mb-8">
+                  <h2 className="text-2xl font-bold text-slate-900 mb-4">Assessment Template</h2>
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-l-4 border-blue-600 shadow-sm">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0">
+                        <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-bold bg-blue-600 text-white shadow-sm">
+                          Template
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">
+                          {projectData.assessment_templates.name}
+                        </h3>
+                        {projectData.assessment_templates.description && (
+                          <p className="text-sm text-slate-700 mb-3 leading-relaxed">
+                            {projectData.assessment_templates.description}
+                          </p>
+                        )}
+                        <button
+                          onClick={() => setShowCriteriaSheet(true)}
+                          className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 transition-colors font-semibold"
+                        >
+                          <Eye size={16} />
+                          View Template Criteria
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              )}
+
+              {/* Project Summary */}
+              {projectData.projectSummary && (
+                <section>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-4">
+                    Executive Summary
+                  </h2>
+                  <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-6 border border-slate-200">
+                    {/* Overall Rating */}
+                    <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-200">
+                      <div className="text-sm font-medium text-slate-600">
+                        Overall Assessment Rating:
+                      </div>
+                      <span
+                        className={`px-6 py-3 rounded-xl font-bold text-lg shadow-lg ${
+                          projectData.projectSummary.overall_rating === 'green'
+                            ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-emerald-500/30'
+                            : projectData.projectSummary.overall_rating === 'amber'
+                            ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-amber-500/30'
+                            : projectData.projectSummary.overall_rating === 'red'
+                            ? 'bg-gradient-to-br from-red-500 to-rose-600 text-white shadow-red-500/30'
+                            : 'bg-slate-300 text-slate-700'
+                        }`}
+                      >
+                        {projectData.projectSummary.overall_rating.toUpperCase()}
+                      </span>
+                    </div>
+
+                    {/* Executive Summary */}
+                    {projectData.projectSummary.executive_summary && (
+                      <div className="mb-6">
+                        <h3 className="text-lg font-semibold text-slate-900 mb-3">
+                          Executive Summary
+                        </h3>
+                        <p className="text-slate-700 leading-relaxed">
+                          {projectData.projectSummary.executive_summary}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Key Strengths */}
+                    {projectData.projectSummary.key_strengths && (
+                      <div className="mb-6 p-5 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-l-4 border-emerald-500">
+                        <h3 className="text-lg font-semibold text-emerald-700 mb-3">
+                          Key Strengths
+                        </h3>
+                        <p className="text-slate-700 leading-relaxed">
+                          {projectData.projectSummary.key_strengths}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Critical Issues */}
+                    {projectData.projectSummary.critical_issues && (
+                      <div className="mb-6 p-5 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border-l-4 border-red-500">
+                        <h3 className="text-lg font-semibold text-red-700 mb-3">
+                          Critical Issues
+                        </h3>
+                        <p className="text-slate-700 leading-relaxed">
+                          {projectData.projectSummary.critical_issues}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Overall Recommendation */}
+                    {projectData.projectSummary.overall_recommendation && (
+                      <div className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-l-4 border-blue-500">
+                        <h3 className="text-lg font-semibold text-blue-700 mb-3">
+                          Overall Recommendation
+                        </h3>
+                        <p className="text-slate-700 leading-relaxed">
+                          {projectData.projectSummary.overall_recommendation}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              )}
+
+              {!projectData.projectSummary && (
+                <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <BarChart3 className="text-blue-600" size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">
+                    No Assessment Yet
+                  </h3>
+                  <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                    Upload documents and run an assessment to see your executive summary
+                  </p>
+                  <button
+                    onClick={() => setActiveTab('documents')}
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30"
+                  >
+                    <FileText size={18} />
+                    Go to Documents
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Documents Tab */}
+          {activeTab === 'documents' && (
+            <div className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900">
+                    Project Documents ({documents.length})
+                  </h2>
+                  <p className="text-sm text-slate-600 mt-1">
+                    Upload up to 50 PDF documents for comprehensive assessment
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowUploadModal(true)}
+                  className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={documents.length >= 50}
+                >
+                  <Upload size={18} />
+                  Add Documents
+                </button>
+              </div>
+
+              {/* Document Guidance Panel */}
+              <DocumentGuidancePanel templateCode={templateCode} templateName={templateName} />
+
+              {/* Documents List */}
+              <DocumentsList
+                documents={documents}
+                onDelete={handleDeleteDocument}
+                deletingId={deletingDocumentId}
+                onUploadClick={() => setShowUploadModal(true)}
+              />
+
+              {/* Run Assessment CTA */}
+              <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">
+                      Ready to assess your documents?
+                    </h3>
+                    <p className="text-slate-700">
+                      {hasFiles
+                        ? 'Run the NISTA/PAR assessment to receive detailed feedback'
+                        : 'Upload at least one document to run the assessment'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setActiveTab('assessment')
+                      setTimeout(() => {
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      }, 100)
+                    }}
+                    disabled={!hasFiles}
+                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-all hover:shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Play size={18} />
+                    Go to Assessment
                   </button>
                 </div>
               </div>
             </div>
-          </section>
-        )}
+          )}
 
-        {/* Document Upload Section */}
-        <section className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Inter, sans-serif' }}>
-                Project Documents ({documents.length})
-              </h2>
-              <p className="text-sm text-gray-600 mt-1">
-                Upload up to 50 PDF documents for comprehensive assessment
-              </p>
-            </div>
-            <button
-              onClick={() => setShowUploadModal(true)}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-semibold transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={documents.length >= 50}
-            >
-              <Upload size={18} />
-              Add Documents
-            </button>
-          </div>
-
-          {/* Document Guidance Panel */}
-          <DocumentGuidancePanel templateCode={templateCode} templateName={templateName} />
-
-          {/* Documents List */}
-          <DocumentsList
-            documents={documents}
-            onDelete={handleDeleteDocument}
-            deletingId={deletingDocumentId}
-            onUploadClick={() => setShowUploadModal(true)}
-          />
-        </section>
-
-        {/* Run Assessment Button */}
-        <section className="mb-12">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 border-2 border-blue-200 shadow-md">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  Ready to assess your documents?
-                </h3>
-                <p className="text-gray-700">
-                  {hasFiles
-                    ? 'Run the NISTA/PAR assessment to receive detailed feedback'
-                    : 'Upload at least one document to run the assessment'}
-                </p>
-              </div>
-              <button
-                onClick={handleRunAssessment}
-                disabled={!hasFiles || runningAssessment}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {runningAssessment ? (
-                  <>
-                    <Loader2 size={20} className="animate-spin" />
-                    Running Assessment...
-                  </>
-                ) : (
-                  <>
-                    <Play size={20} />
-                    Run Assessment
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Progress Bar */}
-            {assessmentProgress && (
-              <div className="mt-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-text-primary">
-                    Assessment Progress
-                  </span>
-                  <span className="text-sm font-semibold text-secondary">
-                    {assessmentProgress.current} / {assessmentProgress.total} criteria
-                  </span>
+          {/* Assessment Tab */}
+          {activeTab === 'assessment' && (
+            <div className="p-8">
+              {/* Run Assessment Section */}
+              <div className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 border-2 border-blue-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                      Ready to assess your documents?
+                    </h3>
+                    <p className="text-slate-700">
+                      {hasFiles
+                        ? 'Run the NISTA/PAR assessment to receive detailed feedback'
+                        : 'Upload at least one document to run the assessment'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleRunAssessment}
+                    disabled={!hasFiles || runningAssessment}
+                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all hover:shadow-xl shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {runningAssessment ? (
+                      <>
+                        <Loader2 size={20} className="animate-spin" />
+                        Running Assessment...
+                      </>
+                    ) : (
+                      <>
+                        <Play size={20} />
+                        Run Assessment
+                      </>
+                    )}
+                  </button>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-secondary to-accent h-3 rounded-full transition-all duration-500 ease-out"
-                    style={{
-                      width: `${Math.min(
-                        (assessmentProgress.current / assessmentProgress.total) * 100,
-                        100
-                      )}%`,
-                    }}
+
+                {/* Progress Bar */}
+                {assessmentProgress && (
+                  <div className="mt-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-slate-900">
+                        Assessment Progress
+                      </span>
+                      <span className="text-sm font-semibold text-blue-600">
+                        {assessmentProgress.current} / {assessmentProgress.total} criteria
+                      </span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                      <div
+                        className="bg-gradient-to-r from-blue-600 to-indigo-600 h-3 rounded-full transition-all duration-500 ease-out"
+                        style={{
+                          width: `${Math.min(
+                            (assessmentProgress.current / assessmentProgress.total) * 100,
+                            100
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                    <p className="text-xs text-slate-600 mt-2">
+                      {Math.round(
+                        (assessmentProgress.current / assessmentProgress.total) * 100
+                      )}% complete • This may take several minutes
+                    </p>
+                  </div>
+                )}
+
+                {assessmentError && (
+                  <p className="mt-4 text-red-600 font-medium">{assessmentError}</p>
+                )}
+              </div>
+
+              {/* Assessment Results */}
+              {hasAssessments ? (
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6">
+                    Detailed Assessment Results
+                  </h2>
+                  <AssessmentResults
+                    assessments={projectData.assessments}
+                    projectSummary={projectData.projectSummary}
+                    projectData={projectData}
+                    assessmentRunId={projectData.assessmentRunId}
                   />
                 </div>
-                <p className="text-xs text-text-secondary mt-2">
-                  {Math.round(
-                    (assessmentProgress.current / assessmentProgress.total) * 100
-                  )}% complete • This may take several minutes
-                </p>
-              </div>
-            )}
-
-            {assessmentError && (
-              <p className="mt-4 text-error">{assessmentError}</p>
-            )}
-          </div>
-        </section>
-
-        {/* Project Summary */}
-        {projectData.projectSummary && (
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-text-primary mb-6">
-              Executive Summary
-            </h2>
-            <div className="card bg-gradient-to-br from-secondary/5 to-primary/5">
-              {/* Overall Rating */}
-              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-border">
-                <div className="text-sm font-medium text-text-secondary">
-                  Overall Assessment Rating:
-                </div>
-                <span
-                  className={`px-4 py-2 rounded-lg font-bold text-lg ${
-                    projectData.projectSummary.overall_rating === 'green'
-                      ? 'bg-rag-green text-white'
-                      : projectData.projectSummary.overall_rating === 'amber'
-                      ? 'bg-rag-amber text-white'
-                      : projectData.projectSummary.overall_rating === 'red'
-                      ? 'bg-rag-red text-white'
-                      : 'bg-gray-300 text-gray-700'
-                  }`}
-                >
-                  {projectData.projectSummary.overall_rating.toUpperCase()}
-                </span>
-              </div>
-
-              {/* Executive Summary */}
-              {projectData.projectSummary.executive_summary && (
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-text-primary mb-3">
-                    Executive Summary
+              ) : (
+                <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <BarChart3 className="text-blue-600" size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">
+                    No Assessment Results Yet
                   </h3>
-                  <p className="text-text-secondary leading-relaxed">
-                    {projectData.projectSummary.executive_summary}
-                  </p>
-                </div>
-              )}
-
-              {/* Key Strengths */}
-              {projectData.projectSummary.key_strengths && (
-                <div className="mb-6 p-4 bg-green-50 rounded-lg border-l-4 border-rag-green">
-                  <h3 className="text-lg font-semibold text-rag-green mb-3">
-                    Key Strengths
-                  </h3>
-                  <p className="text-text-secondary leading-relaxed">
-                    {projectData.projectSummary.key_strengths}
-                  </p>
-                </div>
-              )}
-
-              {/* Critical Issues */}
-              {projectData.projectSummary.critical_issues && (
-                <div className="mb-6 p-4 bg-red-50 rounded-lg border-l-4 border-rag-red">
-                  <h3 className="text-lg font-semibold text-rag-red mb-3">
-                    Critical Issues
-                  </h3>
-                  <p className="text-text-secondary leading-relaxed">
-                    {projectData.projectSummary.critical_issues}
-                  </p>
-                </div>
-              )}
-
-              {/* Overall Recommendation */}
-              {projectData.projectSummary.overall_recommendation && (
-                <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-secondary">
-                  <h3 className="text-lg font-semibold text-secondary mb-3">
-                    Overall Recommendation
-                  </h3>
-                  <p className="text-text-secondary leading-relaxed">
-                    {projectData.projectSummary.overall_recommendation}
+                  <p className="text-slate-600 max-w-md mx-auto">
+                    Upload documents and run an assessment to see detailed results here
                   </p>
                 </div>
               )}
             </div>
-          </section>
-        )}
+          )}
 
-        {/* Assessment Results */}
-        {hasAssessments && (
-          <section>
-            <h2 className="text-2xl font-bold text-text-primary mb-6">
-              Detailed Assessment Results
-            </h2>
-            <AssessmentResults
-              assessments={projectData.assessments}
-              projectSummary={projectData.projectSummary}
-              projectData={projectData}
-              assessmentRunId={projectData.projectSummary?.id || 1}
-            />
-          </section>
-        )}
+          {/* Actions Tab */}
+          {activeTab === 'actions' && (
+            <div className="p-8">
+              {hasAssessments ? (
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-4">Action Plan</h2>
+                  <p className="text-slate-600 mb-6">
+                    View and manage actions generated from your assessment results.
+                  </p>
+                  <AssessmentResults
+                    assessments={projectData.assessments}
+                    projectSummary={projectData.projectSummary}
+                    projectData={projectData}
+                    assessmentRunId={projectData.assessmentRunId}
+                  />
+                </div>
+              ) : (
+                <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Target className="text-blue-600" size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">
+                    No Actions Yet
+                  </h3>
+                  <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                    Complete an assessment first to generate an action plan
+                  </p>
+                  <button
+                    onClick={() => setActiveTab('assessment')}
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30"
+                  >
+                    <BarChart3 size={18} />
+                    Go to Assessment
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </main>
 
       {/* Delete Confirmation Modal */}
