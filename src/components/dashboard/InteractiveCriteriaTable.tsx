@@ -46,10 +46,10 @@ export default function InteractiveCriteriaTable({
 
   const getRagBadge = (rating: string) => {
     const badges = {
-      green: 'bg-rag-green text-white',
-      amber: 'bg-rag-amber text-white',
-      red: 'bg-rag-red text-white',
-      pending: 'bg-gray-300 text-gray-700',
+      green: 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-sm',
+      amber: 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm',
+      red: 'bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-sm',
+      pending: 'bg-slate-300 text-slate-700',
     }
     return badges[rating as keyof typeof badges] || badges.pending
   }
@@ -77,11 +77,11 @@ export default function InteractiveCriteriaTable({
   }
 
   const getConfidenceColor = (confidence: number | null) => {
-    if (confidence === null) return 'bg-gray-200'
+    if (confidence === null) return 'bg-slate-200'
     const confValue = confidence <= 1 ? confidence * 100 : confidence
-    if (confValue >= 80) return 'bg-rag-green'
-    if (confValue >= 50) return 'bg-rag-amber'
-    return 'bg-rag-red'
+    if (confValue >= 80) return 'bg-emerald-500'
+    if (confValue >= 50) return 'bg-amber-500'
+    return 'bg-red-500'
   }
 
   return (

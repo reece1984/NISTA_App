@@ -746,6 +746,7 @@ export default function ProjectDetailPage() {
                   projectSummary={projectData.projectSummary}
                   projectData={projectData}
                   assessmentRunId={projectData.assessmentRunId}
+                  viewMode="summary"
                 />
               ) : (
                 <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
@@ -781,6 +782,7 @@ export default function ProjectDetailPage() {
                     projectSummary={projectData.projectSummary}
                     projectData={projectData}
                     assessmentRunId={projectData.assessmentRunId}
+                    viewMode="detail"
                   />
                 </div>
               ) : (

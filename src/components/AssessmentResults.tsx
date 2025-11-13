@@ -51,6 +51,7 @@ interface AssessmentResultsProps {
   projectSummary?: ProjectSummary | null
   projectData?: any
   assessmentRunId?: number
+  viewMode?: 'full' | 'summary' | 'detail' // Control which parts to render
 }
 
 export default function AssessmentResults({
@@ -58,6 +59,7 @@ export default function AssessmentResults({
   projectSummary,
   projectData,
   assessmentRunId,
+  viewMode = 'full', // Default to full view for backwards compatibility
 }: AssessmentResultsProps) {
   const [filter, setFilter] = useState<'all' | 'green' | 'amber' | 'red'>('all')
   const [expandedId, setExpandedId] = useState<number | null>(null)
@@ -1205,10 +1207,14 @@ export default function AssessmentResults({
 
   const overallRag = getOverallRag()
 
+  // Determine what to show based on viewMode
+  const showSummary = viewMode === 'full' || viewMode === 'summary'
+  const showDetail = viewMode === 'full' || viewMode === 'detail'
+
   return (
     <div>
-      {/* Assessment Comparison Banner */}
-      {assessmentRunId && projectData?.id && (
+      {/* Assessment Comparison Banner - Show in summary and full view */}
+      {showSummary && assessmentRunId && projectData?.id && (
         <AssessmentComparisonBanner
           assessmentRunId={assessmentRunId}
           projectId={projectData.id}
@@ -1216,8 +1222,8 @@ export default function AssessmentResults({
         />
       )}
 
-      {/* Modern Header with Export Buttons */}
-      {totalAssessments > 0 && (
+      {/* Modern Header with Export Buttons - Show in summary and full view */}
+      {showSummary && totalAssessments > 0 && (
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <div>
@@ -1273,8 +1279,8 @@ export default function AssessmentResults({
         </div>
       )}
 
-      {/* Overall Rating Card */}
-      {totalAssessments > 0 && (
+      {/* Overall Rating Card - Show in summary and full view */}
+      {showSummary && totalAssessments > 0 && (
         <div className="mb-8">
           <OverallRatingCard
             overallRating={overallRag as 'green' | 'amber' | 'red' | 'pending'}
@@ -1285,8 +1291,8 @@ export default function AssessmentResults({
         </div>
       )}
 
-      {/* Dashboard Statistics - Charts and Priority Actions */}
-      {totalAssessments > 0 && (
+      {/* Dashboard Statistics - Charts and Priority Actions - Show in summary and full view */}
+      {showSummary && totalAssessments > 0 && (
         <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
           <RAGDonutChart
             ragCounts={ragCounts}
@@ -1320,8 +1326,8 @@ export default function AssessmentResults({
         </div>
       )}
 
-      {/* Search Bar */}
-      <div className="mb-6">
+      {/* Search Bar - Show in detail and full view */}
+      {showDetail && <div className="mb-6">
         <div className="relative">
           <Search
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary"
@@ -1356,8 +1362,8 @@ export default function AssessmentResults({
         )}
       </div>
 
-      {/* Filter Buttons */}
-      <div className="mb-6">
+      {/* Filter Buttons - Show in detail and full view */}
+      {showDetail && <div className="mb-6">
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => setFilter('all')}
@@ -1446,10 +1452,10 @@ export default function AssessmentResults({
             )}
           </div>
         )}
-      </div>
+      </div>}
 
-      {/* Detailed Criteria Table - Only show if not viewing actions */}
-      {!showActionsView && (
+      {/* Detailed Criteria Table - Only show if not viewing actions and in detail/full view */}
+      {showDetail && !showActionsView && (
         <div>
           <h2 className="text-xl font-semibold text-text-primary mb-4">
             Detailed Assessment Criteria
