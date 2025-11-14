@@ -1,17 +1,22 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye, Upload, LayoutGrid, FileText, BarChart3, Target, Activity, Sparkles, FileBarChart } from 'lucide-react'
+import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye, Upload, LayoutGrid, FileText, BarChart3, Target, Activity, Sparkles, FileBarChart, List, Kanban, RefreshCw } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Button from '../components/ui/Button'
 import AssessmentResults from '../components/AssessmentResults'
 import Modal from '../components/ui/Modal'
 import Toast, { type ToastType } from '../components/ui/Toast'
+import ConfirmationDialog from '../components/ui/ConfirmationDialog'
 import TemplateDetailSheet from '../components/TemplateDetailSheet'
 import DocumentGuidancePanel from '../components/DocumentGuidancePanel'
 import DocumentsList from '../components/DocumentsList'
 import UploadDocumentsModal from '../components/UploadDocumentsModal'
 import { useDocuments } from '../hooks/useDocuments'
+import { useActions } from '../hooks/useActions'
+import ActionKanbanBoard from '../components/ActionPlan/ActionKanbanBoard'
+import ActionTableView from '../components/ActionPlan/ActionTableView'
+import ActionDetailModal from '../components/ActionPlan/ActionDetailModal'
 
 type TabType = 'overview' | 'documents' | 'assessment-summary' | 'assessment-detail' | 'actions'
 
@@ -21,12 +26,16 @@ export default function ProjectDetailPage() {
   const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [runningAssessment, setRunningAssessment] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showRerunConfirmDialog, setShowRerunConfirmDialog] = useState(false)
   const [showCriteriaSheet, setShowCriteriaSheet] = useState(false)
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [deletingDocumentId, setDeletingDocumentId] = useState<number | null>(null)
   const [assessmentError, setAssessmentError] = useState('')
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null)
   const [assessmentProgress, setAssessmentProgress] = useState<{ current: number; total: number } | null>(null)
+  const [actionView, setActionView] = useState<'kanban' | 'table'>('kanban')
+  const [selectedActionId, setSelectedActionId] = useState<number | null>(null)
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const {
     data: projectData,
@@ -54,14 +63,33 @@ export default function ProjectDetailPage() {
         console.error('Files error:', filesError)
       }
 
-      // Fetch assessments for this project
-      const { data: assessments, error: assessmentsError } = await supabase
-        .from('assessments')
-        .select('*, assessment_criteria (*)')
+      // Fetch the most recent assessment run ID FIRST
+      const { data: assessmentRuns, error: runError } = await supabase
+        .from('assessment_runs')
+        .select('id')
         .eq('project_id', id!)
+        .order('created_at', { ascending: false })
+        .limit(1)
 
-      if (assessmentsError && assessmentsError.code !== 'PGRST116') {
-        console.error('Assessments error:', assessmentsError)
+      if (runError && runError.code !== 'PGRST116') {
+        console.error('Assessment runs error:', runError)
+      }
+
+      const assessmentRunId = assessmentRuns?.[0]?.id || null
+
+      // Fetch assessments for this project - ONLY FROM THE MOST RECENT RUN
+      let assessments: any[] = []
+      if (assessmentRunId) {
+        const { data: assessmentsData, error: assessmentsError } = await supabase
+          .from('assessments')
+          .select('*, assessment_criteria (*)')
+          .eq('project_id', id!)
+          .eq('assessment_run_id', assessmentRunId)
+
+        if (assessmentsError && assessmentsError.code !== 'PGRST116') {
+          console.error('Assessments error:', assessmentsError)
+        }
+        assessments = assessmentsData || []
       }
 
       // Fetch project summary (most recent one)
@@ -78,24 +106,10 @@ export default function ProjectDetailPage() {
 
       const projectSummary = projectSummaries?.[0] || null
 
-      // Fetch the most recent assessment run ID
-      const { data: assessmentRuns, error: runError } = await supabase
-        .from('assessment_runs')
-        .select('id')
-        .eq('project_id', id!)
-        .order('created_at', { ascending: false })
-        .limit(1)
-
-      if (runError && runError.code !== 'PGRST116') {
-        console.error('Assessment runs error:', runError)
-      }
-
-      const assessmentRunId = assessmentRuns?.[0]?.id || null
-
       return {
         ...project,
         files: files || [],
-        assessments: assessments || [],
+        assessments: assessments,
         projectSummary: projectSummary || null,
         assessmentRunId,
       }
@@ -109,6 +123,22 @@ export default function ProjectDetailPage() {
     deleteDocument,
     refetch: refetchDocuments,
   } = useDocuments(parseInt(id!))
+
+  // Use actions hook for action plan management
+  const {
+    actions,
+    isLoading: actionsLoading,
+  } = useActions({ projectId: parseInt(id!) })
+
+  // Cleanup polling interval on unmount
+  useEffect(() => {
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+        pollIntervalRef.current = null
+      }
+    }
+  }, [])
 
   const handleDeleteDocument = async (document: any) => {
     setDeletingDocumentId(document.id)
@@ -187,33 +217,55 @@ export default function ProjectDetailPage() {
       console.log('🔔 Calling N8N webhook:', webhookUrl)
       console.log('📦 Payload:', payload)
 
-      let response
+      // Fire-and-forget webhook call with extended timeout
+      // We don't need to wait for the full N8N response since polling handles progress tracking
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout just to verify webhook received
+
       try {
-        response = await fetch(webhookUrl, {
+        const response = await fetch(webhookUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(payload),
+          signal: controller.signal,
         })
+
+        clearTimeout(timeoutId)
+
+        console.log('✅ N8N Response Status:', response.status)
+
+        if (!response.ok) {
+          const responseData = await response.text()
+          console.error('❌ N8N webhook error:', responseData)
+          throw new Error(`N8N webhook failed with status ${response.status}: ${responseData}`)
+        }
+
+        console.log('📥 N8N webhook triggered successfully')
       } catch (fetchError: any) {
-        console.error('❌ Fetch error:', fetchError)
-        throw new Error(`Failed to connect to N8N: ${fetchError.message}. Check that N8N is running and the webhook URL is correct.`)
+        clearTimeout(timeoutId)
+
+        // If it's an abort error (timeout), continue anyway since N8N likely received the request
+        if (fetchError.name === 'AbortError') {
+          console.warn('⏱️ Webhook request timed out after 30s, but N8N may still be processing. Continuing with polling...')
+        } else {
+          console.error('❌ Fetch error:', fetchError)
+          throw new Error(`Failed to connect to N8N: ${fetchError.message}. Check that N8N is running and the webhook URL is correct.`)
+        }
       }
 
-      console.log('✅ N8N Response Status:', response.status)
-      const responseData = await response.text()
-      console.log('📥 N8N Response:', responseData)
-
-      if (!response.ok) {
-        throw new Error(`N8N webhook failed with status ${response.status}: ${responseData}`)
+      // Clear any existing polling interval
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+        pollIntervalRef.current = null
       }
 
       // Poll for completion - check every 3 seconds for up to 10 minutes (for 50 criteria)
       let pollCount = 0
       const maxPolls = 200 // 200 polls × 3 seconds = 10 minutes
 
-      const pollInterval = setInterval(async () => {
+      pollIntervalRef.current = setInterval(async () => {
         pollCount++
 
         // Count how many assessments have been completed for this project
@@ -249,7 +301,10 @@ export default function ProjectDetailPage() {
         const allCriteriaComplete = completed >= total
         if (updatedProject?.status === 'completed' || allCriteriaComplete || pollCount >= maxPolls) {
           console.log('✅ Assessment complete! Stopping polling...')
-          clearInterval(pollInterval)
+          if (pollIntervalRef.current) {
+            clearInterval(pollIntervalRef.current)
+            pollIntervalRef.current = null
+          }
           setRunningAssessment(false)
           setAssessmentProgress(null)
 
@@ -278,6 +333,11 @@ export default function ProjectDetailPage() {
       }, 3000) // Poll every 3 seconds
 
     } catch (err: any) {
+      // Clean up polling interval on error
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+        pollIntervalRef.current = null
+      }
       setAssessmentError(err.message || 'Failed to run assessment')
       setRunningAssessment(false)
       setAssessmentProgress(null)
@@ -298,6 +358,15 @@ export default function ProjectDetailPage() {
     } catch (err: any) {
       console.error('Error deleting project:', err)
     }
+  }
+
+  const handleRerunAssessmentClick = () => {
+    setShowRerunConfirmDialog(true)
+  }
+
+  const handleConfirmRerun = async () => {
+    setShowRerunConfirmDialog(false)
+    await handleRunAssessment()
   }
 
   if (isLoading) {
@@ -333,23 +402,20 @@ export default function ProjectDetailPage() {
     { id: 'documents' as TabType, label: 'Documents', icon: FileText, badge: documents.length },
     { id: 'assessment-summary' as TabType, label: 'Assessment Summary', icon: BarChart3, badge: hasAssessments ? projectData.assessments.length : undefined },
     { id: 'assessment-detail' as TabType, label: 'Assessment Detail', icon: FileBarChart, badge: hasAssessments ? projectData.assessments.length : undefined },
-    { id: 'actions' as TabType, label: 'Actions', icon: Target },
+    { id: 'actions' as TabType, label: 'Actions', icon: Target, badge: actions.length > 0 ? actions.length : undefined },
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/50 shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
-              <Link to="/dashboard" className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Target className="text-white" size={22} />
-                </div>
+              <Link to="/dashboard" className="flex items-center gap-2">
                 <div>
-                  <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                    Gateway Success
+                  <div className="text-xl font-bold text-slate-900 tracking-tight">
+                    GATEWAY SUCCESS
                   </div>
                   <div className="text-xs text-slate-600 font-medium">NISTA/PAR Assessment</div>
                 </div>
@@ -379,7 +445,7 @@ export default function ProjectDetailPage() {
             </div>
             <button
               onClick={() => setShowDeleteModal(true)}
-              className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all shadow-sm hover:shadow-md"
+              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all shadow-sm hover:shadow-md"
             >
               <Trash2 size={16} />
               <span className="hidden sm:inline">Delete Project</span>
@@ -389,7 +455,7 @@ export default function ProjectDetailPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Project Header */}
         <div className="mb-6">
           <h1 className="text-4xl font-bold text-slate-900 mb-3">
@@ -430,8 +496,8 @@ export default function ProjectDetailPage() {
 
         {/* Tab Navigation */}
         <div className="mb-8">
-          <div className="border-b border-slate-200 bg-white/50 backdrop-blur-sm rounded-t-2xl">
-            <div className="flex gap-1 p-2">
+          <div className="border-b border-slate-200 bg-white">
+            <div className="flex gap-6 px-2">
               {tabs.map((tab) => {
                 const Icon = tab.icon
                 return (
@@ -439,23 +505,17 @@ export default function ProjectDetailPage() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`
-                      flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all
+                      flex items-center gap-2 px-2 py-3 font-medium text-sm transition-all relative
                       ${activeTab === tab.id
-                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                        ? 'text-blue-600 border-b-4 border-blue-600'
+                        : 'text-slate-600 hover:text-slate-900 border-b-4 border-transparent'
                       }
                     `}
                   >
                     <Icon size={18} />
                     <span>{tab.label}</span>
                     {tab.badge !== undefined && tab.badge > 0 && (
-                      <span className={`
-                        px-2 py-0.5 rounded-full text-xs font-bold min-w-[20px] text-center
-                        ${activeTab === tab.id
-                          ? 'bg-white/20 text-white'
-                          : 'bg-slate-200 text-slate-700'
-                        }
-                      `}>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-semibold min-w-[20px] text-center bg-slate-100 text-slate-700">
                         {tab.badge}
                       </span>
                     )}
@@ -475,10 +535,10 @@ export default function ProjectDetailPage() {
               {projectData.assessment_templates && (
                 <section className="mb-8">
                   <h2 className="text-2xl font-bold text-slate-900 mb-4">Assessment Template</h2>
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-l-4 border-blue-600 shadow-sm">
+                  <div className="bg-white rounded-lg p-6 border-l-4 border-blue-600 shadow-sm border border-slate-200">
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0">
-                        <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-bold bg-blue-600 text-white shadow-sm">
+                        <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-bold bg-blue-600 text-white">
                           Template
                         </span>
                       </div>
@@ -504,88 +564,84 @@ export default function ProjectDetailPage() {
                 </section>
               )}
 
-              {/* Project Summary */}
+              {/* Assessment At A Glance */}
               {projectData.projectSummary && (
-                <section>
+                <section className="mb-8">
                   <h2 className="text-2xl font-bold text-slate-900 mb-4">
-                    Executive Summary
+                    Assessment At A Glance
                   </h2>
-                  <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-6 border border-slate-200">
-                    {/* Overall Rating */}
-                    <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-200">
-                      <div className="text-sm font-medium text-slate-600">
-                        Overall Assessment Rating:
+                  <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
+                    {/* Quick Stats Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      {/* Overall Rating */}
+                      <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                        <div className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wider">
+                          Overall Rating
+                        </div>
+                        <span
+                          className={`inline-block px-4 py-2 rounded-lg font-bold text-lg ${
+                            projectData.projectSummary.overall_rating === 'green'
+                              ? 'bg-emerald-600 text-white'
+                              : projectData.projectSummary.overall_rating === 'amber'
+                              ? 'bg-amber-600 text-white'
+                              : projectData.projectSummary.overall_rating === 'red'
+                              ? 'bg-red-600 text-white'
+                              : 'bg-slate-300 text-slate-700'
+                          }`}
+                        >
+                          {projectData.projectSummary.overall_rating.toUpperCase()}
+                        </span>
                       </div>
-                      <span
-                        className={`px-6 py-3 rounded-xl font-bold text-lg shadow-lg ${
-                          projectData.projectSummary.overall_rating === 'green'
-                            ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-emerald-500/30'
-                            : projectData.projectSummary.overall_rating === 'amber'
-                            ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-amber-500/30'
-                            : projectData.projectSummary.overall_rating === 'red'
-                            ? 'bg-gradient-to-br from-red-500 to-rose-600 text-white shadow-red-500/30'
-                            : 'bg-slate-300 text-slate-700'
-                        }`}
-                      >
-                        {projectData.projectSummary.overall_rating.toUpperCase()}
-                      </span>
+
+                      {/* Critical Issues */}
+                      <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                        <div className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wider">
+                          Critical Issues
+                        </div>
+                        <div className="text-3xl font-bold text-red-600">
+                          {projectData.assessments?.filter((a: any) => a.rag_rating === 'red').length || 0}
+                        </div>
+                      </div>
+
+                      {/* Criteria Assessed */}
+                      <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                        <div className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wider">
+                          Criteria Assessed
+                        </div>
+                        <div className="text-3xl font-bold text-slate-900">
+                          {projectData.assessments?.length || 0}
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Executive Summary */}
-                    {projectData.projectSummary.executive_summary && (
-                      <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-slate-900 mb-3">
-                          Executive Summary
-                        </h3>
-                        <p className="text-slate-700 leading-relaxed">
-                          {projectData.projectSummary.executive_summary}
-                        </p>
-                      </div>
-                    )}
+                    {/* Assessment Metadata */}
+                    <div className="flex items-center gap-4 mb-4 text-sm text-slate-600 pb-4 border-b border-slate-200">
+                      <span>
+                        <span className="font-semibold">Assessment Version:</span> {projectData.assessments?.[0]?.assessment_run_id || 'N/A'}
+                      </span>
+                      {projectData.projectSummary.created_at && (
+                        <span>
+                          <span className="font-semibold">Completed:</span> {new Date(projectData.projectSummary.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                      )}
+                    </div>
 
-                    {/* Key Strengths */}
-                    {projectData.projectSummary.key_strengths && (
-                      <div className="mb-6 p-5 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-l-4 border-emerald-500">
-                        <h3 className="text-lg font-semibold text-emerald-700 mb-3">
-                          Key Strengths
-                        </h3>
-                        <p className="text-slate-700 leading-relaxed">
-                          {projectData.projectSummary.key_strengths}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Critical Issues */}
-                    {projectData.projectSummary.critical_issues && (
-                      <div className="mb-6 p-5 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border-l-4 border-red-500">
-                        <h3 className="text-lg font-semibold text-red-700 mb-3">
-                          Critical Issues
-                        </h3>
-                        <p className="text-slate-700 leading-relaxed">
-                          {projectData.projectSummary.critical_issues}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Overall Recommendation */}
-                    {projectData.projectSummary.overall_recommendation && (
-                      <div className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-l-4 border-blue-500">
-                        <h3 className="text-lg font-semibold text-blue-700 mb-3">
-                          Overall Recommendation
-                        </h3>
-                        <p className="text-slate-700 leading-relaxed">
-                          {projectData.projectSummary.overall_recommendation}
-                        </p>
-                      </div>
-                    )}
+                    {/* Call to Action */}
+                    <button
+                      onClick={() => setActiveTab('assessment-summary')}
+                      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md"
+                    >
+                      View Full Assessment
+                      <BarChart3 size={18} />
+                    </button>
                   </div>
                 </section>
               )}
 
               {!projectData.projectSummary && hasAssessments && (
-                <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <BarChart3 className="text-blue-600" size={32} />
+                <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed border-slate-300">
+                  <div className="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <BarChart3 className="text-slate-700" size={32} />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">
                     No Executive Summary Yet
@@ -595,7 +651,7 @@ export default function ProjectDetailPage() {
                   </p>
                   <button
                     onClick={() => setActiveTab('assessment-summary')}
-                    className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30"
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md"
                   >
                     <BarChart3 size={18} />
                     View Assessment
@@ -604,9 +660,9 @@ export default function ProjectDetailPage() {
               )}
 
               {!projectData.projectSummary && !hasAssessments && (
-                <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <BarChart3 className="text-blue-600" size={32} />
+                <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed border-slate-300">
+                  <div className="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <BarChart3 className="text-slate-700" size={32} />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">
                     No Assessment Yet
@@ -616,7 +672,7 @@ export default function ProjectDetailPage() {
                   </p>
                   <button
                     onClick={() => setActiveTab('assessment-summary')}
-                    className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30"
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md"
                   >
                     <BarChart3 size={18} />
                     Go to Assessment
@@ -640,7 +696,7 @@ export default function ProjectDetailPage() {
                 </div>
                 <button
                   onClick={() => setShowUploadModal(true)}
-                  className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={documents.length >= 50}
                 >
                   <Upload size={18} />
@@ -660,31 +716,45 @@ export default function ProjectDetailPage() {
               />
 
               {/* Run Assessment CTA */}
-              <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
+              <div className="mt-8 bg-blue-50 rounded-lg p-6 border border-blue-200">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-slate-900 mb-2">
-                      Ready to assess your documents?
+                      {hasAssessments ? 'Update Assessment' : 'Ready to assess your documents?'}
                     </h3>
                     <p className="text-slate-700">
-                      {hasFiles
+                      {hasAssessments
+                        ? 'Re-run the assessment with your latest documents or view current results'
+                        : hasFiles
                         ? 'Run the NISTA/PAR assessment to receive detailed feedback'
                         : 'Upload at least one document to run the assessment'}
                     </p>
                   </div>
-                  <button
-                    onClick={() => {
-                      setActiveTab('assessment-summary')
-                      setTimeout(() => {
-                        window.scrollTo({ top: 0, behavior: 'smooth' })
-                      }, 100)
-                    }}
-                    disabled={!hasFiles}
-                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-all hover:shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Play size={18} />
-                    Go to Assessment
-                  </button>
+                  <div className="flex gap-2">
+                    {hasAssessments && (
+                      <button
+                        onClick={handleRerunAssessmentClick}
+                        disabled={!hasFiles || runningAssessment}
+                        className="flex items-center gap-2 bg-slate-600 hover:bg-slate-700 disabled:bg-slate-400 text-white px-5 py-3 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md disabled:cursor-not-allowed"
+                      >
+                        <RefreshCw size={18} className={runningAssessment ? 'animate-spin' : ''} />
+                        {runningAssessment ? 'Running...' : 'Re-run'}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        setActiveTab('assessment-summary')
+                        setTimeout(() => {
+                          window.scrollTo({ top: 0, behavior: 'smooth' })
+                        }, 100)
+                      }}
+                      disabled={!hasFiles}
+                      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Play size={18} />
+                      {hasAssessments ? 'View Results' : 'Go to Assessment'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -693,73 +763,6 @@ export default function ProjectDetailPage() {
           {/* Assessment Summary Tab */}
           {activeTab === 'assessment-summary' && (
             <div className="p-8">
-              {/* Run Assessment Section */}
-              <div className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 border-2 border-blue-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-slate-900 mb-2">
-                      Ready to assess your documents?
-                    </h3>
-                    <p className="text-slate-700">
-                      {hasFiles
-                        ? 'Run the NISTA/PAR assessment to receive detailed feedback'
-                        : 'Upload at least one document to run the assessment'}
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleRunAssessment}
-                    disabled={!hasFiles || runningAssessment}
-                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all hover:shadow-xl shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {runningAssessment ? (
-                      <>
-                        <Loader2 size={20} className="animate-spin" />
-                        Running Assessment...
-                      </>
-                    ) : (
-                      <>
-                        <Play size={20} />
-                        Run Assessment
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                {/* Progress Bar */}
-                {assessmentProgress && (
-                  <div className="mt-6">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-slate-900">
-                        Assessment Progress
-                      </span>
-                      <span className="text-sm font-semibold text-blue-600">
-                        {assessmentProgress.current} / {assessmentProgress.total} criteria
-                      </span>
-                    </div>
-                    <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-                      <div
-                        className="bg-gradient-to-r from-blue-600 to-indigo-600 h-3 rounded-full transition-all duration-500 ease-out"
-                        style={{
-                          width: `${Math.min(
-                            (assessmentProgress.current / assessmentProgress.total) * 100,
-                            100
-                          )}%`,
-                        }}
-                      />
-                    </div>
-                    <p className="text-xs text-slate-600 mt-2">
-                      {Math.round(
-                        (assessmentProgress.current / assessmentProgress.total) * 100
-                      )}% complete • This may take several minutes
-                    </p>
-                  </div>
-                )}
-
-                {assessmentError && (
-                  <p className="mt-4 text-red-600 font-medium">{assessmentError}</p>
-                )}
-              </div>
-
               {/* Assessment Summary Dashboard */}
               {hasAssessments ? (
                 <AssessmentResults
@@ -768,18 +771,27 @@ export default function ProjectDetailPage() {
                   projectData={projectData}
                   assessmentRunId={projectData.assessmentRunId}
                   viewMode="summary"
+                  onViewActionsClick={() => setActiveTab('actions')}
+                  onRerunAssessment={handleRerunAssessmentClick}
+                  isRunningAssessment={runningAssessment}
                 />
               ) : (
-                <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <BarChart3 className="text-blue-600" size={32} />
+                <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed border-slate-300">
+                  <div className="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <BarChart3 className="text-slate-600" size={32} />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">
                     No Assessment Results Yet
                   </h3>
-                  <p className="text-slate-600 max-w-md mx-auto">
-                    Upload documents and run an assessment to see detailed results here
+                  <p className="text-slate-600 max-w-md mx-auto mb-6">
+                    Upload documents in the Documents tab, then run an assessment to see results here.
                   </p>
+                  <button
+                    onClick={() => setActiveTab('documents')}
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md"
+                  >
+                    Go to Documents
+                  </button>
                 </div>
               )}
             </div>
@@ -804,6 +816,7 @@ export default function ProjectDetailPage() {
                     projectData={projectData}
                     assessmentRunId={projectData.assessmentRunId}
                     viewMode="detail"
+                    onViewActionsClick={() => setActiveTab('actions')}
                   />
                 </div>
               ) : (
@@ -825,62 +838,81 @@ export default function ProjectDetailPage() {
           {/* Actions Tab */}
           {activeTab === 'actions' && (
             <div className="p-8">
-              {hasAssessments ? (
+              {actionsLoading ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="animate-spin text-blue-600" size={32} />
+                  <span className="ml-3 text-slate-600">Loading actions...</span>
+                </div>
+              ) : actions.length > 0 ? (
                 <div>
-                  <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Action Plan Management</h2>
-                    <p className="text-slate-600">
-                      Create and manage actions from your assessment results.
-                    </p>
-                  </div>
-
-                  {/* Action Plan CTA */}
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-lg font-bold text-slate-900 mb-1">
-                          Generate Action Plan
-                        </h3>
-                        <p className="text-sm text-slate-700">
-                          Use AI to automatically generate actionable tasks from your assessment results
-                        </p>
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                        Action Plan ({actions.length})
+                      </h2>
+                      <p className="text-slate-600">
+                        Track and manage actions from your assessment
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center bg-slate-100 rounded-lg p-1">
+                        <button
+                          onClick={() => setActionView('kanban')}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-all ${
+                            actionView === 'kanban'
+                              ? 'bg-white text-slate-900 shadow-sm'
+                              : 'text-slate-600 hover:text-slate-900'
+                          }`}
+                        >
+                          <Kanban size={16} />
+                          Kanban
+                        </button>
+                        <button
+                          onClick={() => setActionView('table')}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-all ${
+                            actionView === 'table'
+                              ? 'bg-white text-slate-900 shadow-sm'
+                              : 'text-slate-600 hover:text-slate-900'
+                          }`}
+                        >
+                          <List size={16} />
+                          Table
+                        </button>
                       </div>
-                      <button
-                        onClick={() => setActiveTab('assessment-summary')}
-                        className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30"
-                      >
-                        <Sparkles size={18} />
-                        Go to Assessment
-                      </button>
                     </div>
                   </div>
 
-                  {/* Action Plan Features */}
-                  <div className="text-center py-12 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border border-slate-200">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <Target className="text-blue-600" size={32} />
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">
-                      Action Plan Features
-                    </h3>
-                    <p className="text-slate-600 max-w-lg mx-auto mb-6">
-                      Generate action plans from your assessment, assign owners, set due dates, and track progress through completion.
-                    </p>
-                    <div className="flex flex-wrap gap-3 justify-center">
-                      <div className="px-4 py-2 bg-white rounded-lg border border-slate-200 text-sm text-slate-700">
-                        <span className="font-semibold">AI-Generated</span> Actions
-                      </div>
-                      <div className="px-4 py-2 bg-white rounded-lg border border-slate-200 text-sm text-slate-700">
-                        <span className="font-semibold">Priority</span> Tracking
-                      </div>
-                      <div className="px-4 py-2 bg-white rounded-lg border border-slate-200 text-sm text-slate-700">
-                        <span className="font-semibold">Due Date</span> Management
-                      </div>
-                      <div className="px-4 py-2 bg-white rounded-lg border border-slate-200 text-sm text-slate-700">
-                        <span className="font-semibold">Progress</span> Monitoring
-                      </div>
-                    </div>
+                  {/* Action Views */}
+                  {actionView === 'kanban' ? (
+                    <ActionKanbanBoard
+                      projectId={parseInt(id!)}
+                      onActionClick={setSelectedActionId}
+                    />
+                  ) : (
+                    <ActionTableView
+                      projectId={parseInt(id!)}
+                      onActionClick={setSelectedActionId}
+                    />
+                  )}
+                </div>
+              ) : hasAssessments ? (
+                <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Target className="text-blue-600" size={32} />
                   </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">
+                    No Actions Yet
+                  </h3>
+                  <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                    Generate an action plan from your assessment results
+                  </p>
+                  <button
+                    onClick={() => setActiveTab('assessment-summary')}
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30"
+                  >
+                    <Sparkles size={18} />
+                    Go to Assessment Summary
+                  </button>
                 </div>
               ) : (
                 <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border-2 border-dashed border-slate-300">
@@ -936,6 +968,23 @@ export default function ProjectDetailPage() {
         </div>
       </Modal>
 
+      {/* Re-run Assessment Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showRerunConfirmDialog}
+        onClose={() => setShowRerunConfirmDialog(false)}
+        onConfirm={handleConfirmRerun}
+        title="Re-run Assessment?"
+        message="This will create a new assessment using your latest uploaded documents. Previous assessment results will be archived for comparison. Do you want to continue?"
+        confirmText="Re-run Assessment"
+        confirmVariant="primary"
+        isLoading={runningAssessment}
+        icon={
+          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <RefreshCw className="text-blue-600" size={24} />
+          </div>
+        }
+      />
+
       {/* Toast Notification */}
       {toast && (
         <Toast
@@ -966,6 +1015,14 @@ export default function ProjectDetailPage() {
           refetch()
         }}
       />
+
+      {/* Action Detail Modal */}
+      {selectedActionId && (
+        <ActionDetailModal
+          actionId={selectedActionId}
+          onClose={() => setSelectedActionId(null)}
+        />
+      )}
     </div>
   )
 }
