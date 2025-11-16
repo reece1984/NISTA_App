@@ -4,12 +4,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import ScrollToTop from './components/ScrollToTop'
 
 // Pages
-import CorporateHomePage from './pages/CorporateHomePage'
-import GatewaySuccessPage from './pages/GatewaySuccessPage'
-import BaselineSuccessPage from './pages/BaselineSuccessPage'
-import TenderSuccessPage from './pages/TenderSuccessPage'
-import RiskSuccessPage from './pages/RiskSuccessPage'
-import BusinessCaseSuccessPage from './pages/BusinessCaseSuccessPage'
 import SignUpPage from './pages/SignUpPage'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
@@ -64,58 +58,71 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+// Root redirect based on auth state
+function RootRedirect() {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    )
+  }
+
+  if (user) {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  return <Navigate to="/login" replace />
+}
+
 function AppRoutes() {
   return (
     <>
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<CorporateHomePage />} />
-      <Route path="/programmeinsights" element={<CorporateHomePage />} />
-      <Route path="/gateway-success" element={<GatewaySuccessPage />} />
-      <Route path="/baseline-success" element={<BaselineSuccessPage />} />
-      <Route path="/tender-success" element={<TenderSuccessPage />} />
-      <Route path="/risk-success" element={<RiskSuccessPage />} />
-      <Route path="/business-case-success" element={<BusinessCaseSuccessPage />} />
-      <Route
-        path="/signup"
-        element={
-          <PublicRoute>
-            <SignUpPage />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <LoginPage />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/projects/:id"
-        element={
-          <ProtectedRoute>
-            <ProjectDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/criteria"
-        element={
-          <ProtectedRoute>
-            <AssessmentCriteriaPage />
-          </ProtectedRoute>
-        }
-      />
+        <Route path="/" element={<RootRedirect />} />
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <SignUpPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects/:id"
+          element={
+            <ProtectedRoute>
+              <ProjectDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/criteria"
+          element={
+            <ProtectedRoute>
+              <AssessmentCriteriaPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   )

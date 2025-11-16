@@ -81,14 +81,14 @@ export default function DashboardPage() {
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-6">
-              <Link to="/dashboard" className="flex items-center gap-2">
+              <a href="https://www.programmeinsights.co.uk" className="flex items-center gap-2">
                 <div>
                   <div className="text-xl font-bold text-slate-900 tracking-tight">
-                    GATEWAY SUCCESS
+                    Gateway Success
                   </div>
                   <div className="text-xs text-slate-600 font-medium">NISTA/PAR Assessment</div>
                 </div>
-              </Link>
+              </a>
               <nav className="hidden md:flex items-center gap-1 ml-4">
                 <Link
                   to="/dashboard"
