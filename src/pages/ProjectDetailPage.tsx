@@ -784,14 +784,38 @@ export default function ProjectDetailPage() {
                     No Assessment Results Yet
                   </h3>
                   <p className="text-text-secondary max-w-md mx-auto mb-6">
-                    Upload documents in the Documents tab, then run an assessment to see results here.
+                    {hasFiles
+                      ? 'Your documents are ready. Run an assessment to analyze them against NISTA/PAR criteria.'
+                      : 'Upload documents in the Documents tab, then run an assessment to see results here.'}
                   </p>
-                  <button
-                    onClick={() => setActiveTab('documents')}
-                    className="inline-flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md"
-                  >
-                    Go to Documents
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    {hasFiles ? (
+                      <button
+                        onClick={handleRunAssessment}
+                        disabled={runningAssessment}
+                        className="inline-flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {runningAssessment ? (
+                          <>
+                            <Loader2 size={18} className="animate-spin" />
+                            Running Assessment...
+                          </>
+                        ) : (
+                          <>
+                            <Play size={18} />
+                            Run Assessment
+                          </>
+                        )}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setActiveTab('documents')}
+                        className="inline-flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md"
+                      >
+                        Go to Documents
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
