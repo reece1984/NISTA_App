@@ -1286,6 +1286,9 @@ export default function AssessmentResults({
             overallRating={overallRag as 'green' | 'amber' | 'red' | 'pending'}
             readinessPercentage={Math.round((ragCounts.green / totalAssessments) * 100)}
             executiveSummary={projectSummary?.executive_summary || null}
+            keyStrengths={projectSummary?.key_strengths || null}
+            criticalIssues={projectSummary?.critical_issues || null}
+            overallRecommendation={projectSummary?.overall_recommendation || null}
             totalCriteria={totalAssessments}
           />
         </div>

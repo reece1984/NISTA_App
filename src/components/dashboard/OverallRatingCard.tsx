@@ -4,6 +4,9 @@ interface OverallRatingCardProps {
   overallRating: 'green' | 'amber' | 'red' | 'pending'
   readinessPercentage: number
   executiveSummary: string | null
+  keyStrengths?: string | null
+  criticalIssues?: string | null
+  overallRecommendation?: string | null
   totalCriteria: number
 }
 
@@ -11,6 +14,9 @@ export default function OverallRatingCard({
   overallRating,
   readinessPercentage,
   executiveSummary,
+  keyStrengths,
+  criticalIssues,
+  overallRecommendation,
   totalCriteria,
 }: OverallRatingCardProps) {
   const getRagBadge = (rating: string) => {
@@ -63,6 +69,48 @@ export default function OverallRatingCard({
         <div className="mt-6 pt-6 border-t border-slate-200">
           <p className="text-slate-700 leading-relaxed">
             {executiveSummary}
+          </p>
+        </div>
+      )}
+
+      {keyStrengths && (
+        <div className="mt-6 pt-6 border-t border-slate-200">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+            <h4 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">
+              Key Strengths
+            </h4>
+          </div>
+          <p className="text-slate-700 leading-relaxed">
+            {keyStrengths}
+          </p>
+        </div>
+      )}
+
+      {criticalIssues && (
+        <div className="mt-6 pt-6 border-t border-slate-200">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 rounded-full bg-red-500"></div>
+            <h4 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">
+              Critical Issues
+            </h4>
+          </div>
+          <p className="text-slate-700 leading-relaxed">
+            {criticalIssues}
+          </p>
+        </div>
+      )}
+
+      {overallRecommendation && (
+        <div className="mt-6 pt-6 border-t border-slate-200">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+            <h4 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">
+              Overall Recommendation
+            </h4>
+          </div>
+          <p className="text-slate-700 leading-relaxed">
+            {overallRecommendation}
           </p>
         </div>
       )}
