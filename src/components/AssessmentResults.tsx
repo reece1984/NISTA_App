@@ -1360,7 +1360,7 @@ export default function AssessmentResults({
             )}
           </div>
         )}
-      </div>
+      </div>}
 
       {/* Filter Buttons - Show in detail and full view */}
       {showDetail && <div className="mb-6">
