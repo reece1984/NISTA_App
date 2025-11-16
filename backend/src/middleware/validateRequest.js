@@ -1,0 +1,27 @@
+/**
+ * Request Validation Middleware
+ * Using express-validator for input validation
+ */
+
+import { validationResult } from 'express-validator';
+
+/**
+ * Check validation results and return errors if any
+ */
+export function validate(req, res, next) {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      success: false,
+      error: 'Validation failed',
+      errors: errors.array().map(err => ({
+        field: err.path,
+        message: err.msg,
+        value: err.value
+      }))
+    });
+  }
+
+  next();
+}

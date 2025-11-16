@@ -45,7 +45,8 @@ export function useActions({ projectId, filters }: UseActionsOptions) {
     queryKey: ['actions', projectId, localFilters],
     queryFn: async () => {
       const result = await n8nApi.getActions(projectId, localFilters)
-      return result.actions || []
+      // apiAdapter returns the actions array directly, not wrapped in { actions: [] }
+      return Array.isArray(result) ? result : (result.actions || [])
     },
     enabled: !!projectId,
     refetchOnWindowFocus: false

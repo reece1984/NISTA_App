@@ -1,0 +1,31 @@
+{
+  "name": "gateway-success-api",
+  "version": "1.0.0",
+  "description": "Express API backend for Gateway Success action plan management",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "db:setup": "node src/db/setup.js"
+  },
+  "keywords": [
+    "express",
+    "postgresql",
+    "api",
+    "gateway-success"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.81.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

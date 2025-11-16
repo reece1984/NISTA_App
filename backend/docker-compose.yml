@@ -1,0 +1,52 @@
+# Docker Compose for Gateway Success API
+# For local development and testing
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database (for local testing only)
+  # In production, use your existing database
+  postgres:
+    image: postgres:15-alpine
+    container_name: gateway-success-db
+    environment:
+      POSTGRES_DB: gateway_success
+      POSTGRES_USER: gateway_user
+      POSTGRES_PASSWORD: gateway_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gateway_user -d gateway_success"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Express API
+  api:
+    build: .
+    container_name: gateway-success-api
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://gateway_user:gateway_password@postgres:5432/gateway_success
+      CORS_ORIGIN: http://localhost:5173
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      # Mount source code for hot reload in development
+      - ./src:/app/src
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  default:
+    name: gateway-success-network
