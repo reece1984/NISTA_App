@@ -27,7 +27,12 @@ const PORT = process.env.PORT || 3000;
 // =====================================================
 
 // CORS - Allow frontend to call API
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5184'];
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5184',
+  'https://app.programmeinsights.co.uk',
+  'https://nista-app.vercel.app'
+];
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
