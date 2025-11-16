@@ -7,23 +7,24 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Programme Insights Brand Colors
-        primary: '#0055A5', // Deep blue
-        'primary-dark': '#003d7a',
-        accent: '#FF5722', // Bright orange
-        'accent-light': '#FF7043',
-        secondary: '#0088FF', // Light blue
+        // Programme Insights Brand Colors - Navy & Copper Theme
+        primary: '#2c3e50', // Navy
+        'primary-dark': '#1a252f', // Dark Navy
+        accent: '#c17a4a', // Copper
+        'accent-hover': '#a66339', // Copper hover
+        secondary: '#c17a4a', // Copper (for consistency)
         success: '#00703c',
         warning: '#f47738',
         error: '#d4351c',
         'rag-green': '#00703c',
         'rag-amber': '#f47738',
         'rag-red': '#d4351c',
-        background: '#f8f9fa',
+        background: '#ffffff',
         card: '#ffffff',
-        'text-primary': '#1a1a1a',
-        'text-secondary': '#6c757d',
-        border: '#dee2e6',
+        'text-primary': '#1a252f',
+        'text-secondary': '#6b7280',
+        border: '#e5e7eb',
+        'border-default': '#d1d5db',
       },
     },
   },

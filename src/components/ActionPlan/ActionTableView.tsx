@@ -121,13 +121,13 @@ export default function ActionTableView({ projectId, onActionClick }: ActionTabl
     <div>
       {/* Bulk Actions Toolbar */}
       {selectedIds.size > 0 && (
-        <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200 flex items-center justify-between">
-          <span className="text-sm font-semibold text-blue-900">
+        <div className="mb-4 p-4 bg-accent/5 rounded-lg border border-accent/20 flex items-center justify-between">
+          <span className="text-sm font-semibold text-accent-hover">
             {selectedIds.size} action{selectedIds.size !== 1 ? 's' : ''} selected
           </span>
           <div className="flex items-center gap-3">
             <select
-              className="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-accent"
               onChange={(e) => {
                 if (e.target.value) {
                   bulkUpdate({
@@ -145,7 +145,7 @@ export default function ActionTableView({ projectId, onActionClick }: ActionTabl
               <option value="wont_fix">Won't Fix</option>
             </select>
             <select
-              className="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-accent"
               onChange={(e) => {
                 if (e.target.value) {
                   bulkUpdate({
@@ -192,7 +192,7 @@ export default function ActionTableView({ projectId, onActionClick }: ActionTabl
                   placeholder="Filter..."
                   value={filters.title}
                   onChange={(e) => setFilters({ ...filters, title: e.target.value })}
-                  className="mt-1 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </th>
               <th className="px-4 py-3 text-left w-36">
@@ -208,7 +208,7 @@ export default function ActionTableView({ projectId, onActionClick }: ActionTabl
                   placeholder="Filter..."
                   value={filters.assignedTo}
                   onChange={(e) => setFilters({ ...filters, assignedTo: e.target.value })}
-                  className="mt-1 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </th>
               <th className="px-4 py-3 text-left w-32">
@@ -222,7 +222,7 @@ export default function ActionTableView({ projectId, onActionClick }: ActionTabl
                 <select
                   value={filters.status}
                   onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                  className="mt-1 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-accent"
                 >
                   <option value="">All</option>
                   <option value="not_started">Not Started</option>
@@ -242,7 +242,7 @@ export default function ActionTableView({ projectId, onActionClick }: ActionTabl
                 <select
                   value={filters.priority}
                   onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-                  className="mt-1 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-accent"
                 >
                   <option value="">All</option>
                   <option value="low">Low</option>
@@ -289,7 +289,7 @@ export default function ActionTableView({ projectId, onActionClick }: ActionTabl
                 <td className="px-4 py-3 text-sm text-gray-700">
                   {action.assignedTo ? (
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-600 font-semibold text-xs">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-accent/10 text-accent font-semibold text-xs">
                         {action.assignedTo.name?.[0] || action.assignedTo.email[0]}
                       </span>
                       <span className="truncate">{action.assignedTo.name || action.assignedTo.email}</span>

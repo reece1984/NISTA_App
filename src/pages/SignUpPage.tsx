@@ -75,7 +75,7 @@ export default function SignUpPage() {
               Already have an account?{' '}
               <Link
                 to="/login"
-                className="font-medium text-secondary hover:text-secondary/80"
+                className="font-medium text-accent hover:text-accent-hover"
               >
                 Sign in
               </Link>
@@ -161,7 +161,7 @@ export default function SignUpPage() {
           <div className="mt-6">
             <Link
               to="/"
-              className="text-sm text-text-secondary hover:text-secondary text-center block"
+              className="text-sm text-text-secondary hover:text-accent text-center block"
             >
               ← Back to home
             </Link>

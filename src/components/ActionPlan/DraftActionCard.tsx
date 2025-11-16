@@ -59,7 +59,7 @@ export default function DraftActionCard({
               type="text"
               value={editedAction.title}
               onChange={(e) => setEditedAction({ ...editedAction, title: e.target.value })}
-              className="w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
+              className="w-full px-2 py-1 border border-accent/30 rounded focus:outline-none focus:ring-2 focus:ring-accent font-semibold"
               placeholder="Action title..."
             />
           ) : (
@@ -70,7 +70,7 @@ export default function DraftActionCard({
 
           {/* Category Badge */}
           {action.criteriaCategory && (
-            <span className="inline-block mt-1 px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded">
+            <span className="inline-block mt-1 px-2 py-0.5 bg-accent/5 text-accent-hover text-xs rounded">
               {action.criteriaCategory}
             </span>
           )}
@@ -99,7 +99,7 @@ export default function DraftActionCard({
             <>
               <button
                 onClick={handleEdit}
-                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                className="p-1.5 text-accent hover:bg-accent/5 rounded transition-colors"
                 title="Edit action"
               >
                 <Edit2 size={16} />
@@ -129,7 +129,7 @@ export default function DraftActionCard({
           <select
             value={editedAction.priority}
             onChange={(e) => setEditedAction({ ...editedAction, priority: e.target.value as DraftAction['priority'] })}
-            className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-accent"
           >
             {priorityOptions.map(p => (
               <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
@@ -161,7 +161,7 @@ export default function DraftActionCard({
             type="date"
             value={editedAction.suggestedDueDate || ''}
             onChange={(e) => setEditedAction({ ...editedAction, suggestedDueDate: e.target.value })}
-            className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-accent"
           />
         ) : action.suggestedDueDate ? (
           <span className="text-gray-600">
@@ -186,7 +186,7 @@ export default function DraftActionCard({
               value={editedAction.description}
               onChange={(e) => setEditedAction({ ...editedAction, description: e.target.value })}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-accent text-sm"
               placeholder="Describe the action in detail..."
             />
           ) : (

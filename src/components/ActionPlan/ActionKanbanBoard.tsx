@@ -28,7 +28,7 @@ interface KanbanColumn {
 
 const columns: KanbanColumn[] = [
   { id: 'not_started', title: 'Not Started', color: 'bg-gray-100 border-gray-300' },
-  { id: 'in_progress', title: 'In Progress', color: 'bg-blue-50 border-blue-300' },
+  { id: 'in_progress', title: 'In Progress', color: 'bg-accent/5 border-accent/30' },
   { id: 'completed', title: 'Completed', color: 'bg-green-50 border-green-300' },
   { id: 'wont_fix', title: "Won't Fix", color: 'bg-gray-50 border-gray-300' }
 ]
@@ -75,7 +75,7 @@ function ActionCard({
         {/* Assigned User */}
         {action.assignedTo && (
           <div className="text-xs text-gray-600 flex items-center gap-1">
-            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-blue-600 font-semibold">
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-accent/10 text-accent font-semibold">
               {action.assignedTo.name?.[0] || action.assignedTo.email[0]}
             </span>
             <span className="truncate">{action.assignedTo.name || action.assignedTo.email}</span>
@@ -224,7 +224,7 @@ export default function ActionKanbanBoard({
             <Filter size={16} />
             Filters
             {Object.keys(filters).length > 0 && (
-              <span className="bg-blue-600 text-white px-1.5 py-0.5 rounded-full text-xs font-bold">
+              <span className="bg-accent text-white px-1.5 py-0.5 rounded-full text-xs font-bold">
                 {Object.keys(filters).length}
               </span>
             )}
@@ -247,7 +247,7 @@ export default function ActionKanbanBoard({
               <select
                 value={filters.priority || ''}
                 onChange={(e) => updateFilters({ ...filters, priority: e.target.value || undefined })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
               >
                 <option value="">All Priorities</option>
                 <option value="critical">Critical</option>
@@ -265,7 +265,7 @@ export default function ActionKanbanBoard({
               <select
                 value={filters.status || ''}
                 onChange={(e) => updateFilters({ ...filters, status: e.target.value || undefined })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
               >
                 <option value="">All Statuses</option>
                 <option value="not_started">Not Started</option>

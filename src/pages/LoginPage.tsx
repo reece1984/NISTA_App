@@ -77,16 +77,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900">
+    <div className="min-h-screen bg-gradient-to-br from-primary-dark via-primary to-primary-dark">
       {/* Header */}
-      <nav className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+      <nav className="bg-white/95 backdrop-blur-sm border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-xl font-bold text-gray-900">Gateway Success</span>
-              <span className="text-xs text-gray-500">NISTA/PAR Assessment</span>
+              <span className="text-xl font-bold text-text-primary">Gateway Success</span>
+              <span className="text-xs text-text-secondary">NISTA/PAR Assessment</span>
             </Link>
-            <Link to="/signup" className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold hover:shadow-md transition-all">
+            <Link to="/signup" className="bg-accent hover:bg-accent-hover text-white px-5 py-2 rounded-lg font-semibold hover:shadow-md transition-all">
               Get Started
             </Link>
           </div>
@@ -99,11 +99,11 @@ export default function LoginPage() {
             <h2 className="text-center text-3xl font-bold text-white" style={{ fontFamily: 'Inter, sans-serif' }}>
               Sign in to your account
             </h2>
-            <p className="mt-2 text-center text-sm text-blue-100">
+            <p className="mt-2 text-center text-sm text-white/80">
               Don't have an account?{' '}
               <Link
                 to="/signup"
-                className="font-semibold text-blue-400 hover:text-blue-300 transition-colors"
+                className="font-semibold text-accent hover:text-accent-hover transition-colors"
               >
                 Sign up
               </Link>
@@ -156,7 +156,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowResetPassword(true)}
-                  className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                  className="font-semibold text-accent hover:text-accent-hover transition-colors"
                 >
                   Forgot your password?
                 </button>
@@ -165,7 +165,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-4 rounded-lg transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
               {loading ? 'Signing in...' : 'Sign In'}
@@ -175,7 +175,7 @@ export default function LoginPage() {
           <div className="mt-6">
             <Link
               to="/"
-              className="text-sm text-gray-600 hover:text-blue-600 text-center block font-medium transition-colors"
+              className="text-sm text-text-secondary hover:text-accent text-center block font-medium transition-colors"
             >
               ← Back to home
             </Link>
@@ -227,14 +227,14 @@ export default function LoginPage() {
                       setError('')
                       setResetMessage('')
                     }}
-                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-lg transition-all disabled:opacity-50"
+                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-text-primary font-semibold py-3 px-4 rounded-lg transition-all disabled:opacity-50"
                     disabled={loading}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-4 rounded-lg transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={loading || !resetEmail}
                   >
                     {loading ? 'Sending...' : 'Send Reset Link'}

@@ -47,7 +47,7 @@ export default function AssessmentComparisonBanner({
     <div
       className={cn(
         'mb-8 rounded-xl border-2 p-6 shadow-lg',
-        isImproved ? 'bg-green-50 border-green-300' : isDeteriorated ? 'bg-red-50 border-red-300' : 'bg-blue-50 border-blue-300'
+        isImproved ? 'bg-green-50 border-green-300' : isDeteriorated ? 'bg-red-50 border-red-300' : 'bg-accent/5 border-accent/30'
       )}
     >
       {/* Header */}
@@ -125,10 +125,10 @@ export default function AssessmentComparisonBanner({
         {/* Improved */}
         <div className="bg-white rounded-lg p-4 border border-gray-200">
           <div className="flex items-center gap-2 mb-1">
-            <TrendingUp size={16} className="text-blue-600" />
+            <TrendingUp size={16} className="text-accent" />
             <span className="text-sm text-gray-600">Improved</span>
           </div>
-          <div className="text-2xl font-bold text-blue-600">{data.summary.improved}</div>
+          <div className="text-2xl font-bold text-accent">{data.summary.improved}</div>
         </div>
 
         {/* Unchanged */}
@@ -174,7 +174,7 @@ export default function AssessmentComparisonBanner({
         {data.suggestedActions.generateNewActions && (
           <button
             onClick={onGenerateActionPlan}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-lg font-medium transition-colors"
           >
             <Sparkles size={16} />
             Generate New Action Plan

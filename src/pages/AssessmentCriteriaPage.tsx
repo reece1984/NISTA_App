@@ -212,28 +212,28 @@ export default function AssessmentCriteriaPage() {
   }, [criteria])
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-card border-b border-border sticky top-0 z-10">
+      <header className="bg-primary border-b border-white/10 shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-6">
               <Link to="/dashboard" className="flex items-center gap-2">
                 <div>
-                  <div className="text-xl font-semibold text-text-primary">Gateway Success</div>
-                  <div className="text-xs text-text-secondary">NISTA/PAR Assessment</div>
+                  <div className="text-xl font-semibold text-white">Gateway Success</div>
+                  <div className="text-xs text-white/70">NISTA/PAR Assessment</div>
                 </div>
               </Link>
               <nav className="hidden md:flex items-center gap-4">
                 <Link
                   to="/dashboard"
-                  className="text-sm text-text-secondary hover:text-text-primary transition-colors"
+                  className="text-sm text-white/85 hover:text-white transition-colors"
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/criteria"
-                  className="text-sm text-secondary font-medium flex items-center gap-2"
+                  className="text-sm text-white font-medium flex items-center gap-2 border-b-2 border-accent"
                 >
                   <ClipboardList size={16} />
                   Criteria
@@ -241,16 +241,14 @@ export default function AssessmentCriteriaPage() {
               </nav>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-text-secondary hidden sm:inline">{user?.email}</span>
-              <Button
-                variant="secondary"
-                size="sm"
+              <span className="text-sm text-white/70 hidden sm:inline">{user?.email}</span>
+              <button
                 onClick={handleSignOut}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white/85 hover:text-white px-3 py-2 rounded-lg font-medium text-sm transition-all"
               >
                 <LogOut size={16} />
                 <span className="hidden sm:inline">Sign Out</span>
-              </Button>
+              </button>
             </div>
           </div>
         </div>
@@ -261,7 +259,7 @@ export default function AssessmentCriteriaPage() {
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-text-primary mb-2">Assessment Criteria</h1>
-          <p className="text-text-secondary">
+          <p className="text-text-accent">
             {selectedTemplateId
               ? templates.find((t) => t.id === selectedTemplateId)?.name || 'Review NISTA/PAR criteria for your assessment'
               : 'Review NISTA/PAR criteria for your assessment'}
@@ -270,24 +268,24 @@ export default function AssessmentCriteriaPage() {
 
         {loading ? (
           <div className="text-center py-12">
-            <div className="text-lg text-text-secondary">Loading templates...</div>
+            <div className="text-lg text-text-accent">Loading templates...</div>
           </div>
         ) : !selectedTemplateId ? (
           /* INITIAL STATE - NO TEMPLATE SELECTED */
           <>
             {/* About NISTA/PAR Section */}
-            <div className="mb-12 card bg-gradient-to-br from-blue-50 to-blue-100/50 border-l-4 border-secondary">
+            <div className="mb-12 card bg-gradient-to-br from-accent/5 to-accent/10 border-l-4 border-accent">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <BookOpen size={24} className="text-secondary" />
+                  <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+                    <BookOpen size={24} className="text-accent" />
                   </div>
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-text-primary mb-4">
                     About NISTA/PAR Assessment Framework
                   </h2>
-                  <div className="space-y-4 text-text-secondary leading-relaxed">
+                  <div className="space-y-4 text-text-accent leading-relaxed">
                     <p>
                       The <strong>NISTA (New Infrastructure Strategic Transparency Assessment)</strong> and{' '}
                       <strong>PAR (Project Assessment Review)</strong> frameworks are used by the Infrastructure and
@@ -344,7 +342,7 @@ export default function AssessmentCriteriaPage() {
               <h2 className="text-2xl font-bold text-text-primary mb-2 text-center">
                 Select Assessment Template
               </h2>
-              <p className="text-text-secondary text-center mb-8">
+              <p className="text-text-accent text-center mb-8">
                 Choose a template to view its assessment criteria
               </p>
 
@@ -354,19 +352,19 @@ export default function AssessmentCriteriaPage() {
                   <button
                     key={template.id}
                     onClick={() => handleTemplateSelect(template.id)}
-                    className="card text-left hover:shadow-lg hover:border-secondary transition-all duration-200 group"
+                    className="card text-left hover:shadow-lg hover:border-accent transition-all duration-200 group"
                   >
                     <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-xl font-bold text-text-primary group-hover:text-secondary transition-colors">
+                      <h3 className="text-xl font-bold text-text-primary group-hover:text-accent transition-colors">
                         {template.name}
                       </h3>
                       <ArrowRight
                         size={24}
-                        className="text-text-secondary group-hover:text-secondary group-hover:translate-x-1 transition-all flex-shrink-0"
+                        className="text-text-accent group-hover:text-accent group-hover:translate-x-1 transition-all flex-shrink-0"
                       />
                     </div>
                     {template.description && (
-                      <p className="text-text-secondary mb-4 leading-relaxed">{template.description}</p>
+                      <p className="text-text-accent mb-4 leading-relaxed">{template.description}</p>
                     )}
                     <div className="flex items-center gap-4 pt-4 border-t border-border">
                       <div className="text-sm">
@@ -383,11 +381,11 @@ export default function AssessmentCriteriaPage() {
           <>
             {/* Template Selector Dropdown */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-text-secondary mb-2">Template:</label>
+              <label className="block text-sm font-medium text-text-accent mb-2">Template:</label>
               <select
                 value={selectedTemplateId}
                 onChange={(e) => handleTemplateSelect(Number(e.target.value))}
-                className="w-full md:w-auto min-w-[300px] px-4 py-3 border-2 border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-colors text-text-primary font-medium"
+                className="w-full md:w-auto min-w-[300px] px-4 py-3 border-2 border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-colors text-text-primary font-medium"
               >
                 {templates.map((template) => (
                   <option key={template.id} value={template.id}>
@@ -401,7 +399,7 @@ export default function AssessmentCriteriaPage() {
             <div className="mb-6">
               <div className="relative">
                 <Search
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-accent"
                   size={20}
                 />
                 <input
@@ -409,7 +407,7 @@ export default function AssessmentCriteriaPage() {
                   placeholder="Search criteria by code, title, or question..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-border bg-card text-text-primary placeholder-text-secondary focus:outline-none focus:border-secondary transition-colors"
+                  className="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-border bg-card text-text-primary placeholder-text-accent focus:outline-none focus:border-accent transition-colors"
                 />
               </div>
             </div>
@@ -440,7 +438,7 @@ export default function AssessmentCriteriaPage() {
                             type="checkbox"
                             checked={selectedDimensions.has(dimension)}
                             onChange={() => toggleDimension(dimension)}
-                            className="rounded border-gray-300 text-secondary focus:ring-secondary"
+                            className="rounded border-gray-300 text-accent focus:ring-accent"
                           />
                           <span className="text-sm text-text-primary">{dimension}</span>
                         </label>
@@ -456,7 +454,7 @@ export default function AssessmentCriteriaPage() {
                         type="checkbox"
                         checked={showCriticalOnly}
                         onChange={(e) => setShowCriticalOnly(e.target.checked)}
-                        className="rounded border-gray-300 text-secondary focus:ring-secondary"
+                        className="rounded border-gray-300 text-accent focus:ring-accent"
                       />
                       <span className="text-sm text-text-primary">Show only critical criteria</span>
                     </label>
@@ -468,7 +466,7 @@ export default function AssessmentCriteriaPage() {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                      className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
+                      className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                     >
                       <option value="code">Criterion Code</option>
                       <option value="title">Title</option>
@@ -485,7 +483,7 @@ export default function AssessmentCriteriaPage() {
                       setSortBy('code')
                       setSearchQuery('')
                     }}
-                    className="text-sm text-secondary hover:text-secondary/80 transition-colors"
+                    className="text-sm text-accent hover:text-accent/80 transition-colors"
                   >
                     Clear all filters
                   </button>
@@ -497,33 +495,33 @@ export default function AssessmentCriteriaPage() {
             <div className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="card">
                 <div className="text-3xl font-bold text-text-primary">{stats.total}</div>
-                <div className="text-sm text-text-secondary">Total Criteria</div>
+                <div className="text-sm text-text-accent">Total Criteria</div>
               </div>
               <div className="card">
                 <div className="text-3xl font-bold text-rag-red">{stats.criticalCount}</div>
-                <div className="text-sm text-text-secondary">Critical</div>
+                <div className="text-sm text-text-accent">Critical</div>
               </div>
               <div className="card">
                 <div className="text-3xl font-bold text-text-primary">{Object.keys(stats.dimensionCounts).length}</div>
-                <div className="text-sm text-text-secondary">Dimensions</div>
+                <div className="text-sm text-text-accent">Dimensions</div>
               </div>
               <div className="card">
                 <div className="text-3xl font-bold text-text-primary">{stats.averageWeight}%</div>
-                <div className="text-sm text-text-secondary">Avg Weight</div>
+                <div className="text-sm text-text-accent">Avg Weight</div>
               </div>
             </div>
 
             {/* Criteria List */}
             {filteredCriteria.length === 0 ? (
               <div className="card text-center py-12">
-                <p className="text-text-secondary">No criteria found matching your filters.</p>
+                <p className="text-text-accent">No criteria found matching your filters.</p>
                 <button
                   onClick={() => {
                     setSearchQuery('')
                     setSelectedDimensions(new Set())
                     setShowCriticalOnly(false)
                   }}
-                  className="mt-4 text-secondary hover:text-secondary/80 font-medium"
+                  className="mt-4 text-accent hover:text-accent/80 font-medium"
                 >
                   Clear all filters
                 </button>
@@ -542,10 +540,10 @@ export default function AssessmentCriteriaPage() {
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2 mb-2">
-                              <span className="font-mono text-sm font-semibold text-secondary bg-secondary/10 px-2 py-1 rounded">
+                              <span className="font-mono text-sm font-semibold text-accent bg-accent/10 px-2 py-1 rounded">
                                 {criterion.criterionCode}
                               </span>
-                              <span className="px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-text-secondary">
+                              <span className="px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-text-accent">
                                 {criterion.dimension}
                               </span>
                               {criterion.is_critical && (
@@ -555,7 +553,7 @@ export default function AssessmentCriteriaPage() {
                                 </span>
                               )}
                               {criterion.weight !== null && (
-                                <span className="text-xs font-medium text-text-secondary bg-gray-100 px-2 py-1 rounded">
+                                <span className="text-xs font-medium text-text-accent bg-gray-100 px-2 py-1 rounded">
                                   Weight: {criterion.weight}%
                                 </span>
                               )}
@@ -566,9 +564,9 @@ export default function AssessmentCriteriaPage() {
                           </div>
                           <div className="flex-shrink-0">
                             {isExpanded ? (
-                              <ChevronUp size={20} className="text-text-secondary" />
+                              <ChevronUp size={20} className="text-text-accent" />
                             ) : (
-                              <ChevronDown size={20} className="text-text-secondary" />
+                              <ChevronDown size={20} className="text-text-accent" />
                             )}
                           </div>
                         </div>
@@ -577,8 +575,8 @@ export default function AssessmentCriteriaPage() {
                       {isExpanded && (
                         <div className="mt-4 pt-4 border-t border-border space-y-4">
                           {/* Assessment Question */}
-                          <div className="p-3 bg-blue-50 rounded-lg border-l-4 border-secondary">
-                            <div className="text-xs font-semibold text-secondary uppercase mb-1">
+                          <div className="p-3 bg-accent/5 rounded-lg border-l-4 border-accent">
+                            <div className="text-xs font-semibold text-accent uppercase mb-1">
                               Assessment Question
                             </div>
                             <p className="text-sm text-text-primary leading-relaxed italic">
@@ -592,14 +590,14 @@ export default function AssessmentCriteriaPage() {
                               <h4 className="text-sm font-semibold text-text-primary mb-2">
                                 Description
                               </h4>
-                              <p className="text-sm text-text-secondary leading-relaxed">
+                              <p className="text-sm text-text-accent leading-relaxed">
                                 {criterion.description}
                               </p>
                             </div>
                           )}
 
                           {/* Template Info */}
-                          <div className="text-xs text-text-secondary">
+                          <div className="text-xs text-text-accent">
                             Template:{' '}
                             {templates.find((t) => t.id === criterion.template_id)?.name || 'Unknown'}
                           </div>

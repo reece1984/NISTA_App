@@ -137,7 +137,7 @@ export default function ActionPlanDraftWorkspace({
           </div>
           <button
             onClick={handleAddManualAction}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-accent hover:bg-accent-hover text-white rounded-lg transition-colors"
             title="Add a new action manually"
           >
             <Plus size={16} />
@@ -149,7 +149,7 @@ export default function ActionPlanDraftWorkspace({
         <div className="flex-1 overflow-y-auto space-y-6 pr-2">
           {isLoadingDraft || isGenerating ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 size={48} className="animate-spin text-blue-600 mb-4" />
+              <Loader2 size={48} className="animate-spin text-accent mb-4" />
               <p className="text-lg font-medium text-gray-900">
                 {isLoadingDraft ? 'Loading action plan...' : 'Generating action plan...'}
               </p>
@@ -168,7 +168,7 @@ export default function ActionPlanDraftWorkspace({
               {Object.entries(groupedActions).map(([category, items]) => (
                 <div key={category} className="space-y-3">
                   <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide flex items-center gap-2">
-                    <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">
+                    <span className="flex-shrink-0 w-6 h-6 bg-accent/10 text-accent rounded-full flex items-center justify-center text-xs font-bold">
                       {items.length}
                     </span>
                     {category}
@@ -190,7 +190,7 @@ export default function ActionPlanDraftWorkspace({
                   <p>No actions generated yet.</p>
                   <button
                     onClick={handleAddManualAction}
-                    className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+                    className="mt-4 text-accent hover:text-blue-700 font-medium"
                   >
                     Add your first action
                   </button>
@@ -204,7 +204,7 @@ export default function ActionPlanDraftWorkspace({
         {!isGenerating && actions.length > 0 && (
           <div className="mt-4 pt-3 border-t border-gray-200 bg-gray-50 -mx-6 px-6 pb-3">
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles size={14} className="text-blue-600" />
+              <Sparkles size={14} className="text-accent" />
               <h4 className="text-xs font-semibold text-gray-700">Refine with AI</h4>
             </div>
 
@@ -231,13 +231,13 @@ export default function ActionPlanDraftWorkspace({
                 onChange={(e) => setUserMessage(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
                 placeholder="Ask AI to refine..."
-                className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-accent"
                 disabled={isRefining}
               />
               <button
                 onClick={handleSendMessage}
                 disabled={!userMessage.trim() || isRefining}
-                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition-colors"
+                className="px-3 py-1.5 bg-accent hover:bg-accent-hover text-white text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition-colors"
                 title="Send message"
               >
                 {isRefining ? (
@@ -261,7 +261,7 @@ export default function ActionPlanDraftWorkspace({
                   key={idx}
                   onClick={() => setUserMessage(prompt)}
                   disabled={isRefining}
-                  className="px-2 py-1 text-xs bg-white border border-gray-300 hover:border-blue-400 hover:bg-blue-50 text-gray-600 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-2 py-1 text-xs bg-white border border-gray-300 hover:border-accent hover:bg-accent/5 text-gray-600 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {prompt}
                 </button>

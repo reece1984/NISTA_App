@@ -133,7 +133,7 @@ export default function ActionDetailModal({
     return (
       <Modal isOpen={true} onClose={onClose} title="Action Details" size="lg">
         <div className="flex items-center justify-center py-12">
-          <Loader2 size={32} className="animate-spin text-blue-600" />
+          <Loader2 size={32} className="animate-spin text-accent" />
         </div>
       </Modal>
     )
@@ -167,7 +167,7 @@ export default function ActionDetailModal({
               type="text"
               value={editedAction.title || ''}
               onChange={(e) => setEditedAction({ ...editedAction, title: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
             />
           ) : (
             <h2 className="text-xl font-semibold text-gray-900">{action.title}</h2>
@@ -184,7 +184,7 @@ export default function ActionDetailModal({
               value={editedAction.description || ''}
               onChange={(e) => setEditedAction({ ...editedAction, description: e.target.value })}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
             />
           ) : (
             <p className="text-gray-700 whitespace-pre-wrap">{action.description}</p>
@@ -219,7 +219,7 @@ export default function ActionDetailModal({
               <select
                 value={editedAction.actionStatus || ''}
                 onChange={(e) => setEditedAction({ ...editedAction, actionStatus: e.target.value as Action['actionStatus'] })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
               >
                 <option value="not_started">Not Started</option>
                 <option value="in_progress">In Progress</option>
@@ -240,7 +240,7 @@ export default function ActionDetailModal({
               <select
                 value={editedAction.priority || ''}
                 onChange={(e) => setEditedAction({ ...editedAction, priority: e.target.value as Action['priority'] })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -262,7 +262,7 @@ export default function ActionDetailModal({
                 type="date"
                 value={editedAction.dueDate || ''}
                 onChange={(e) => setEditedAction({ ...editedAction, dueDate: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
               />
             ) : (
               <div className="text-gray-900">
@@ -348,12 +348,12 @@ export default function ActionDetailModal({
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add a comment... Use @name to mention someone"
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-sm"
             />
             <button
               onClick={() => addCommentMutation.mutate()}
               disabled={!newComment.trim() || addCommentMutation.isPending}
-              className="mt-2 flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="mt-2 flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {addCommentMutation.isPending ? (
                 <Loader2 size={16} className="animate-spin" />
