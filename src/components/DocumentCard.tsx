@@ -46,11 +46,20 @@ export default function DocumentCard({ document, onDelete, deleting }: DocumentC
       )
     }
 
-    if (status === 'uploaded' || status === 'uploading') {
+    if (status === 'uploading') {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">
           <Loader2 size={12} className="animate-spin" />
           Uploading
+        </span>
+      )
+    }
+
+    if (status === 'uploaded') {
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-rag-green/10 text-rag-green border border-rag-green/30">
+          <CheckCircle size={12} />
+          Uploaded
         </span>
       )
     }

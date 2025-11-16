@@ -10,12 +10,12 @@ const DIMENSION_ORDER = ['Strategic', 'Economic', 'Commercial', 'Financial', 'Ma
 
 interface AssessmentCriterion {
   id: number
-  criterionCode: string
+  criterion_code: string
   dimension: string
   category: string
   title: string
   description: string
-  assessmentQuestion: string
+  assessment_question: string
   weight: number | null
   is_critical: boolean
   template_id: number
@@ -134,9 +134,9 @@ export default function AssessmentCriteriaPage() {
       const query = searchQuery.toLowerCase()
       result = result.filter(
         (c) =>
-          c.criterionCode.toLowerCase().includes(query) ||
+          c.criterion_code.toLowerCase().includes(query) ||
           c.title.toLowerCase().includes(query) ||
-          c.assessmentQuestion.toLowerCase().includes(query) ||
+          c.assessment_question.toLowerCase().includes(query) ||
           c.description?.toLowerCase().includes(query)
       )
     }
@@ -155,7 +155,7 @@ export default function AssessmentCriteriaPage() {
     result.sort((a, b) => {
       switch (sortBy) {
         case 'code':
-          return a.criterionCode.localeCompare(b.criterionCode, undefined, { numeric: true })
+          return a.criterion_code.localeCompare(b.criterion_code, undefined, { numeric: true })
         case 'title':
           return a.title.localeCompare(b.title)
         case 'dimension': {
@@ -164,7 +164,7 @@ export default function AssessmentCriteriaPage() {
           // If dimension not found in order, put it at the end
           const orderA = indexA === -1 ? 999 : indexA
           const orderB = indexB === -1 ? 999 : indexB
-          return orderA - orderB || a.criterionCode.localeCompare(b.criterionCode)
+          return orderA - orderB || a.criterion_code.localeCompare(b.criterion_code)
         }
         default:
           return 0
@@ -541,7 +541,7 @@ export default function AssessmentCriteriaPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2 mb-2">
                               <span className="font-mono text-sm font-semibold text-accent bg-accent/10 px-2 py-1 rounded">
-                                {criterion.criterionCode}
+                                {criterion.criterion_code}
                               </span>
                               <span className="px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-text-accent">
                                 {criterion.dimension}
@@ -580,7 +580,7 @@ export default function AssessmentCriteriaPage() {
                               Assessment Question
                             </div>
                             <p className="text-sm text-text-primary leading-relaxed italic">
-                              {criterion.assessmentQuestion}
+                              {criterion.assessment_question}
                             </p>
                           </div>
 
