@@ -27,22 +27,11 @@ export default function ActionDetailModal({
   const queryClient = useQueryClient()
 
   // Fetch action details
-  const { data: actionData, isLoading, error: queryError } = useQuery({
+  const { data: actionData, isLoading } = useQuery({
     queryKey: ['action-details', actionId],
-    queryFn: async () => {
-      console.log('Fetching action details for ID:', actionId)
-      const result = await n8nApi.getActionDetails(actionId)
-      console.log('Action details result:', result)
-      console.log('Result type:', typeof result)
-      console.log('Result keys:', result ? Object.keys(result) : 'null')
-      return result
-    },
+    queryFn: () => n8nApi.getActionDetails(actionId),
     refetchOnWindowFocus: false
   })
-
-  console.log('ActionDetailModal - actionData:', actionData)
-  console.log('ActionDetailModal - isLoading:', isLoading)
-  console.log('ActionDetailModal - queryError:', queryError)
 
   const action = actionData
 
