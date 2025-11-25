@@ -49,7 +49,7 @@ export default function ActionPlanDraftWorkspace({
       generateActionPlan()
       setHasAttemptedGeneration(true)
     }
-  }, [isLoadingDraft, existingDraft, hasAttemptedGeneration])
+  }, [isLoadingDraft, existingDraft, hasAttemptedGeneration, generateActionPlan])
 
   // Auto-save every 30 seconds
   useEffect(() => {

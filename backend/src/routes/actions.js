@@ -222,6 +222,62 @@ router.get(
 );
 
 /**
+ * PATCH /api/actions/bulk
+ * Bulk update multiple actions
+ * IMPORTANT: This route must be defined BEFORE /actions/:id to prevent "bulk" being matched as an ID
+ */
+router.patch(
+  '/actions/bulk',
+  [
+    body('action_ids').isArray({ min: 1 }).withMessage('action_ids must be a non-empty array'),
+    body('action_ids.*').isInt(),
+    body('updates').isObject().withMessage('updates must be an object'),
+    body('updated_by').isInt().withMessage('updated_by is required'),
+    validate
+  ],
+  asyncHandler(async (req, res) => {
+    const { action_ids, updates, updated_by } = req.body;
+
+    // Debug logging
+    console.log('Bulk update request:', { action_ids, updates, updated_by });
+
+    // Validate that at least one field is being updated
+    const allowedFields = ['action_status', 'priority', 'assigned_to', 'due_date'];
+    const fieldsToUpdate = Object.keys(updates).filter(key => allowedFields.includes(key));
+
+    if (fieldsToUpdate.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Bad Request',
+        message: 'No valid fields to update'
+      });
+    }
+
+    // Build update object - include updated_by for trigger tracking
+    const updateData = { ...updates, updated_by };
+
+    const { data, error } = await supabase
+      .from('actions')
+      .update(updateData)
+      .in('id', action_ids)
+      .select('id');
+
+    if (error) {
+      throw new Error(`Database error: ${error.message}`);
+    }
+
+    res.json({
+      success: true,
+      data: {
+        updated_count: data.length,
+        updated_ids: data.map(r => r.id)
+      },
+      message: `Successfully updated ${data.length} action(s)`
+    });
+  })
+);
+
+/**
  * PATCH /api/actions/:id
  * Update a single action
  * History is automatically logged by database trigger
@@ -289,39 +345,26 @@ router.patch(
 );
 
 /**
- * PATCH /api/actions/bulk
- * Bulk update multiple actions
+ * DELETE /api/actions/bulk
+ * Bulk delete multiple actions
+ * IMPORTANT: This route must be defined BEFORE /actions/:id to prevent "bulk" being matched as an ID
  */
-router.patch(
+router.delete(
   '/actions/bulk',
   [
     body('action_ids').isArray({ min: 1 }).withMessage('action_ids must be a non-empty array'),
     body('action_ids.*').isInt(),
-    body('updates').isObject().withMessage('updates must be an object'),
-    body('updated_by').isInt().withMessage('updated_by is required'),
     validate
   ],
   asyncHandler(async (req, res) => {
-    const { action_ids, updates, updated_by } = req.body;
+    const { action_ids } = req.body;
 
-    // Validate that at least one field is being updated
-    const allowedFields = ['action_status', 'priority', 'assigned_to', 'due_date'];
-    const fieldsToUpdate = Object.keys(updates).filter(key => allowedFields.includes(key));
-
-    if (fieldsToUpdate.length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: 'Bad Request',
-        message: 'No valid fields to update'
-      });
-    }
-
-    // Build update object
-    const updateData = { ...updates, updated_by };
+    // Debug logging
+    console.log('Bulk delete request:', { action_ids });
 
     const { data, error } = await supabase
       .from('actions')
-      .update(updateData)
+      .delete()
       .in('id', action_ids)
       .select('id');
 
@@ -332,10 +375,10 @@ router.patch(
     res.json({
       success: true,
       data: {
-        updated_count: data.length,
-        updated_ids: data.map(r => r.id)
+        deleted_count: data.length,
+        deleted_ids: data.map(r => r.id)
       },
-      message: `Successfully updated ${data.length} action(s)`
+      message: `Successfully deleted ${data.length} action(s)`
     });
   })
 );

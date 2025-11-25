@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, X, FileDown, FileSpreadsheet, Sparkles, ClipboardList } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
@@ -52,6 +52,8 @@ interface AssessmentResultsProps {
   projectData?: any
   assessmentRunId?: number
   viewMode?: 'full' | 'summary' | 'detail' // Control which parts to render
+  openActionPlanWorkspace?: boolean // External control to open the action plan workspace
+  onActionPlanWorkspaceClose?: () => void // Callback when workspace is closed
 }
 
 export default function AssessmentResults({
@@ -60,12 +62,27 @@ export default function AssessmentResults({
   projectData,
   assessmentRunId,
   viewMode = 'full', // Default to full view for backwards compatibility
+  openActionPlanWorkspace = false,
+  onActionPlanWorkspaceClose,
 }: AssessmentResultsProps) {
   const [filter, setFilter] = useState<'all' | 'green' | 'amber' | 'red'>('all')
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [dimensionFilter, setDimensionFilter] = useState<string | null>(null)
-  const [showActionPlanWorkspace, setShowActionPlanWorkspace] = useState(false)
+  const [showActionPlanWorkspace, setShowActionPlanWorkspace] = useState(openActionPlanWorkspace)
+
+  // Sync with external control prop
+  useEffect(() => {
+    if (openActionPlanWorkspace) {
+      setShowActionPlanWorkspace(true)
+    }
+  }, [openActionPlanWorkspace])
+
+  // Handle workspace close
+  const handleCloseWorkspace = () => {
+    setShowActionPlanWorkspace(false)
+    onActionPlanWorkspaceClose?.()
+  }
 
   // Check if action plan draft exists and its status
   const { data: existingDraft } = useQuery({
@@ -1500,10 +1517,10 @@ export default function AssessmentResults({
         <ActionPlanDraftWorkspace
           assessmentRunId={assessmentRunId}
           projectId={projectData.id}
-          onClose={() => setShowActionPlanWorkspace(false)}
+          onClose={handleCloseWorkspace}
           onConfirm={(result) => {
             console.log('Action plan confirmed:', result)
-            setShowActionPlanWorkspace(false)
+            handleCloseWorkspace()
             // Switch to actions view to show the newly created actions
             setShowActionsView(true)
           }}

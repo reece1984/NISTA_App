@@ -30,7 +30,7 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
-  // Fetch existing action plan draft
+  // Fetch existing action plan draft (only drafts that haven't been confirmed yet)
   const { data: existingDraft, isLoading: isLoadingDraft } = useQuery({
     queryKey: ['action-plan-draft', assessmentRunId],
     queryFn: async () => {
@@ -38,6 +38,7 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
         .from('action_plan_drafts')
         .select('*')
         .eq('assessment_run_id', assessmentRunId)
+        .eq('draft_status', 'editing')  // Only fetch unconfirmed drafts (status is 'editing', not 'draft')
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle()
@@ -93,7 +94,8 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
       setActions(data.proposedActions || [])
       setIsGenerating(false)
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Failed to generate action plan:', error)
       setIsGenerating(false)
     }
   })
@@ -117,14 +119,18 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
       return n8nApi.refineActionPlan(draftId, userMessage, newConversation)
     },
     onSuccess: (data) => {
-      setActions(data.refinedActions || actions)
+      // Try both refinedActions and proposedActions (N8N might use either)
+      const newActions = data.refinedActions || data.proposedActions || actions
+      setActions(newActions)
+
       // Only add AI response (user message already added in mutationFn)
       setConversationHistory(prev => [
         ...prev,
         { role: 'assistant', content: data.aiResponse || 'Action plan has been updated.' }
       ])
     },
-    onError: (error, userMessage) => {
+    onError: (error) => {
+      console.error('Failed to refine action plan:', error)
       // Remove the user message that was optimistically added
       setConversationHistory(prev => prev.slice(0, -1))
     }

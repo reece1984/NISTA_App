@@ -143,6 +143,14 @@ export const n8nApi = {
   },
 
   /**
+   * Bulk delete multiple actions
+   * Now uses Express API instead of N8N
+   */
+  bulkDeleteActions: async (actionIds: number[]) => {
+    return apiAdapter.bulkDeleteActions(actionIds)
+  },
+
+  /**
    * Get detailed action information including history and comments
    * Now uses Express API instead of N8N
    */

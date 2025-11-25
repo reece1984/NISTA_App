@@ -114,6 +114,14 @@ export const apiAdapter = {
   },
 
   /**
+   * Bulk delete multiple actions
+   */
+  bulkDeleteActions: async (actionIds: number[]) => {
+    const result = await api.bulkDeleteActions(actionIds)
+    return toCamelCase(result)
+  },
+
+  /**
    * Get action history
    */
   getActionHistory: async (actionId: number) => {

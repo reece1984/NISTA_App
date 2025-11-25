@@ -191,6 +191,16 @@ export const api = {
   },
 
   /**
+   * Bulk delete multiple actions
+   */
+  bulkDeleteActions: async (actionIds: number[]) => {
+    return callAPI<{ deleted_count: number; deleted_ids: number[] }>('/api/actions/bulk', {
+      method: 'DELETE',
+      body: JSON.stringify({ action_ids: actionIds }),
+    });
+  },
+
+  /**
    * Get action history
    */
   getActionHistory: async (actionId: number) => {

@@ -15,6 +15,7 @@ import DocumentsList from '../components/DocumentsList'
 import UploadDocumentsModal from '../components/UploadDocumentsModal'
 import { useDocuments } from '../hooks/useDocuments'
 import { useActions } from '../hooks/useActions'
+import { n8nApi } from '../services/n8nApi'
 import ActionKanbanBoard from '../components/ActionPlan/ActionKanbanBoard'
 import ActionTableView from '../components/ActionPlan/ActionTableView'
 import ActionDetailModal from '../components/ActionPlan/ActionDetailModal'
@@ -37,6 +38,7 @@ export default function ProjectDetailPage() {
   const [assessmentProgress, setAssessmentProgress] = useState<{ current: number; total: number } | null>(null)
   const [actionView, setActionView] = useState<'kanban' | 'table'>('kanban')
   const [selectedActionId, setSelectedActionId] = useState<number | null>(null)
+  const [openActionPlanWorkspace, setOpenActionPlanWorkspace] = useState(false)
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const {
@@ -377,17 +379,14 @@ export default function ProjectDetailPage() {
     if (!actions || actions.length === 0) return
 
     const confirmed = window.confirm(
-      `Are you sure you want to delete all ${actions.length} actions? This action cannot be undone.`
+      `Are you sure you want to permanently delete all ${actions.length} actions? This action cannot be undone.`
     )
 
     if (!confirmed) return
 
     try {
       const actionIds = actions.map((action: any) => action.id)
-      await bulkUpdate({
-        actionIds,
-        updates: { actionStatus: 'cancelled' }
-      })
+      await n8nApi.bulkDeleteActions(actionIds)
 
       setToast({
         message: `Successfully deleted ${actions.length} actions`,
@@ -810,6 +809,8 @@ export default function ProjectDetailPage() {
                   onViewActionsClick={() => setActiveTab('actions')}
                   onRerunAssessment={handleRerunAssessmentClick}
                   isRunningAssessment={runningAssessment}
+                  openActionPlanWorkspace={openActionPlanWorkspace}
+                  onActionPlanWorkspaceClose={() => setOpenActionPlanWorkspace(false)}
                 />
               ) : (
                 <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed border-border">
@@ -877,6 +878,8 @@ export default function ProjectDetailPage() {
                     assessmentRunId={projectData.assessmentRunId}
                     viewMode="detail"
                     onViewActionsClick={() => setActiveTab('actions')}
+                    openActionPlanWorkspace={openActionPlanWorkspace}
+                    onActionPlanWorkspaceClose={() => setOpenActionPlanWorkspace(false)}
                   />
                 </div>
               ) : (
@@ -940,6 +943,17 @@ export default function ProjectDetailPage() {
                         </button>
                       </div>
                       <button
+                        onClick={() => {
+                          setActiveTab('assessment-summary')
+                          setOpenActionPlanWorkspace(true)
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 transition-all"
+                        title="Generate action plan"
+                      >
+                        <Sparkles size={16} />
+                        Generate Plan
+                      </button>
+                      <button
                         onClick={handleDeleteAllActions}
                         className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-all"
                         title="Delete all actions"
@@ -964,23 +978,38 @@ export default function ProjectDetailPage() {
                   )}
                 </div>
               ) : hasAssessments ? (
-                <div className="text-center py-16 bg-card rounded-xl border-2 border-dashed border-border">
-                  <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Target className="text-accent" size={32} />
+                <div className="text-center py-20 bg-card rounded-xl border-2 border-dashed border-border">
+                  <div className="w-20 h-20 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                    <Target className="text-orange-600" size={36} />
                   </div>
-                  <h3 className="text-xl font-bold text-text-primary mb-2">
+                  <h3 className="text-2xl font-bold text-text-primary mb-3">
                     No Actions Yet
                   </h3>
-                  <p className="text-text-secondary mb-6 max-w-md mx-auto">
-                    Generate an action plan from your assessment results
+                  <p className="text-text-secondary mb-2 max-w-lg mx-auto text-base">
+                    Your assessment has identified areas for improvement.
                   </p>
-                  <button
-                    onClick={() => setActiveTab('assessment-summary')}
-                    className="inline-flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg shadow-accent/30"
-                  >
-                    <Sparkles size={18} />
-                    Go to Assessment Summary
-                  </button>
+                  <p className="text-text-secondary mb-8 max-w-lg mx-auto text-base">
+                    Generate an AI-powered action plan to address the weaknesses and strengthen your project.
+                  </p>
+                  <div className="flex gap-3 justify-center">
+                    <button
+                      onClick={() => {
+                        setActiveTab('assessment-summary')
+                        setOpenActionPlanWorkspace(true)
+                      }}
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg shadow-blue-500/30"
+                    >
+                      <Sparkles size={20} />
+                      Generate Action Plan
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('assessment-summary')}
+                      className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-md"
+                    >
+                      <BarChart3 size={20} />
+                      View Assessment
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-16 bg-card rounded-xl border-2 border-dashed border-border">
