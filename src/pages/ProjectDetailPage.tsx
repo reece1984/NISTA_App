@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye, Upload, LayoutGrid, FileText, BarChart3, Target, Activity, Sparkles, FileBarChart, List, Kanban, RefreshCw } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
 import Button from '../components/ui/Button'
 import AssessmentResults from '../components/AssessmentResults'
 import Modal from '../components/ui/Modal'
@@ -23,6 +24,7 @@ type TabType = 'overview' | 'documents' | 'assessment-summary' | 'assessment-det
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [runningAssessment, setRunningAssessment] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -128,6 +130,8 @@ export default function ProjectDetailPage() {
   const {
     actions,
     isLoading: actionsLoading,
+    bulkUpdate,
+    refetch: refetchActions,
   } = useActions({ projectId: parseInt(id!) })
 
   // Cleanup polling interval on unmount
@@ -367,6 +371,38 @@ export default function ProjectDetailPage() {
   const handleConfirmRerun = async () => {
     setShowRerunConfirmDialog(false)
     await handleRunAssessment()
+  }
+
+  const handleDeleteAllActions = async () => {
+    if (!actions || actions.length === 0) return
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete all ${actions.length} actions? This action cannot be undone.`
+    )
+
+    if (!confirmed) return
+
+    try {
+      const actionIds = actions.map((action: any) => action.id)
+      await bulkUpdate({
+        actionIds,
+        updates: { actionStatus: 'cancelled' }
+      })
+
+      setToast({
+        message: `Successfully deleted ${actions.length} actions`,
+        type: 'success'
+      })
+
+      // Refetch actions to update the UI
+      refetchActions()
+    } catch (error) {
+      console.error('Error deleting actions:', error)
+      setToast({
+        message: 'Failed to delete actions. Please try again.',
+        type: 'error'
+      })
+    }
   }
 
   if (isLoading) {
@@ -903,6 +939,14 @@ export default function ProjectDetailPage() {
                           Table
                         </button>
                       </div>
+                      <button
+                        onClick={handleDeleteAllActions}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-all"
+                        title="Delete all actions"
+                      >
+                        <Trash2 size={16} />
+                        Delete All
+                      </button>
                     </div>
                   </div>
 
