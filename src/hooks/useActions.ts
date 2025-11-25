@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { n8nApi } from '../services/n8nApi'
 import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 
 export interface Action {
   id: number
@@ -67,7 +68,17 @@ export function useActions({ projectId, filters }: UseActionsOptions) {
   const bulkUpdateMutation = useMutation({
     mutationFn: async ({ actionIds, updates }: { actionIds: number[]; updates: any }) => {
       if (!user?.id) throw new Error('User not authenticated')
-      return n8nApi.bulkUpdateActions(actionIds, updates, parseInt(user.id))
+
+      // Get the database user ID from the users table
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id')
+        .eq('open_id', user.id)
+        .single()
+
+      if (!userData) throw new Error('User not found in database')
+
+      return n8nApi.bulkUpdateActions(actionIds, updates, userData.id)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['actions', projectId] })
