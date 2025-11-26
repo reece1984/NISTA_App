@@ -35,7 +35,8 @@ export default function ActionPlanDraftWorkspace({
     isConfirming,
     isLoadingDraft,
     existingDraft,
-    error
+    error,
+    generationProgress
   } = useActionPlan(assessmentRunId, projectId)
 
   const [userMessage, setUserMessage] = useState('')
@@ -153,9 +154,38 @@ export default function ActionPlanDraftWorkspace({
               <p className="text-lg font-medium text-gray-900">
                 {isLoadingDraft ? 'Loading action plan...' : 'Generating action plan...'}
               </p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 mt-1 mb-6">
                 {isLoadingDraft ? 'Fetching existing draft' : 'Analyzing assessment findings with AI'}
               </p>
+
+              {/* Progress Bar - only show during generation */}
+              {isGenerating && generationProgress && (
+                <div className="w-full max-w-md">
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-blue-600">
+                          Generating actions...
+                        </span>
+                        <span className="text-sm font-semibold text-gray-700">
+                          {generationProgress.current}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out"
+                          style={{
+                            width: `${generationProgress.current}%`
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 text-center">
+                      This may take 1-2 minutes depending on assessment size
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           ) : error ? (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">

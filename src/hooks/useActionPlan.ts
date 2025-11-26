@@ -29,6 +29,7 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
   const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [generationProgress, setGenerationProgress] = useState<{ current: number; total: number } | null>(null)
 
   // Fetch existing action plan draft (only drafts that haven't been confirmed yet)
   const { data: existingDraft, isLoading: isLoadingDraft } = useQuery({
@@ -75,6 +76,7 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
   const generateMutation = useMutation({
     mutationFn: async () => {
       setIsGenerating(true)
+      setGenerationProgress({ current: 0, total: 100 })
 
       // Get the database user ID from the users table
       let dbUserId: number | undefined
@@ -87,16 +89,61 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
         dbUserId = userData?.id
       }
 
-      return n8nApi.generateActionPlan(projectId, assessmentRunId, dbUserId)
-    },
-    onSuccess: (data) => {
-      setDraftId(data.draftId)
-      setActions(data.proposedActions || [])
-      setIsGenerating(false)
+      // Trigger N8N workflow (don't await - it's asynchronous)
+      n8nApi.generateActionPlan(projectId, assessmentRunId, dbUserId)
+
+      // Poll for draft creation (N8N creates it asynchronously)
+      return new Promise((resolve, reject) => {
+        let pollCount = 0
+        const maxPolls = 60 // 60 polls × 2 seconds = 2 minutes max
+
+        const pollInterval = setInterval(async () => {
+          pollCount++
+          setGenerationProgress({ current: Math.min(pollCount * 5, 95), total: 100 })
+
+          // Check if draft has been created
+          const { data: draftData } = await supabase
+            .from('action_plan_drafts')
+            .select('*')
+            .eq('assessment_run_id', assessmentRunId)
+            .eq('draft_status', 'editing')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+
+          if (draftData?.draft_data?.proposedActions || pollCount >= maxPolls) {
+            clearInterval(pollInterval)
+            setGenerationProgress({ current: 100, total: 100 })
+
+            if (draftData) {
+              setDraftId(draftData.id)
+              if (draftData.draft_data?.proposedActions) {
+                const transformedActions = draftData.draft_data.proposedActions.map((action: any) => ({
+                  title: action.title,
+                  description: action.description,
+                  priority: action.priority,
+                  suggestedDueDate: action.suggested_due_date || action.suggestedDueDate,
+                  linkedAssessmentIds: action.linked_assessment_ids || action.linkedAssessmentIds || [],
+                  criteriaCategory: action.criteria_category || action.criteriaCategory,
+                  assignedTo: action.assigned_to || action.assignedTo
+                }))
+                setActions(transformedActions)
+              }
+              resolve(draftData)
+            } else {
+              reject(new Error('Timeout waiting for action plan generation'))
+            }
+
+            setIsGenerating(false)
+            setGenerationProgress(null)
+          }
+        }, 2000) // Poll every 2 seconds
+      })
     },
     onError: (error) => {
       console.error('Failed to generate action plan:', error)
       setIsGenerating(false)
+      setGenerationProgress(null)
     }
   })
 
@@ -198,6 +245,7 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
     isGenerating,
     isSaving,
     existingDraft,
+    generationProgress,
 
     // Mutations
     generateActionPlan: generateMutation.mutate,
