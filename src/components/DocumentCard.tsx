@@ -1,17 +1,20 @@
 import { useState } from 'react'
-import { FileText, Trash2, ExternalLink, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { FileText, Trash2, ExternalLink, Loader2, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react'
 import type { ProjectDocument } from '../hooks/useDocuments'
 import Button from './ui/Button'
 import Modal from './ui/Modal'
+import { supabase } from '../lib/supabase'
 
 interface DocumentCardProps {
   document: ProjectDocument
   onDelete: (document: ProjectDocument) => void
   deleting: boolean
+  onRetry?: () => void
 }
 
-export default function DocumentCard({ document, onDelete, deleting }: DocumentCardProps) {
+export default function DocumentCard({ document, onDelete, deleting, onRetry }: DocumentCardProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [retrying, setRetrying] = useState(false)
 
   const formatRelativeTime = (dateString: string) => {
     const date = new Date(dateString)
@@ -85,6 +88,73 @@ export default function DocumentCard({ document, onDelete, deleting }: DocumentC
     setShowDeleteModal(false)
   }
 
+  const handleRetry = async () => {
+    setRetrying(true)
+    try {
+      // Update status to 'processing'
+      await supabase
+        .from('files')
+        .update({
+          status: 'processing',
+          error_message: null,
+        })
+        .eq('id', document.id)
+
+      // Trigger N8N webhook for document processing
+      const webhookUrl = import.meta.env.VITE_N8N_DOCUMENT_UPLOAD_WEBHOOK
+      if (!webhookUrl) {
+        throw new Error('N8N webhook URL not configured')
+      }
+
+      const payload = {
+        identifier: 'document_upload',
+        project_id: document.project_id,
+        file_id: document.id,
+        file_name: document.file_name,
+        file_url: document.file_url,
+        file_key: document.file_key,
+      }
+
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        const responseText = await response.text()
+        throw new Error(`Webhook failed: ${responseText}`)
+      }
+
+      // Update status to 'uploaded' after successful webhook
+      await supabase
+        .from('files')
+        .update({ status: 'uploaded' })
+        .eq('id', document.id)
+
+      // Trigger refresh
+      if (onRetry) {
+        onRetry()
+      }
+    } catch (err: any) {
+      // Update status back to 'failed' with error message
+      await supabase
+        .from('files')
+        .update({
+          status: 'failed',
+          error_message: err.message || 'Retry failed',
+        })
+        .eq('id', document.id)
+
+      // Trigger refresh to show updated error
+      if (onRetry) {
+        onRetry()
+      }
+    } finally {
+      setRetrying(false)
+    }
+  }
+
   return (
     <>
       <div className="card hover:shadow-md transition-shadow">
@@ -112,9 +182,34 @@ export default function DocumentCard({ document, onDelete, deleting }: DocumentC
             <div className="flex items-center gap-2">
               {getStatusBadge()}
             </div>
+
+            {/* Show error message if status is failed */}
+            {(document.status === 'failed' || document.status === 'error') && document.error_message && (
+              <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-xs text-red-700">
+                  <strong>Error:</strong> {document.error_message}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="flex-shrink-0 flex items-center gap-2">
+            {/* Show Retry button for failed files */}
+            {(document.status === 'failed' || document.status === 'error') && (
+              <button
+                onClick={handleRetry}
+                disabled={retrying}
+                className="p-2 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+                title="Retry processing"
+              >
+                {retrying ? (
+                  <Loader2 size={18} className="text-blue-600 animate-spin" />
+                ) : (
+                  <RefreshCw size={18} className="text-blue-600" />
+                )}
+              </button>
+            )}
+
             {document.file_url && (
               <a
                 href={document.file_url}

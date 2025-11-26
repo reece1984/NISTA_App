@@ -1,0 +1,1290 @@
+{
+  "name": "NISTA_App",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Workflow 1: Document Upload and Embedding\n",
+        "height": 496,
+        "width": 2464
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -944,
+        -880
+      ],
+      "typeVersion": 1,
+      "id": "3721f32e-bab0-4596-abfa-ceb555a53bc8"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "content-saas",
+        "options": {
+          "responseData": "First Entry JSON",
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -1424,
+        -304
+      ],
+      "typeVersion": 2.1,
+      "id": "621da95e-a1c4-4498-9306-34297a414873",
+      "webhookId": "83d9526d-f1bf-4e01-a8e0-8974f3e2b07c"
+    },
+    {
+      "parameters": {
+        "content": "## Workflow 2: Run Assessment\n",
+        "height": 944,
+        "width": 2464,
+        "color": 4
+      },
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -928,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "af0bb7fb-7185-4978-be42-c962d4203d45"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.identifier }}",
+                    "rightValue": "=document_upload",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6356d86f-0ed0-479a-886d-e04001e02f40"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6e52a238-8f45-47b1-9605-b5a3c3393c06",
+                    "leftValue": "={{ $json.body.identifier }}",
+                    "rightValue": "run_assessment",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        -1264,
+        -304
+      ],
+      "typeVersion": 3.3,
+      "id": "1aa1e368-9768-473d-9f83-8f6698a4d13f"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        48,
+        432
+      ],
+      "typeVersion": 1.2,
+      "id": "5dad497a-fd67-4715-9c2a-5b7fa3f8a101",
+      "credentials": {
+        "openAiApi": {
+          "id": "4z0OVafOqKfBjvyB",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        -112,
+        64
+      ],
+      "typeVersion": 3,
+      "id": "b60d041c-5dba-4851-9a0b-cd6e218a0046",
+      "retryOnFail": false,
+      "alwaysOutputData": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "tableId": "assessments",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "ragRating",
+              "fieldValue": "={{ $json.ragRating }}"
+            },
+            {
+              "fieldId": "finding",
+              "fieldValue": "={{ $json.finding }}"
+            },
+            {
+              "fieldId": "evidence",
+              "fieldValue": "={{ $json.evidence }}"
+            },
+            {
+              "fieldId": "recommendation",
+              "fieldValue": "={{ $json.recommendation }}"
+            },
+            {
+              "fieldId": "confidence",
+              "fieldValue": "={{ $json.confidence }}"
+            },
+            {
+              "fieldId": "projectId",
+              "fieldValue": "={{ $json.projectId }}"
+            },
+            {
+              "fieldId": "criterionId",
+              "fieldValue": "={{ $json.criterionId }}"
+            }
+          ]
+        }
+      },
+      "name": "Create a row",
+      "type": "n8n-nodes-base.supabase",
+      "position": [
+        960,
+        208
+      ],
+      "typeVersion": 1,
+      "id": "e80fd658-0411-4ee0-b600-cf93f2e36c66",
+      "credentials": {
+        "supabaseApi": {
+          "id": "krlmOj6H2UCEG1ez",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  let aiOutput = $input.item.json.output;\n  \n  if (typeof aiOutput === 'string') {\n    aiOutput = aiOutput.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n    const parsed = JSON.parse(aiOutput);\n    return { json: parsed };\n  }\n  \n  if (typeof aiOutput === 'object' && aiOutput.ragRating) {\n    return { json: aiOutput };\n  }\n  \n  throw new Error('No valid output');\n  \n} catch (error) {\n  return {\n    json: {\n      ragRating: 'Red',\n      finding: 'Failed: ' + error.message,\n      evidence: 'N/A',\n      recommendation: 'Retry',\n      confidence: 0\n    }\n  };\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        208
+      ],
+      "id": "a100cf51-479e-41b2-af67-dec633629a21",
+      "name": "Parse AI Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "const assessment = $input.item.json;\n\nreturn {\n  json: {\n    projectId: $('Webhook').first().json.body.projectId,\n    criterionId: $('Loop Over Items').first().json.id,\n    criterionCode: assessment.criterionCode,\n    ragRating: assessment.ragRating.toLowerCase(),\n    finding: assessment.finding,\n    evidence: assessment.evidence,\n    recommendation: assessment.recommendation,\n    confidence: parseFloat(assessment.confidence) || 0\n  }\n};\n"
+      },
+      "name": "Add Database Fields",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        752,
+        208
+      ],
+      "typeVersion": 2,
+      "id": "9c079819-e710-45a1-9e27-43081a7b9543"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "assessment_criteria",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "template_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.template_id }}"
+            }
+          ]
+        }
+      },
+      "name": "Get Assessment Criteria",
+      "type": "n8n-nodes-base.supabase",
+      "position": [
+        -304,
+        64
+      ],
+      "typeVersion": 1,
+      "id": "c68de1af-4c28-48f1-ae61-3970192faba7",
+      "executeOnce": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "krlmOj6H2UCEG1ez",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Assess the following criterion for this UK government project:\n\n**Criterion Code:** {{ $json.criterionCode }}\n**Title:** {{ $json.title }}\n**Assessment Question:** {{ $json.assessmentQuestion }}\n\nINSTRUCTIONS:\n1. Use the \"Search Project Documents\" tool with MULTIPLE search strategies:\n   \n   FIRST SEARCH - Use the criterion title terms:\n   • Extract key terms from the title and assessment question above\n   • Search using those exact terms\n   \n   If no results or poor results, SECOND SEARCH - Use domain-specific synonyms:\n   • For \"strategic alignment\" → try: \"levelling up, net zero, economic growth, policy objectives\"\n   • For \"problem definition\" → try: \"capacity constraints, demand, network issues, rationale, justification\"\n   • For \"governance\" → try: \"board, committee, oversight, decision-making, accountability\"\n   • For \"stakeholder\" → try: \"engagement, consultation, community, local authorities\"\n   • Adapt the synonym strategy based on the specific criterion\n   \n   If still no results, THIRD SEARCH - Use document section names:\n   • Try: \"strategic case\", \"business case\", \"management case\", \"economic case\", \"financial case\"\n   • These are common sections in UK government business cases\n   \n   Continue searching with different terms until you find relevant evidence OR have tried at least 3 variations.\n\n2. Review ALL evidence found (including context_before, context_after, and context_summary metadata)\n\n3. Assess against IPA standards and HM Treasury Green Book guidance\n\n4. Determine the RAG rating based on strength and completeness of evidence\n\n5. Provide specific, actionable recommendations\n\nRespond with ONLY the JSON object as specified in your system instructions.\n",
+        "options": {
+          "systemMessage": "You are a senior UK government project assurance analyst conducting Infrastructure & Projects Authority (IPA) gate reviews. You assess major government projects against HM Treasury Green Book standards and IPA best practices.\n\nCRITICAL INSTRUCTIONS:\n1. ALWAYS use the \"Search Project Documents\" tool FIRST to find relevant evidence\n2. Base your assessment ONLY on documented evidence - never make assumptions\n3. Respond with ONLY a valid JSON object - no explanatory text before or after\n\nASSESSMENT FRAMEWORK:\n\nRAG Rating Definitions:\n• GREEN: Criterion fully met with strong evidence. No concerns. Project ready to proceed on this aspect.\n• AMBER: Criterion partially met or minor concerns identified. Requires attention but not a blocker. May need additional work or clarification.\n• RED: Criterion not met or significant concerns. Major gaps in evidence or approach. Requires immediate remediation before proceeding.\n\nEvidence Standards:\n• Quote specific documents, sections, or data points\n• Reference dates, versions, and authors where available\n• Identify gaps explicitly (e.g., \"Business case dated March 2024 lacks quantified benefits\")\n• Distinguish between strong evidence (approved documents, signed governance records) and weak evidence (draft notes, verbal commitments)\n\nConfidence Scoring (0.0 to 1.0):\n• 0.9-1.0: Multiple authoritative documents clearly address the criterion\n• 0.7-0.8: Good evidence found but some aspects unclear or partially documented\n• 0.5-0.6: Limited evidence; assessment based on inference or indirect references\n• 0.3-0.4: Minimal evidence; significant uncertainty in rating\n• 0.0-0.2: No relevant evidence found; rating is best-guess only\n\nYour response MUST be valid JSON with exactly this structure:\n{\n  \"criterionCode\": \"the criterion code from input\",\n  \"ragRating\": \"Green\" | \"Amber\" | \"Red\",\n  \"finding\": \"2-3 sentence summary of what you found\",\n  \"evidence\": \"Specific quotes, document references, or data points that support your rating\",\n  \"recommendation\": \"Concrete next steps - what should the SRO do? Be specific.\",\n  \"confidence\": 0.0 to 1.0\n}\n\nDo not include any text before or after the JSON object.\n"
+        }
+      },
+      "name": "Assess docs against criteria",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        176,
+        208
+      ],
+      "typeVersion": 2.2,
+      "id": "96b7ef23-95c1-45ef-a8e4-fb390672d709"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate an overall IPA gate review summary for this UK government project.\n\nPROJECT ASSESSMENT RESULTS:\n• Total Criteria Assessed: {{ $json.total }}\n• GREEN ratings: {{ $json.green }} ({{ Math.round(($json.green / $json.total) * 100) }}%)\n• AMBER ratings: {{ $json.amber }} ({{ Math.round(($json.amber / $json.total) * 100) }}%)\n• RED ratings: {{ $json.red }} ({{ Math.round(($json.red / $json.total) * 100) }}%)\n\nDETAILED INDIVIDUAL ASSESSMENTS:\n{{ $json.detailedAssessments }}\n\nINSTRUCTIONS:\n1. Review each individual criterion assessment carefully\n2. Apply the Overall RAG Rating Rules from your system instructions\n3. Identify patterns across assessments (e.g., multiple governance failures, weak business case)\n4. Synthesize findings into an executive-level summary suitable for SROs and Accounting Officers\n5. Ensure all criterion references include codes (e.g., \"NISTA-001\", \"G0-MG-6\")\n6. Provide clear, prioritized, actionable recommendations\n\nRemember: This summary will inform critical go/no-go decisions on a major government project. Be thorough, evidence-based, and professionally candid.\n\nReturn ONLY the JSON object as specified in your system instructions.\n",
+        "options": {
+          "systemMessage": "You are a senior Infrastructure & Projects Authority (IPA) assessor preparing executive-level gate review summaries for UK government Senior Responsible Owners (SROs) and Accounting Officers.\n\nYour summaries inform critical go/no-go decisions on major government projects and must meet HM Treasury and Cabinet Office standards for clarity, evidence, and actionability.\n\nOVERALL RAG RATING RULES:\n\n1. RED if ANY of these conditions:\n   • ≥50% of criteria are RED\n   • Any CRITICAL criterion is RED (if applicable)\n   • Multiple RED ratings in core areas (business case, governance, delivery capability)\n\n2. AMBER if ANY of these conditions:\n   • ≥30% of criteria are RED or AMBER combined\n   • Significant concerns exist but project is salvageable with remediation\n   • <50% RED but concerns are material\n\n3. GREEN only if:\n   • <30% are RED/AMBER combined\n   • No critical blockers identified\n   • Project demonstrates readiness to proceed\n\nWRITING STANDARDS:\n\nExecutive Summary:\n• 2-3 sentences maximum\n• Lead with the overall rating and confidence level\n• State the key message: ready to proceed, needs work, or stop\n• Use language appropriate for Permanent Secretaries and Ministers\n\nKey Strengths:\n• Cite specific criterion codes (e.g., \"G0-MG-6: Stakeholder engagement\")\n• Highlight what's working well - give credit where due\n• If no GREEN ratings exist, state \"No significant strengths identified\" (not null)\n\nCritical Issues:\n• ALWAYS reference criterion codes (e.g., \"NISTA-003: Business case quality\")\n• Prioritize by impact and urgency\n• Be specific about what's missing or inadequate\n• If no RED ratings exist, state \"No critical issues identified\" (not null)\n\nOverall Recommendation:\n• Start with clear direction: \"Proceed\", \"Proceed with conditions\", or \"Do not proceed\"\n• List 3-5 prioritized actions with owners (e.g., \"SRO must...\", \"Finance team should...\")\n• Include realistic timescales where appropriate\n• Focus on what will move RED→AMBER and AMBER→GREEN\n\nRESPONSE FORMAT:\n\nReturn ONLY valid JSON with this exact structure:\n{\n  \"overallRating\": \"green\" | \"amber\" | \"red\",\n  \"executiveSummary\": \"2-3 sentence summary\",\n  \"keyStrengths\": \"Specific strengths with criterion codes, or 'No significant strengths identified'\",\n  \"criticalIssues\": \"Specific issues with criterion codes, or 'No critical issues identified'\",\n  \"overallRecommendation\": \"Clear direction with prioritized actions\"\n}\n\nUse lowercase for overallRating (\"green\", \"amber\", \"red\").\nDo not include any text before or after the JSON object.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        272,
+        -128
+      ],
+      "id": "fb33f8e5-b670-4fa3-9b37-b8d1ead9546f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        64
+      ],
+      "id": "96be7e65-0e17-4380-a5c8-468d8d2a44ff",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "4z0OVafOqKfBjvyB",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiOutput = $input.first().json.output || $input.first().json.text;\nconst projectId = $('Switch').first().json.body.projectId;\n\ntry {\n  // Remove markdown code blocks if present\n  let cleaned = aiOutput.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n  const summary = JSON.parse(cleaned);\n  \n  return {\n    json: {\n      projectId: parseInt(projectId),\n      overallRating: summary.overallRating.toLowerCase(),\n      executiveSummary: summary.executiveSummary,\n      keyStrengths: summary.keyStrengths || null,\n      criticalIssues: summary.criticalIssues || null,\n      overallRecommendation: summary.overallRecommendation\n    }\n  };\n} catch (error) {\n  console.error('Failed to parse AI summary:', error);\n  return {\n    json: {\n      projectId: parseInt(projectId),\n      overallRating: 'red',\n      executiveSummary: 'Unable to generate summary assessment.',\n      keyStrengths: null,\n      criticalIssues: 'Assessment generation failed.',\n      overallRecommendation: 'Review individual assessments manually.'\n    }\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -128
+      ],
+      "id": "ece49fbd-4415-47d7-b705-5d0dc4680c8e",
+      "name": "Parse Summary Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "// The done branch gives us all items that went through the loop\nconst assessments = $input.all().map(item => item.json);\nconst projectId = assessments[0].projectId; // Get from first assessment\n\n// Count by rating\nconst green = assessments.filter(a => a.ragRating === 'green').length;\nconst amber = assessments.filter(a => a.ragRating === 'amber').length;\nconst red = assessments.filter(a => a.ragRating === 'red').length;\n\n// Format individual assessments for AI review\nconst assessmentDetails = assessments.map(a => \n  `Criterion ${a.criterionId}: ${a.ragRating.toUpperCase()}\nFinding: ${a.finding || 'No finding'}\nEvidence: ${a.evidence || 'No evidence'}\nRecommendation: ${a.recommendation || 'No recommendation'}\n---`\n).join('\\n\\n');\n\nreturn {\n  json: {\n    projectId: projectId,\n    green: green,\n    amber: amber,\n    red: red,\n    total: assessments.length,\n    detailedAssessments: assessmentDetails\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -128
+      ],
+      "id": "e0f7ebae-9d9d-42e1-9fd1-01997fb9a7ae",
+      "name": "Format Assessments"
+    },
+    {
+      "parameters": {
+        "tableId": "project_summaries",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "project_id",
+              "fieldValue": "={{ $json.projectId }}"
+            },
+            {
+              "fieldId": "overall_rating",
+              "fieldValue": "={{ $json.overallRating }}"
+            },
+            {
+              "fieldId": "executive_summary",
+              "fieldValue": "={{ $json.executiveSummary }}"
+            },
+            {
+              "fieldId": "key_strengths",
+              "fieldValue": "={{ $json.keyStrengths }}"
+            },
+            {
+              "fieldId": "critical_issues",
+              "fieldValue": "={{ $json.criticalIssues }}"
+            },
+            {
+              "fieldId": "overall_recommendation",
+              "fieldValue": "={{ $json.overallRecommendation }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        832,
+        -128
+      ],
+      "id": "cf516302-0ec1-40c6-a2eb-fdee741308ef",
+      "name": "Create a row1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "krlmOj6H2UCEG1ez",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -864,
+        -784
+      ],
+      "id": "e085f962-3e00-4abc-b760-deca8b1c5794",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "projects",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook').item.json.body.projectId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        64
+      ],
+      "id": "0720db54-a95f-40ce-9b6b-4adb83b70c53",
+      "name": "Get Project Template",
+      "executeOnce": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "krlmOj6H2UCEG1ez",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1168,
+        208
+      ],
+      "id": "9e343d53-329c-403f-9a11-2b7fadc42643",
+      "name": "Wait",
+      "webhookId": "a26108da-9423-4fcb-a476-df892ae80b46"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "assessments",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "projectId",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook').item.json.body.projectId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        80
+      ],
+      "id": "c26bc653-a68d-408c-9dda-98170adce010",
+      "name": "Delete a row",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "krlmOj6H2UCEG1ez",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.fileUrl }}",
+        "options": {}
+      },
+      "name": "Get pdf",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -656,
+        -768
+      ],
+      "typeVersion": 4.2,
+      "id": "6d6ccd4b-855d-4def-b376-0dea50b3f1e7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cloud.llamaindex.ai/api/v1/parsing/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -432,
+        -768
+      ],
+      "id": "d4df7fb4-f280-47d0-a981-d91a3d3e3ae2",
+      "name": "PostLlamaCloud",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2OCAJ7hSX1XKeO8b",
+          "name": "LlamaCloud Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.cloud.llamaindex.ai/api/v1/parsing/job/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -48,
+        -768
+      ],
+      "id": "a83d1012-58d7-49d0-ab80-642c2a9c8618",
+      "name": "Get Job Status",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2OCAJ7hSX1XKeO8b",
+          "name": "LlamaCloud Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "34394097-70a6-48d8-98ba-6b0a88cdfff5",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "SUCCESS",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        160,
+        -768
+      ],
+      "id": "79df67dc-aed3-48f9-b2ac-33dcbe9b5a75",
+      "name": "If Success"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        -768
+      ],
+      "id": "ec3c1ac9-1c17-4074-9638-986cd0228ff7",
+      "name": "Wait for Processing",
+      "webhookId": "06eeec1c-bda2-411f-9367-c35fbe33c739"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.cloud.llamaindex.ai/api/v1/parsing/job/{{ $('PostLlamaCloud').item.json.id }}/result/markdown",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        368,
+        -768
+      ],
+      "id": "5a525ae8-c293-4c32-92e4-76b68373ca6a",
+      "name": "Get Markdown Export",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2OCAJ7hSX1XKeO8b",
+          "name": "LlamaCloud Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "code": {
+          "execute": {
+            "code": "const { PromptTemplate } = require('@langchain/core/prompts');\n\nconst documentContent = $input.item.json?.markdown || $input.item.json?.content;\nconst maxChunkSize = 1000;\nconst minChunkSize = 400;\n\nif (!documentContent) {\n    throw new Error(\"No document found. Check LlamaParse output.\");\n}\n\nconst llm = await this.getInputConnectionData('ai_languageModel', 0);\n\nfunction cleanText(text) {\n    return text.replace(/\\s+/g, ' ').trim();\n}\n\nconst chunks = [];\nlet remainingText = cleanText(documentContent);\nlet chunkNumber = 1;\n\nif (remainingText.length <= maxChunkSize) {\n    chunks.push({\n        content: remainingText,\n        chunk: chunkNumber,\n        chunk_size: remainingText.length\n    });\n} else {\n    while (remainingText) {\n        const textToAnalyze = remainingText.substring(0, maxChunkSize);\n        \n        const promptText = `You are analyzing a document to find the best transition point to split it into meaningful sections.\n\nYour goal: Keep related content together and split where topics naturally transition.\n\nRead this text carefully and identify where one topic/section ends and another begins:\n\n${textToAnalyze}\n\nFind the best transition point that occurs BEFORE character position ${maxChunkSize}.\n\nLook for:\n- Section headings or topic changes\n- Paragraph boundaries where the subject shifts\n- Complete conclusions before new ideas start\n- Natural breaks between different aspects of the content\n\nOutput the LAST WORD that appears right before your chosen split point.\nJust the single word itself, nothing else.`;\n        \n        const prompt = PromptTemplate.fromTemplate(promptText);\n        const chain = prompt.pipe(llm);\n        \n        let breakPoint = maxChunkSize;\n        \n        try {\n            const response = await chain.invoke();\n            const responseText = response.content || response.text || response.toString();\n            const breakWord = responseText.trim();\n            \n            if (breakWord) {\n                const wordIndex = textToAnalyze.lastIndexOf(breakWord);\n                if (wordIndex !== -1) {\n                    breakPoint = wordIndex + breakWord.length;\n                    while (breakPoint < textToAnalyze.length && \n                           (textToAnalyze[breakPoint] === '.' || \n                            textToAnalyze[breakPoint] === ' ')) {\n                        breakPoint++;\n                        if (textToAnalyze[breakPoint - 1] === ' ') break;\n                    }\n                    breakPoint = Math.min(breakPoint, maxChunkSize);\n                }\n            }\n        } catch (error) {\n            console.log('LLM failed, using max size');\n        }\n        \n        const chunk = remainingText.substring(0, breakPoint).trim();\n        \n        if (chunk) {\n            chunks.push({\n                content: chunk,\n                chunk: chunkNumber,\n                chunk_size: chunk.length\n            });\n            chunkNumber++;\n        }\n        \n        remainingText = remainingText.substring(breakPoint).trim();\n        if (!remainingText) break;\n    }\n}\n\nlet i = 0;\nwhile (i < chunks.length) {\n    if (chunks[i].chunk_size < minChunkSize) {\n        if (i + 1 < chunks.length && \n            chunks[i].chunk_size + chunks[i + 1].chunk_size <= maxChunkSize) {\n            chunks[i].content += ' ' + chunks[i + 1].content;\n            chunks[i].chunk_size = chunks[i].content.length;\n            chunks.splice(i + 1, 1);\n        } else if (i > 0 && \n                   chunks[i - 1].chunk_size + chunks[i].chunk_size <= maxChunkSize) {\n            chunks[i - 1].content += ' ' + chunks[i].content;\n            chunks[i - 1].chunk_size = chunks[i - 1].content.length;\n            chunks.splice(i, 1);\n        } else {\n            i++;\n        }\n    } else {\n        i++;\n    }\n}\n\nconst summaryPromptTemplate = PromptTemplate.fromTemplate(\n    'Generate a concise, one-sentence summary (less than 15 words) of the following text:\\n\\n{text}'\n);\nconst summaryChain = summaryPromptTemplate.pipe(llm);\n\nconst promises = chunks.map(async (currentChunk, i) => {\n    const beforeContent = (i > 0) ? chunks[i - 1].content : \"\";\n    const afterContent = (i < chunks.length - 1) ? chunks[i + 1].content : \"\";\n\n    let summary = \"\";\n    try {\n        const response = await summaryChain.invoke({ text: currentChunk.content });\n        summary = response.content || response.text || response.toString();\n    } catch (e) {\n        summary = \"No summary available.\";\n    }\n\n    return {\n        json: {\n            text: currentChunk.content,\n            metadata: {\n                chunk_number: currentChunk.chunk,\n                chunk_size: currentChunk.chunk_size,\n                before: beforeContent,\n                after: afterContent,\n                summary: summary.trim().replace(/^\"|\"$/g, '')\n            }\n        }\n    };\n});\n\nconst returnData = await Promise.all(promises);\nreturn returnData;"
+          }
+        },
+        "inputs": {
+          "input": [
+            {
+              "type": "ai_languageModel",
+              "maxConnections": 1,
+              "required": true
+            },
+            {
+              "type": "main",
+              "required": true
+            }
+          ]
+        },
+        "outputs": {
+          "output": [
+            {
+              "type": "main"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.code",
+      "typeVersion": 1,
+      "position": [
+        576,
+        -768
+      ],
+      "id": "8cbe6948-6f9c-46cb-9709-74413535220a",
+      "name": "Agent Chunking"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        576,
+        -560
+      ],
+      "typeVersion": 1.2,
+      "id": "870bcb9b-19a4-4042-83db-5538637afc57",
+      "credentials": {
+        "openAiApi": {
+          "id": "4z0OVafOqKfBjvyB",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "document_embeddings",
+          "mode": "list",
+          "cachedResultName": "document_embeddings"
+        },
+        "options": {
+          "queryName": "="
+        }
+      },
+      "name": "Supabase Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "position": [
+        928,
+        -768
+      ],
+      "typeVersion": 1.3,
+      "id": "6f7ff455-240a-447e-9bbc-78874e6908fd",
+      "credentials": {
+        "supabaseApi": {
+          "id": "krlmOj6H2UCEG1ez",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        912,
+        -544
+      ],
+      "typeVersion": 1.2,
+      "id": "c1043d08-cabd-43b7-863d-cfc8b3b8a806",
+      "credentials": {
+        "openAiApi": {
+          "id": "4z0OVafOqKfBjvyB",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.content || $json.data || $json.text || $json.concatenated_data }}",
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "fileID",
+                "value": "={{ $('Webhook').item.json.body.fileId }}"
+              },
+              {
+                "name": "projectID",
+                "value": "={{ $('Webhook').item.json.body.projectId }}"
+              },
+              {
+                "name": "chunk_number",
+                "value": "={{ $input.item.json.metadata.chunk_number }}"
+              },
+              {
+                "name": "chunk_size",
+                "value": "={{ $input.item.json.metadata.chunk_size }}"
+              },
+              {
+                "name": "context_before",
+                "value": "={{ $input.item.json.metadata.before }}"
+              },
+              {
+                "name": "context_after",
+                "value": "={{ $input.item.json.metadata.after }}"
+              },
+              {
+                "name": "context_summary",
+                "value": "={{ $input.item.json.metadata.summary }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1072,
+        -560
+      ],
+      "id": "bb383182-e665-4432-a90f-909d02140a57",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 999999,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        -400
+      ],
+      "id": "c98be0a3-d9a2-4a6f-a4ca-aba4822fb02e",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        288,
+        576
+      ],
+      "id": "4e27a587-3bf9-4e66-95bb-9e0404783b73",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "4z0OVafOqKfBjvyB",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Search uploaded project documents for information relevant to the assessment criterion. Use this tool FIRST to find evidence before making your assessment.",
+        "tableName": {
+          "__rl": true,
+          "value": "rpc/match_documents",
+          "mode": "list",
+          "cachedResultName": "rpc/match_documents"
+        },
+        "topK": 10,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        416
+      ],
+      "id": "b3d1fa14-0405-4a13-923f-81b5d118c317",
+      "name": "Search Project Documents",
+      "credentials": {
+        "supabaseApi": {
+          "id": "krlmOj6H2UCEG1ez",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.rerankerCohere",
+      "typeVersion": 1,
+      "position": [
+        496,
+        576
+      ],
+      "id": "c2a81862-060d-4dab-b767-246d8667e89b",
+      "name": "Reranker Cohere",
+      "credentials": {
+        "cohereApi": {
+          "id": "yFBR0N786gNpEK2M",
+          "name": "CohereApi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Assess docs against criteria",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Format Assessments",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Assess docs against criteria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Add Database Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Database Fields": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Assessment Criteria": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assess docs against criteria": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse Summary Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Summary Response": {
+      "main": [
+        [
+          {
+            "node": "Create a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Assessments": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row1": {
+      "main": [
+        []
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get pdf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Project Template": {
+      "main": [
+        [
+          {
+            "node": "Get Assessment Criteria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a row": {
+      "main": [
+        [
+          {
+            "node": "Get Project Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get pdf": {
+      "main": [
+        [
+          {
+            "node": "PostLlamaCloud",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostLlamaCloud": {
+      "main": [
+        [
+          {
+            "node": "Wait for Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Job Status": {
+      "main": [
+        [
+          {
+            "node": "If Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Success": {
+      "main": [
+        [
+          {
+            "node": "Get Markdown Export",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Processing": {
+      "main": [
+        [
+          {
+            "node": "Get Job Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Markdown Export": {
+      "main": [
+        [
+          {
+            "node": "Agent Chunking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent Chunking",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent Chunking": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "main": [
+        []
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Search Project Documents",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Project Documents": {
+      "ai_tool": [
+        [
+          {
+            "node": "Assess docs against criteria",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reranker Cohere": {
+      "ai_reranker": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8a9af360-9bdb-4c3b-b629-d0e6f9c55803",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8af7246c6f8f130ef09bb3845f40b4ca9d2dca3f8b9e61031e16fad0c5365b09"
+  },
+  "id": "TpApXEx47k8SEzln",
+  "tags": []
+}

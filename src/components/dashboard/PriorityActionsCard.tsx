@@ -39,8 +39,8 @@ export default function PriorityActionsCard({
 
   const getRagBadge = (rating: string) => {
     const badges = {
-      amber: 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm',
-      red: 'bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-sm',
+      amber: 'bg-amber-500 text-white shadow-sm',
+      red: 'bg-red-500 text-white shadow-sm',
     }
     return badges[rating as keyof typeof badges] || 'bg-slate-300 text-slate-700'
   }

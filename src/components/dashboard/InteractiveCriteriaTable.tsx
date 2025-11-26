@@ -46,10 +46,10 @@ export default function InteractiveCriteriaTable({
 
   const getRagBadge = (rating: string) => {
     const badges = {
-      green: 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-sm',
-      amber: 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm',
-      red: 'bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-sm',
-      pending: 'bg-slate-300 text-slate-700',
+      green: 'bg-emerald-500 text-white shadow-sm min-w-[90px]',
+      amber: 'bg-amber-500 text-white shadow-sm min-w-[90px]',
+      red: 'bg-red-500 text-white shadow-sm min-w-[90px]',
+      pending: 'bg-slate-300 text-slate-700 min-w-[90px]',
     }
     return badges[rating as keyof typeof badges] || badges.pending
   }
@@ -78,10 +78,7 @@ export default function InteractiveCriteriaTable({
 
   const getConfidenceColor = (confidence: number | null) => {
     if (confidence === null) return 'bg-slate-200'
-    const confValue = confidence <= 1 ? confidence * 100 : confidence
-    if (confValue >= 80) return 'bg-emerald-500'
-    if (confValue >= 50) return 'bg-amber-500'
-    return 'bg-red-500'
+    return 'bg-blue-500'
   }
 
   return (
@@ -131,7 +128,7 @@ export default function InteractiveCriteriaTable({
                 {/* RAG Badge */}
                 <span
                   className={cn(
-                    'px-4 py-2 rounded-lg font-bold text-base',
+                    'px-4 py-2 rounded-lg font-bold text-base text-center inline-flex items-center justify-center',
                     getRagBadge(assessment.rag_rating)
                   )}
                 >
@@ -181,34 +178,34 @@ export default function InteractiveCriteriaTable({
 
             {/* Expanded Details */}
             {expandedId === assessment.id && (
-              <div className="mt-6 space-y-4 pt-6 border-t border-border animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="mt-6 pt-6 border-t border-slate-200 animate-in fade-in slide-in-from-top-2 duration-200">
                 {/* Metadata Row */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pb-4 border-b border-border">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pb-6 border-b border-slate-200">
                   <div>
-                    <div className="text-xs text-text-secondary mb-1">Satisfaction</div>
-                    <div className="text-lg font-bold text-text-primary">
+                    <div className="text-sm text-slate-500 mb-1">Satisfaction</div>
+                    <div className="text-lg font-bold text-slate-900">
                       {assessment.satisfaction_score !== null
-                        ? assessment.satisfaction_score
-                        : getSatisfactionPercentage(assessment.rag_rating)}%
+                        ? `${assessment.satisfaction_score}%`
+                        : `${getSatisfactionPercentage(assessment.rag_rating)}%`}
                     </div>
                   </div>
                   <div>
-                    <div className="text-xs text-text-secondary mb-1">Confidence</div>
-                    <div className="text-lg font-bold text-text-primary">
+                    <div className="text-sm text-slate-500 mb-1">Confidence</div>
+                    <div className="text-lg font-bold text-slate-900">
                       {getConfidenceLabel(assessment.confidence)}
                     </div>
                   </div>
                   {assessment.assessment_criteria.weight !== null && (
                     <div>
-                      <div className="text-xs text-text-secondary mb-1">Weight</div>
-                      <div className="text-lg font-bold text-text-primary">
+                      <div className="text-sm text-slate-500 mb-1">Weight</div>
+                      <div className="text-lg font-bold text-slate-900">
                         {assessment.assessment_criteria.weight}%
                       </div>
                     </div>
                   )}
                   <div>
-                    <div className="text-xs text-text-secondary mb-1">Critical</div>
-                    <div className="text-lg font-bold text-text-primary">
+                    <div className="text-sm text-slate-500 mb-1">Critical</div>
+                    <div className="text-lg font-bold text-slate-900">
                       {assessment.assessment_criteria.is_critical ? 'Yes' : 'No'}
                     </div>
                   </div>
@@ -216,12 +213,14 @@ export default function InteractiveCriteriaTable({
 
                 {/* Finding */}
                 {assessment.finding && (
-                  <div>
-                    <h4 className="font-semibold text-text-primary mb-2 flex items-center gap-2">
-                      <div className="w-1 h-5 bg-primary rounded-full"></div>
-                      Finding
-                    </h4>
-                    <p className="text-text-secondary bg-gray-50 p-4 rounded-lg leading-relaxed">
+                  <div className="mt-6 pt-6 border-t border-slate-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 rounded-full bg-slate-700"></div>
+                      <h4 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">
+                        Finding
+                      </h4>
+                    </div>
+                    <p className="text-slate-700 leading-relaxed">
                       {assessment.finding}
                     </p>
                   </div>
@@ -229,27 +228,29 @@ export default function InteractiveCriteriaTable({
 
                 {/* Evidence */}
                 {assessment.evidence && (
-                  <div>
-                    <h4 className="font-semibold text-text-primary mb-2 flex items-center gap-2">
-                      <div className="w-1 h-5 bg-secondary rounded-full"></div>
-                      Evidence
-                    </h4>
-                    <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-secondary">
-                      <p className="text-text-secondary italic leading-relaxed whitespace-pre-wrap">
-                        {assessment.evidence}
-                      </p>
+                  <div className="mt-6 pt-6 border-t border-slate-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                      <h4 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">
+                        Evidence
+                      </h4>
                     </div>
+                    <p className="text-slate-700 leading-relaxed">
+                      {assessment.evidence}
+                    </p>
                   </div>
                 )}
 
                 {/* Recommendation */}
                 {assessment.recommendation && (
-                  <div>
-                    <h4 className="font-semibold text-text-primary mb-2 flex items-center gap-2">
-                      <div className="w-1 h-5 bg-rag-green rounded-full"></div>
-                      Recommendation
-                    </h4>
-                    <p className="text-text-secondary bg-green-50 p-4 rounded-lg leading-relaxed">
+                  <div className="mt-6 pt-6 border-t border-slate-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                      <h4 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">
+                        Recommendation
+                      </h4>
+                    </div>
+                    <p className="text-slate-700 leading-relaxed">
                       {assessment.recommendation}
                     </p>
                   </div>

@@ -285,10 +285,19 @@ export default function ProjectDetailPage() {
         // Update progress
         setAssessmentProgress({ current: completed, total })
 
-        // Update toast with progress
+        // Update toast with progress and more descriptive messaging
         const percentage = Math.round((completed / total) * 100)
+        let statusMessage = 'Analyzing documents against criteria...'
+        if (percentage > 0 && percentage < 25) {
+          statusMessage = 'Starting assessment...'
+        } else if (percentage >= 25 && percentage < 75) {
+          statusMessage = 'Analyzing criteria...'
+        } else if (percentage >= 75 && percentage < 100) {
+          statusMessage = 'Finalizing assessment...'
+        }
+
         setToast({
-          message: `Assessing criteria... ${completed} of ${total} (${percentage}%)`,
+          message: `${statusMessage} ${completed} of ${total} (${percentage}%)`,
           type: 'loading'
         })
 
@@ -696,20 +705,36 @@ export default function ProjectDetailPage() {
               {!projectData.projectSummary && !hasAssessments && (
                 <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed border-border">
                   <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <BarChart3 className="text-text-primary" size={32} />
+                    {documents.length === 0 ? (
+                      <Upload className="text-text-primary" size={32} />
+                    ) : (
+                      <BarChart3 className="text-text-primary" size={32} />
+                    )}
                   </div>
                   <h3 className="text-xl font-bold text-text-primary mb-2">
-                    No Assessment Yet
+                    {documents.length === 0 ? 'No Documents Uploaded' : 'No Assessment Yet'}
                   </h3>
                   <p className="text-text-secondary mb-6 max-w-md mx-auto">
-                    Run an assessment to see your project overview
+                    {documents.length === 0
+                      ? 'Upload project documents to begin your assessment'
+                      : 'Run an assessment to see your project overview'
+                    }
                   </p>
                   <button
-                    onClick={() => setActiveTab('assessment-summary')}
+                    onClick={() => setActiveTab(documents.length === 0 ? 'documents' : 'assessment-summary')}
                     className="inline-flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md"
                   >
-                    <BarChart3 size={18} />
-                    Go to Assessment
+                    {documents.length === 0 ? (
+                      <>
+                        <Upload size={18} />
+                        Upload Documents
+                      </>
+                    ) : (
+                      <>
+                        <BarChart3 size={18} />
+                        Go to Assessment
+                      </>
+                    )}
                   </button>
                 </div>
               )}
@@ -808,6 +833,7 @@ export default function ProjectDetailPage() {
                   onViewActionsClick={() => setActiveTab('actions')}
                   onRerunAssessment={handleRerunAssessmentClick}
                   isRunningAssessment={runningAssessment}
+                  assessmentProgress={assessmentProgress}
                   openActionPlanWorkspace={openActionPlanWorkspace}
                   onActionPlanWorkspaceClose={() => setOpenActionPlanWorkspace(false)}
                 />
@@ -824,6 +850,37 @@ export default function ProjectDetailPage() {
                       ? 'Your documents are ready. Run an assessment to analyze them against NISTA/PAR criteria.'
                       : 'Upload documents in the Documents tab, then run an assessment to see results here.'}
                   </p>
+
+                  {/* Progress Bar - shown when assessment is running */}
+                  {runningAssessment && assessmentProgress && (
+                    <div className="max-w-2xl mx-auto mb-6">
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                        <div className="mb-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium text-blue-600 flex items-center gap-2">
+                              <Loader2 size={16} className="animate-spin" />
+                              Assessing criteria...
+                            </span>
+                            <span className="text-sm font-semibold text-gray-700">
+                              {assessmentProgress.current} of {assessmentProgress.total}
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out"
+                              style={{
+                                width: `${Math.round((assessmentProgress.current / assessmentProgress.total) * 100)}%`
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500 text-center">
+                          This may take 2-5 minutes depending on document size
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     {hasFiles ? (
                       <button

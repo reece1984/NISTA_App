@@ -14,6 +14,7 @@ export interface ProjectDocument {
   document_type: string | null
   document_category: string | null
   display_order: number | null
+  error_message: string | null
 }
 
 export function useDocuments(projectId: number) {

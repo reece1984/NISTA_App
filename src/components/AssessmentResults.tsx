@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search, X, FileDown, FileSpreadsheet, Sparkles, ClipboardList } from 'lucide-react'
+import { Search, X, FileDown, FileSpreadsheet, Sparkles, ClipboardList, RefreshCw, Loader2 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { cn } from '../lib/utils'
@@ -57,6 +57,7 @@ interface AssessmentResultsProps {
   onViewActionsClick?: () => void // Callback to navigate to actions tab
   onRerunAssessment?: () => void // Callback to rerun assessment
   isRunningAssessment?: boolean // Is assessment currently running
+  assessmentProgress?: { current: number; total: number } | null // Progress of running assessment
 }
 
 export default function AssessmentResults({
@@ -68,6 +69,9 @@ export default function AssessmentResults({
   openActionPlanWorkspace = false,
   onActionPlanWorkspaceClose,
   onViewActionsClick,
+  onRerunAssessment,
+  isRunningAssessment,
+  assessmentProgress,
 }: AssessmentResultsProps) {
   const [filter, setFilter] = useState<'all' | 'green' | 'amber' | 'red'>('all')
   const [expandedId, setExpandedId] = useState<number | null>(null)
@@ -1244,6 +1248,36 @@ export default function AssessmentResults({
         />
       )}
 
+      {/* Progress Bar - shown when assessment is running */}
+      {isRunningAssessment && assessmentProgress && (
+        <div className="max-w-2xl mx-auto mb-6">
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+            <div className="mb-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-blue-600 flex items-center gap-2">
+                  <Loader2 size={16} className="animate-spin" />
+                  Assessing criteria...
+                </span>
+                <span className="text-sm font-semibold text-gray-700">
+                  {assessmentProgress.current} of {assessmentProgress.total}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out"
+                  style={{
+                    width: `${Math.round((assessmentProgress.current / assessmentProgress.total) * 100)}%`
+                  }}
+                />
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 text-center">
+              This may take 2-5 minutes depending on document size
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Modern Header with Export Buttons - Show in summary and full view */}
       {showSummary && totalAssessments > 0 && (
         <div className="mb-8">
@@ -1264,6 +1298,21 @@ export default function AssessmentResults({
                 <ClipboardList size={18} />
                 Action Plan
               </button>
+              {onRerunAssessment && (
+                <button
+                  onClick={onRerunAssessment}
+                  disabled={isRunningAssessment}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white rounded-xl transition-all font-medium shadow-sm disabled:cursor-not-allowed"
+                  title="Re-run assessment with latest documents"
+                >
+                  {isRunningAssessment ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <RefreshCw size={18} />
+                  )}
+                  <span className="hidden sm:inline">{isRunningAssessment ? 'Running...' : 'Re-run'}</span>
+                </button>
+              )}
               <button
                 onClick={exportToExcel}
                 className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all font-medium shadow-sm"

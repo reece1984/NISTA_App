@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "n8n-mcp": {
+      "command": "npx",
+      "args": ["n8n-mcp"],
+      "env": {
+        "N8N_API_URL": "https://n8n-reeceai-u56804.vm.elestio.app",
+        "N8N_API_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiYzBjNGFlNC1hNTZhLTRhMDMtODJkNS03MmExNzdjMDEzMTciLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzYyOTc4MjczLCJleHAiOjE3NzA2OTk2MDB9.u2D6kpJSPwdhaL8nqr0DjdLkT9mrPRkU1Fj0oeUhywU"
+      }
+    }
+  }
+}

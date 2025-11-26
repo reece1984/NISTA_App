@@ -47,6 +47,8 @@ export default function FileUpload({
       return
     }
 
+    let fileId: number | null = null
+
     try {
       setError('')
       setUploading(true)
@@ -64,49 +66,83 @@ export default function FileUpload({
         .from('project-documents')
         .getPublicUrl(fileKey)
 
-      // Save file metadata to database
-      const { error: dbError } = await supabase.from('files').insert({
-        project_id: projectId,
-        file_name: file.name,
-        file_type: fileType,
-        file_url: publicUrl,
-        file_key: fileKey,
-        status: 'uploaded',
-      })
+      // Save file metadata to database with 'processing' status initially
+      const { data: insertedFile, error: dbError } = await supabase
+        .from('files')
+        .insert({
+          project_id: projectId,
+          file_name: file.name,
+          file_type: fileType,
+          file_url: publicUrl,
+          file_key: fileKey,
+          status: 'processing',
+          error_message: null,
+        })
+        .select()
+        .single()
 
       if (dbError) throw dbError
 
-      // Trigger N8N webhook for document processing (optional - don't fail if webhook fails)
+      fileId = insertedFile?.id
+
+      // Trigger N8N webhook for document processing
       const webhookUrl = import.meta.env.VITE_N8N_DOCUMENT_UPLOAD_WEBHOOK
-      if (webhookUrl) {
-        try {
-          const payload = {
-            identifier: 'document_upload',
-            project_id: projectId,
-            file_name: file.name,
-            file_url: publicUrl,
-            file_key: fileKey,
-          }
-          console.log('🔔 Calling N8N webhook:', webhookUrl)
-          console.log('📦 Payload:', payload)
-
-          const response = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          })
-
-          console.log('✅ N8N Response Status:', response.status)
-          const responseData = await response.text()
-          console.log('📥 N8N Response:', responseData)
-        } catch (webhookError) {
-          console.warn('N8N webhook failed (this is ok if N8N is not configured):', webhookError)
-        }
+      if (!webhookUrl) {
+        throw new Error('N8N webhook URL not configured. Please add VITE_N8N_DOCUMENT_UPLOAD_WEBHOOK to your environment variables.')
       }
+
+      const payload = {
+        identifier: 'document_upload',
+        project_id: projectId,
+        file_id: fileId,
+        file_name: file.name,
+        file_url: publicUrl,
+        file_key: fileKey,
+      }
+      console.log('🔔 Calling N8N webhook:', webhookUrl)
+      console.log('📦 Payload:', payload)
+
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      console.log('✅ N8N Response Status:', response.status)
+
+      if (!response.ok) {
+        const responseText = await response.text()
+        console.error('❌ N8N webhook error:', responseText)
+        throw new Error(`Webhook failed with status ${response.status}: ${responseText}`)
+      }
+
+      const responseData = await response.json()
+      console.log('📥 N8N Response:', responseData)
+
+      // Update status to 'uploaded' after successful webhook call
+      await supabase
+        .from('files')
+        .update({ status: 'uploaded' })
+        .eq('id', fileId)
 
       onUploadSuccess()
     } catch (err: any) {
-      setError(err.message || 'Failed to upload file')
+      const errorMessage = err.message || 'Failed to upload file'
+      setError(errorMessage)
+
+      // If we have a file ID, update its status to 'failed' with error message
+      if (fileId) {
+        await supabase
+          .from('files')
+          .update({
+            status: 'failed',
+            error_message: errorMessage,
+          })
+          .eq('id', fileId)
+      }
+
+      // Still call onUploadSuccess to refresh the list and show the failed file
+      onUploadSuccess()
     } finally {
       setUploading(false)
     }

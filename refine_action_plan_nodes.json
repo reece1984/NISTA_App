@@ -1,0 +1,157 @@
+{
+  "nodes_to_add": [
+    {
+      "name": "Get Draft",
+      "type": "n8n-nodes-base.supabase",
+      "position": [500, 400],
+      "parameters": {
+        "operation": "get",
+        "tableId": "action_plan_drafts",
+        "id": "={{ $json.body.draft_id }}"
+      },
+      "typeVersion": 1,
+      "notes": "Fetches the current draft from database"
+    },
+    {
+      "name": "Format Refinement Request",
+      "type": "n8n-nodes-base.code",
+      "position": [700, 400],
+      "parameters": {
+        "jsCode": "const draft = $('Get Draft').item.json;\nconst userMessage = $input.item.json.body.user_message;\nconst conversationHistory = $input.item.json.body.conversation_history || [];\n\n// Parse draft_data if it's a string\nlet currentActions = draft.draft_data;\nif (typeof currentActions === 'string') {\n  try {\n    currentActions = JSON.parse(currentActions);\n  } catch (e) {\n    // If it's not JSON, assume it's already an object\n  }\n}\n\n// Handle both formats: {proposedActions: [...]} or just [...]\nif (currentActions && currentActions.proposedActions) {\n  currentActions = currentActions.proposedActions;\n}\n\nreturn [{\n  json: {\n    current_actions: currentActions,\n    user_message: userMessage,\n    conversation_history: conversationHistory,\n    draft_id: draft.id,\n    assessment_run_id: draft.assessment_run_id\n  }\n}];"
+      },
+      "typeVersion": 2,
+      "notes": "Prepares data for AI refinement"
+    },
+    {
+      "name": "AI Agent - Refine Actions",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [900, 400],
+      "parameters": {
+        "promptType": "define",
+        "text": "=Current action plan:\n{{ JSON.stringify($json.current_actions, null, 2) }}\n\nPrevious conversation:\n{{ $json.conversation_history.map(m => `${m.role}: ${m.content}`).join('\\n') }}\n\nUser's refinement request:\n{{ $json.user_message }}\n\nPlease modify the action plan according to the user's request. Return the complete updated JSON array of actions. Make only the changes requested - keep everything else the same.",
+        "options": {
+          "systemMessage": "You are an expert infrastructure project advisor helping refine an action plan based on user feedback.\n\nCRITICAL: You must respond with ONLY a valid JSON array. No introduction, no explanation, no markdown code blocks - JUST the JSON array starting with [ and ending with ].\n\nRules for refinement:\n1. Listen carefully to the user's feedback\n2. Modify, add, or remove actions as requested\n3. Maintain the JSON structure exactly\n4. Preserve action IDs where possible\n5. Keep all required fields: title, description, priority, suggested_due_date, linked_assessment_ids, criteria_category\n6. If adding new actions, they must have all required fields\n7. If the user asks to delete an action, remove it from the array\n8. If the user asks to modify an action, update that specific action\n9. Keep unchanged actions exactly as they were\n\nReturn the complete refined array of actions with NO other text."
+        }
+      },
+      "typeVersion": 1.5,
+      "notes": "AI refines the action plan based on user feedback"
+    },
+    {
+      "name": "OpenAI Chat Model - Refine",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [900, 600],
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "typeVersion": 1,
+      "notes": "Language model for refinement"
+    },
+    {
+      "name": "Parse Refinement Response",
+      "type": "n8n-nodes-base.code",
+      "position": [1100, 400],
+      "parameters": {
+        "jsCode": "let outputString = $input.first().json.output;\n\n// Remove markdown code blocks if present\noutputString = outputString.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n\n// Parse JSON\nlet refinedActions;\ntry {\n  refinedActions = JSON.parse(outputString);\n} catch (error) {\n  console.error('Failed to parse AI refinement response:', error);\n  console.error('Raw output:', outputString);\n  throw new Error(`AI returned invalid JSON: ${error.message}`);\n}\n\n// Validate it's an array\nif (!Array.isArray(refinedActions)) {\n  throw new Error('AI response must be an array of actions');\n}\n\n// Build updated conversation history\nconst previousHistory = $('Format Refinement Request').item.json.conversation_history;\nconst userMessage = $('Format Refinement Request').item.json.user_message;\n\nconst newHistory = [\n  ...previousHistory,\n  {\n    role: 'user',\n    content: userMessage,\n    timestamp: new Date().toISOString()\n  },\n  {\n    role: 'assistant',\n    content: `I've updated the action plan with ${refinedActions.length} actions based on your feedback.`,\n    timestamp: new Date().toISOString()\n  }\n];\n\nreturn [{\n  json: {\n    refined_actions: refinedActions,\n    conversation_history: newHistory,\n    draft_id: $('Format Refinement Request').item.json.draft_id,\n    action_count: refinedActions.length\n  }\n}];"
+      },
+      "typeVersion": 2,
+      "notes": "Parses AI response and updates conversation history"
+    },
+    {
+      "name": "Update Draft",
+      "type": "n8n-nodes-base.supabase",
+      "position": [1300, 400],
+      "parameters": {
+        "operation": "update",
+        "tableId": "action_plan_drafts",
+        "id": "={{ $json.draft_id }}",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "draft_data",
+              "fieldValue": "={{ { proposedActions: $json.refined_actions } }}"
+            },
+            {
+              "fieldId": "conversation_history",
+              "fieldValue": "={{ $json.conversation_history }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "notes": "Saves refined actions back to database"
+    },
+    {
+      "name": "Respond to Webhook - Refine",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1500, 400],
+      "parameters": {
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, GET, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          },
+          "responseKey": "= {   \"success\": true,   \"draft_id\": {{ $('Update Draft').item.json.id }},   \"action_count\": {{ $('Parse Refinement Response').item.json.action_count }},   \"refined_actions\": {{ JSON.stringify($('Parse Refinement Response').item.json.refined_actions) }},   \"ai_response\": \"I've updated the action plan based on your feedback\" }"
+        }
+      },
+      "typeVersion": 1,
+      "notes": "Returns refined actions to frontend"
+    }
+  ],
+  "connections": {
+    "Switch": {
+      "main": [
+        [],
+        [],
+        [],
+        [{"node": "Get Draft", "type": "main", "index": 0}]
+      ]
+    },
+    "Get Draft": {
+      "main": [[{"node": "Format Refinement Request", "type": "main", "index": 0}]]
+    },
+    "Format Refinement Request": {
+      "main": [[{"node": "AI Agent - Refine Actions", "type": "main", "index": 0}]]
+    },
+    "AI Agent - Refine Actions": {
+      "main": [[{"node": "Parse Refinement Response", "type": "main", "index": 0}]]
+    },
+    "OpenAI Chat Model - Refine": {
+      "ai_languageModel": [[{"node": "AI Agent - Refine Actions", "type": "ai_languageModel", "index": 0}]]
+    },
+    "Parse Refinement Response": {
+      "main": [[{"node": "Update Draft", "type": "main", "index": 0}]]
+    },
+    "Update Draft": {
+      "main": [[{"node": "Respond to Webhook - Refine", "type": "main", "index": 0}]]
+    }
+  },
+  "instructions": [
+    "1. Open the NISTA_App workflow in N8N editor",
+    "2. The Switch node already has the refine_action_plan case (output 3)",
+    "3. Add each node above to the canvas at the specified positions",
+    "4. Connect the nodes as shown in the connections section",
+    "5. Configure Supabase credentials for Get Draft and Update Draft nodes",
+    "6. Configure OpenAI credentials for OpenAI Chat Model node",
+    "7. Save the workflow",
+    "8. Test with the provided curl command",
+    "9. Activate the workflow"
+  ]
+}

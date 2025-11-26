@@ -12,6 +12,11 @@ interface FileQueueItem {
   selectedType: string | null
   uploading: boolean
   error: string | null
+  progress: number
+  uploadStartTime: number | null
+  estimatedTimeRemaining: number | null
+  processingStatus: 'uploading' | 'processing' | 'complete'
+  fileRecordId: number | null
 }
 
 interface UploadDocumentsModalProps {
@@ -69,6 +74,11 @@ export default function UploadDocumentsModal({
         selectedType: null,
         uploading: false,
         error: null,
+        progress: 0,
+        uploadStartTime: null,
+        estimatedTimeRemaining: null,
+        processingStatus: 'uploading' as const,
+        fileRecordId: null,
       }))
 
       setFileQueue((prev) => [...prev, ...newFiles])
@@ -107,8 +117,9 @@ export default function UploadDocumentsModal({
     }
 
     // Mark as uploading
+    const startTime = Date.now()
     setFileQueue((prev) =>
-      prev.map((f) => (f.id === queueItem.id ? { ...f, uploading: true, error: null } : f))
+      prev.map((f) => (f.id === queueItem.id ? { ...f, uploading: true, error: null, progress: 0, uploadStartTime: startTime, estimatedTimeRemaining: null, processingStatus: 'uploading' } : f))
     )
 
     try {
@@ -129,25 +140,72 @@ export default function UploadDocumentsModal({
 
       const nextDisplayOrder = (maxOrderData?.display_order || 0) + 1
 
-      // Upload to storage
+      // Upload to storage with progress tracking
       const timestamp = Date.now()
       const filePath = `projects/${projectId}/${timestamp}_${file.name}`
 
-      const { error: storageError } = await supabase.storage
-        .from('project-documents')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-        })
+      // Create XMLHttpRequest for upload with progress tracking
+      const xhr = new XMLHttpRequest()
 
-      if (storageError) throw storageError
+      // Track upload progress
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+          const percentComplete = (e.loaded / e.total) * 100
+          const elapsed = Date.now() - startTime
+          const uploadSpeed = e.loaded / elapsed // bytes per ms
+          const remaining = e.total - e.loaded
+          const estimatedMs = remaining / uploadSpeed
+
+          setFileQueue((prev) =>
+            prev.map((f) =>
+              f.id === queueItem.id
+                ? { ...f, progress: Math.round(percentComplete), estimatedTimeRemaining: Math.round(estimatedMs / 1000) }
+                : f
+            )
+          )
+        }
+      })
+
+      // Get signed upload URL from Supabase
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('project-documents')
+        .createSignedUploadUrl(filePath)
+
+      if (uploadError) throw uploadError
+
+      // Upload file using XMLHttpRequest for progress tracking
+      await new Promise<void>((resolve, reject) => {
+        xhr.open('PUT', uploadData.signedUrl)
+        xhr.setRequestHeader('Content-Type', file.type || 'application/pdf')
+        xhr.setRequestHeader('Cache-Control', '3600')
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve()
+          } else {
+            reject(new Error(`Upload failed with status ${xhr.status}`))
+          }
+        }
+
+        xhr.onerror = () => reject(new Error('Network error during upload'))
+        xhr.send(file)
+      })
+
+      // Update progress to 50% (upload complete, now processing)
+      setFileQueue((prev) =>
+        prev.map((f) =>
+          f.id === queueItem.id
+            ? { ...f, progress: 50, estimatedTimeRemaining: null, processingStatus: 'processing' }
+            : f
+        )
+      )
 
       // Get public URL
       const {
         data: { publicUrl },
       } = supabase.storage.from('project-documents').getPublicUrl(filePath)
 
-      // Insert file record
+      // Insert file record with 'processing' status initially
       const { data: fileRecord, error: dbError } = await supabase
         .from('files')
         .insert({
@@ -159,7 +217,8 @@ export default function UploadDocumentsModal({
           document_type: queueItem.selectedType,
           document_category: typeData.category,
           display_order: nextDisplayOrder,
-          status: 'uploaded',
+          status: 'processing',
+          error_message: null,
         })
         .select()
         .single()
@@ -169,59 +228,153 @@ export default function UploadDocumentsModal({
         throw new Error(dbError.message || 'Failed to save file to database')
       }
 
-      // Trigger N8N webhook
-      const webhookUrl = import.meta.env.VITE_N8N_DOCUMENT_UPLOAD_WEBHOOK
-      if (webhookUrl) {
-        try {
-          const payload = {
-            identifier: 'document_upload',
-            file_id: fileRecord.id,
-            project_id: projectId,
-            file_name: file.name,
-            file_url: publicUrl,
-            file_key: filePath,
-          }
-
-          console.log('🔔 Triggering N8N webhook for fileId:', fileRecord.id, 'fileName:', file.name)
-          console.log('📦 Webhook URL:', webhookUrl)
-          console.log('📦 Payload:', payload)
-
-          const response = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-          })
-
-          console.log('✅ N8N Response Status:', response.status, 'for fileId:', fileRecord.id)
-          const responseData = await response.text()
-          console.log('📥 N8N Response:', responseData)
-        } catch (webhookError) {
-          console.error('❌ Webhook error for fileId:', fileRecord.id, webhookError)
-          // Don't throw - file is uploaded, webhook failure is not critical
-        }
-      } else {
-        console.warn('⚠️ No webhook URL configured - skipping N8N trigger for fileId:', fileRecord.id)
-      }
-
-      // Remove from queue
-      setFileQueue((prev) => prev.filter((f) => f.id !== queueItem.id))
-      setToast({
-        message: `${file.name} uploaded successfully`,
-        type: 'success',
-      })
-    } catch (error: any) {
-      console.error('Upload error:', error)
+      // Store fileRecordId for polling
       setFileQueue((prev) =>
         prev.map((f) =>
           f.id === queueItem.id
-            ? { ...f, uploading: false, error: error.message || 'Upload failed' }
+            ? { ...f, fileRecordId: fileRecord.id }
+            : f
+        )
+      )
+
+      // Trigger N8N webhook for document processing
+      const webhookUrl = import.meta.env.VITE_N8N_DOCUMENT_UPLOAD_WEBHOOK
+      if (!webhookUrl) {
+        throw new Error('N8N webhook URL not configured. Please add VITE_N8N_DOCUMENT_UPLOAD_WEBHOOK to your environment variables.')
+      }
+
+      const payload = {
+        identifier: 'document_upload',
+        file_id: fileRecord.id,
+        project_id: projectId,
+        file_name: file.name,
+        file_url: publicUrl,
+        file_key: filePath,
+      }
+
+      console.log('🔔 Triggering N8N webhook for fileId:', fileRecord.id, 'fileName:', file.name)
+      console.log('📦 Webhook URL:', webhookUrl)
+      console.log('📦 Payload:', payload)
+
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+
+      console.log('✅ N8N Response Status:', response.status, 'for fileId:', fileRecord.id)
+
+      if (!response.ok) {
+        const responseText = await response.text()
+        console.error('❌ N8N webhook error:', responseText)
+        throw new Error(`Webhook failed with status ${response.status}: ${responseText}`)
+      }
+
+      const responseData = await response.json()
+      console.log('📥 N8N Response:', responseData)
+
+      // Poll document_embeddings table for processing status
+      const pollInterval = setInterval(async () => {
+        try {
+          // Check if embeddings have been created for this file
+          const { data: embeddings, error: pollError } = await supabase
+            .from('document_embeddings')
+            .select('id, chunk_index')
+            .eq('file_id', fileRecord.id)
+
+          if (pollError) {
+            console.error('Poll error:', pollError)
+            return
+          }
+
+          const embeddingCount = embeddings?.length || 0
+          console.log(`📊 File ${fileRecord.id} has ${embeddingCount} embeddings`)
+
+          // Update progress based on embedding count
+          if (embeddingCount > 0) {
+            // Processing complete - embeddings exist
+            clearInterval(pollInterval)
+
+            // Update file status to embedded
+            await supabase
+              .from('files')
+              .update({
+                status: 'embedded',
+                chunks_count: embeddingCount
+              })
+              .eq('id', fileRecord.id)
+
+            setFileQueue((prev) => {
+              const newQueue = prev.filter((f) => f.id !== queueItem.id)
+
+              // If queue is now empty, close modal after a short delay
+              if (newQueue.length === 0) {
+                setTimeout(() => {
+                  onUploadComplete()
+                  onClose()
+                }, 1500)
+              }
+
+              return newQueue
+            })
+
+            setToast({
+              message: `${file.name} uploaded and embedded successfully (${embeddingCount} chunks)`,
+              type: 'success',
+            })
+          } else {
+            // Still processing - update progress from 50% to 90%
+            setFileQueue((prev) =>
+              prev.map((f) =>
+                f.id === queueItem.id
+                  ? { ...f, progress: Math.min(90, 50 + Math.floor((Date.now() - startTime) / 2000)) }
+                  : f
+              )
+            )
+          }
+        } catch (error) {
+          console.error('Polling error:', error)
+          clearInterval(pollInterval)
+        }
+      }, 3000) // Poll every 3 seconds
+
+      // Timeout after 5 minutes
+      setTimeout(() => {
+        clearInterval(pollInterval)
+        setFileQueue((prev) =>
+          prev.map((f) =>
+            f.id === queueItem.id && f.processingStatus === 'processing'
+              ? { ...f, uploading: false, error: 'Processing timeout - please check document status' }
+              : f
+          )
+        )
+      }, 300000) // 5 minutes
+    } catch (error: any) {
+      console.error('Upload error:', error)
+      const errorMessage = error.message || 'Upload failed'
+
+      // If we have a file record ID, update its status to 'failed'
+      if (queueItem.fileRecordId) {
+        await supabase
+          .from('files')
+          .update({
+            status: 'failed',
+            error_message: errorMessage,
+          })
+          .eq('id', queueItem.fileRecordId)
+      }
+
+      setFileQueue((prev) =>
+        prev.map((f) =>
+          f.id === queueItem.id
+            ? { ...f, uploading: false, error: errorMessage }
             : f
         )
       )
       setToast({
-        message: `Failed to upload ${file.name}: ${error.message}`,
+        message: `Failed to upload ${file.name}: ${errorMessage}`,
         type: 'error',
       })
     }
@@ -234,13 +387,7 @@ export default function UploadDocumentsModal({
       await uploadFile(file)
     }
 
-    // Refresh documents list
-    onUploadComplete()
-
-    // Close modal if all uploads successful
-    if (fileQueue.length === 0) {
-      onClose()
-    }
+    // Modal will auto-close when last file is removed from queue
   }
 
   const allFilesHaveTypes = fileQueue.every((f) => f.selectedType)
@@ -356,13 +503,41 @@ export default function UploadDocumentsModal({
                     </select>
                   </div>
 
-                  {/* Status */}
-                  <div className="flex items-center gap-2">
+                  {/* Status and Progress */}
+                  <div className="space-y-2">
                     {queueItem.uploading ? (
-                      <span className="text-xs text-blue-600 flex items-center gap-1">
-                        <Loader2 size={14} className="animate-spin" />
-                        Uploading...
-                      </span>
+                      <>
+                        {/* Progress Bar */}
+                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="h-full bg-blue-600 transition-all duration-300 ease-out"
+                            style={{ width: `${queueItem.progress}%` }}
+                          />
+                        </div>
+
+                        {/* Progress Text */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-blue-600 flex items-center gap-1">
+                            <Loader2 size={14} className="animate-spin" />
+                            {queueItem.processingStatus === 'uploading' && queueItem.progress < 50
+                              ? `Uploading... ${queueItem.progress}%`
+                              : `Processing & embedding... ${queueItem.progress}%`
+                            }
+                          </span>
+                          {queueItem.estimatedTimeRemaining !== null && queueItem.estimatedTimeRemaining > 0 && queueItem.processingStatus === 'uploading' && (
+                            <span className="text-xs text-text-secondary">
+                              {queueItem.estimatedTimeRemaining < 60
+                                ? `${queueItem.estimatedTimeRemaining} seconds remaining`
+                                : `${Math.ceil(queueItem.estimatedTimeRemaining / 60)} minutes remaining`}
+                            </span>
+                          )}
+                          {queueItem.processingStatus === 'processing' && (
+                            <span className="text-xs text-text-secondary">
+                              This may take 1-2 minutes
+                            </span>
+                          )}
+                        </div>
+                      </>
                     ) : queueItem.error ? (
                       <span className="text-xs text-error flex items-center gap-1">
                         <AlertCircle size={14} />
