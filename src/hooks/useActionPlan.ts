@@ -94,8 +94,9 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
       setActions([])
       setConversationHistory([])
 
-      // Invalidate the existing draft query to refetch
-      queryClient.invalidateQueries({ queryKey: ['action-plan-draft', assessmentRunId] })
+      // Invalidate and refetch the existing draft query
+      await queryClient.invalidateQueries({ queryKey: ['action-plan-draft', assessmentRunId] })
+      await queryClient.refetchQueries({ queryKey: ['action-plan-draft', assessmentRunId] })
 
       // Get the database user ID from the users table
       let dbUserId: number | undefined

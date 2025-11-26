@@ -44,13 +44,14 @@ export default function ActionPlanDraftWorkspace({
   const [hasAttemptedGeneration, setHasAttemptedGeneration] = useState(false)
   const chatEndRef = useRef<HTMLDivElement>(null)
 
-  // Generate action plan on mount only if no existing draft
+  // Generate action plan on mount
+  // The generateActionPlan function handles cancelling existing drafts automatically
   useEffect(() => {
-    if (!isLoadingDraft && !existingDraft && !hasAttemptedGeneration) {
+    if (!isLoadingDraft && !hasAttemptedGeneration) {
       generateActionPlan()
       setHasAttemptedGeneration(true)
     }
-  }, [isLoadingDraft, existingDraft, hasAttemptedGeneration, generateActionPlan])
+  }, [isLoadingDraft, hasAttemptedGeneration, generateActionPlan])
 
   // Auto-save every 30 seconds
   useEffect(() => {
