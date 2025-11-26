@@ -275,14 +275,14 @@ export default function UploadDocumentsModal({
       const responseData = await response.json()
       console.log('📥 N8N Response:', responseData)
 
-      // Poll document_embeddings table for processing status
+      // Poll document_chunks table for processing status
       const pollInterval = setInterval(async () => {
         try {
           // Check if embeddings have been created for this file
           const { data: embeddings, error: pollError } = await supabase
-            .from('document_embeddings')
-            .select('id, chunk_index')
-            .eq('file_id', fileRecord.id)
+            .from('document_chunks')
+            .select('id, chunkIndex')
+            .eq('fileId', fileRecord.id)
 
           if (pollError) {
             console.error('Poll error:', pollError)
