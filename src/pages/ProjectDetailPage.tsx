@@ -38,6 +38,7 @@ export default function ProjectDetailPage() {
   const [selectedActionId, setSelectedActionId] = useState<number | null>(null)
   const [openActionPlanWorkspace, setOpenActionPlanWorkspace] = useState(false)
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const {
     data: projectData,
@@ -134,12 +135,16 @@ export default function ProjectDetailPage() {
     refetch: refetchActions,
   } = useActions({ projectId: parseInt(id!) })
 
-  // Cleanup polling interval on unmount
+  // Cleanup polling interval and abort controller on unmount
   useEffect(() => {
     return () => {
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current)
         pollIntervalRef.current = null
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+        abortControllerRef.current = null
       }
     }
   }, [])
@@ -259,11 +264,19 @@ export default function ProjectDetailPage() {
         }
       }
 
-      // Clear any existing polling interval
+      // Clear any existing polling interval and abort controller
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current)
         pollIntervalRef.current = null
       }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+        abortControllerRef.current = null
+      }
+
+      // Create new AbortController for this assessment run
+      abortControllerRef.current = new AbortController()
+      const signal = abortControllerRef.current.signal
 
       // Poll for completion - check every 3 seconds for up to 10 minutes (for 50 criteria)
       let pollCount = 0
@@ -272,84 +285,118 @@ export default function ProjectDetailPage() {
       pollIntervalRef.current = setInterval(async () => {
         pollCount++
 
-        // Count how many assessments have been completed for this project
-        const { count: completedCount } = await supabase
-          .from('assessments')
-          .select('*', { count: 'exact', head: true })
-          .eq('project_id', id!)
-
-        const completed = completedCount || 0
-
-        console.log(`📊 Poll ${pollCount}: ${completed}/${total} assessments completed`)
-
-        // Update progress
-        setAssessmentProgress({ current: completed, total })
-
-        // Update toast with progress and more descriptive messaging
-        const percentage = Math.round((completed / total) * 100)
-        let statusMessage = 'Analyzing documents against criteria...'
-        if (percentage > 0 && percentage < 25) {
-          statusMessage = 'Starting assessment...'
-        } else if (percentage >= 25 && percentage < 75) {
-          statusMessage = 'Analyzing criteria...'
-        } else if (percentage >= 75 && percentage < 100) {
-          statusMessage = 'Finalizing assessment...'
-        }
-
-        setToast({
-          message: `${statusMessage} ${completed} of ${total} (${percentage}%)`,
-          type: 'loading'
-        })
-
-        // Check project status
-        const { data: updatedProject } = await supabase
-          .from('projects')
-          .select('status')
-          .eq('id', id!)
-          .single()
-
-        console.log(`🔍 Project status: ${updatedProject?.status}, All complete: ${completed >= total}`)
-
-        // Check if completed (either status is 'completed', all criteria done, or timed out)
-        const allCriteriaComplete = completed >= total
-        if (updatedProject?.status === 'completed' || allCriteriaComplete || pollCount >= maxPolls) {
-          console.log('✅ Assessment complete! Stopping polling...')
-          if (pollIntervalRef.current) {
-            clearInterval(pollIntervalRef.current)
-            pollIntervalRef.current = null
-          }
-          setRunningAssessment(false)
-          setAssessmentProgress(null)
-
-          // Update project status to completed if still processing
-          if (updatedProject?.status === 'processing') {
-            const { error: updateError } = await supabase
-              .from('projects')
-              .update({ status: 'completed', updated_at: new Date().toISOString() })
-              .eq('id', id!)
-
-            if (updateError) {
-              console.error('Failed to update project status:', updateError)
-            } else {
-              console.log('✅ Project status updated to completed')
+        try {
+          // Check if aborted
+          if (signal.aborted) {
+            console.log('⏹️ Polling aborted')
+            if (pollIntervalRef.current) {
+              clearInterval(pollIntervalRef.current)
+              pollIntervalRef.current = null
             }
+            return
           }
 
-          // Refetch all data to show results
-          await refetch()
+          // Count how many assessments have been completed for this project
+          const { count: completedCount } = await supabase
+            .from('assessments')
+            .select('*', { count: 'exact', head: true })
+            .eq('project_id', id!)
+            .abortSignal(signal)
+
+          const completed = completedCount || 0
+
+          console.log(`📊 Poll ${pollCount}: ${completed}/${total} assessments completed`)
+
+          // Update progress
+          setAssessmentProgress({ current: completed, total })
+
+          // Update toast with progress and more descriptive messaging
+          const percentage = Math.round((completed / total) * 100)
+          let statusMessage = 'Analyzing documents against criteria...'
+          if (percentage > 0 && percentage < 25) {
+            statusMessage = 'Starting assessment...'
+          } else if (percentage >= 25 && percentage < 75) {
+            statusMessage = 'Analyzing criteria...'
+          } else if (percentage >= 75 && percentage < 100) {
+            statusMessage = 'Finalizing assessment...'
+          }
 
           setToast({
-            message: `Assessment completed! ${completed} criteria assessed.`,
-            type: 'success'
+            message: `${statusMessage} ${completed} of ${total} (${percentage}%)`,
+            type: 'loading'
           })
+
+          // Check project status
+          const { data: updatedProject } = await supabase
+            .from('projects')
+            .select('status')
+            .eq('id', id!)
+            .abortSignal(signal)
+            .single()
+
+          console.log(`🔍 Project status: ${updatedProject?.status}, All complete: ${completed >= total}`)
+
+          // Check if completed (either status is 'completed', all criteria done, or timed out)
+          const allCriteriaComplete = completed >= total
+          if (updatedProject?.status === 'completed' || allCriteriaComplete || pollCount >= maxPolls) {
+            console.log('✅ Assessment complete! Stopping polling...')
+
+            // Clear interval and abort controller
+            if (pollIntervalRef.current) {
+              clearInterval(pollIntervalRef.current)
+              pollIntervalRef.current = null
+            }
+            if (abortControllerRef.current) {
+              abortControllerRef.current.abort()
+              abortControllerRef.current = null
+            }
+
+            setRunningAssessment(false)
+            setAssessmentProgress(null)
+
+            // Update project status to completed if still processing
+            if (updatedProject?.status === 'processing') {
+              const { error: updateError } = await supabase
+                .from('projects')
+                .update({ status: 'completed', updated_at: new Date().toISOString() })
+                .eq('id', id!)
+
+              if (updateError) {
+                console.error('Failed to update project status:', updateError)
+              } else {
+                console.log('✅ Project status updated to completed')
+              }
+            }
+
+            // Refetch all data to show results
+            await refetch()
+
+            setToast({
+              message: `Assessment completed! ${completed} criteria assessed.`,
+              type: 'success'
+            })
+          }
+        } catch (error: any) {
+          // Ignore abort errors
+          if (error.name === 'AbortError') {
+            console.log('⏹️ Request aborted')
+            return
+          }
+
+          // Log other errors but continue polling
+          console.error('Polling error:', error)
         }
       }, 3000) // Poll every 3 seconds
 
     } catch (err: any) {
-      // Clean up polling interval on error
+      // Clean up polling interval and abort controller on error
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current)
         pollIntervalRef.current = null
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+        abortControllerRef.current = null
       }
       setAssessmentError(err.message || 'Failed to run assessment')
       setRunningAssessment(false)
