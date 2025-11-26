@@ -21,10 +21,10 @@ export default function OverallRatingCard({
 }: OverallRatingCardProps) {
   const getRagBadge = (rating: string) => {
     const badges = {
-      green: 'bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30',
-      amber: 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/30',
-      red: 'bg-gradient-to-br from-red-500 to-rose-600 text-white shadow-lg shadow-red-500/30',
-      pending: 'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-700 shadow-lg',
+      green: 'bg-emerald-500 text-white shadow-lg min-w-[140px]',
+      amber: 'bg-amber-500 text-white shadow-lg min-w-[140px]',
+      red: 'bg-red-500 text-white shadow-lg min-w-[140px]',
+      pending: 'bg-slate-300 text-slate-700 shadow-lg min-w-[140px]',
     }
     return badges[rating as keyof typeof badges] || badges.pending
   }
@@ -43,18 +43,12 @@ export default function OverallRatingCard({
           <div className="flex items-center gap-6">
             <span
               className={cn(
-                'px-8 py-4 rounded-2xl font-bold text-3xl',
+                'px-8 py-4 rounded-2xl font-bold text-3xl text-center inline-flex items-center justify-center',
                 getRagBadge(overallRating)
               )}
             >
               {getRagLabel(overallRating)}
             </span>
-            <div>
-              <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                {readinessPercentage}%
-              </div>
-              <div className="text-sm text-slate-600 font-medium mt-1">Ready</div>
-            </div>
           </div>
         </div>
         <div className="text-right bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl px-6 py-4 border border-blue-100">
