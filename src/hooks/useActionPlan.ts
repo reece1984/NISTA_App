@@ -169,10 +169,12 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
 
   // Refine action plan mutation
   const refineMutation = useMutation({
-    mutationFn: async (userMessage: string) => {
+    mutationFn: async (params: { userMessage: string; contextualMessage?: string }) => {
       if (!draftId) throw new Error('No draft ID available')
 
-      // Add user message to history immediately for UI feedback
+      const { userMessage, contextualMessage } = params
+
+      // Add user message to history immediately for UI feedback (use original message, not contextual)
       setConversationHistory(prev => [
         ...prev,
         { role: 'user', content: userMessage }
@@ -183,8 +185,11 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
         { role: 'user' as const, content: userMessage }
       ]
 
+      // Send contextual message to N8N if provided, otherwise use original
+      const messageToSend = contextualMessage || userMessage
+
       // Trigger N8N workflow
-      const response = await n8nApi.refineActionPlan(draftId, userMessage, newConversation)
+      const response = await n8nApi.refineActionPlan(draftId, messageToSend, newConversation)
       console.log('N8N refine response:', response)
 
       // Poll for updated draft (N8N updates asynchronously)

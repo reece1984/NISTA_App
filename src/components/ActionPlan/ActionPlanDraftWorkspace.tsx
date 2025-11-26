@@ -73,7 +73,17 @@ export default function ActionPlanDraftWorkspace({
     if (!userMessage.trim() || isRefining) return
 
     try {
-      await refineActionPlan(userMessage)
+      // Add context about current actions to help AI identify specific actions by number
+      const actionsList = actions.map((action, idx) =>
+        `${idx + 1}. ${action.title}`
+      ).join('\n')
+
+      const contextualMessage = `Current actions:\n${actionsList}\n\nUser request: ${userMessage}`
+
+      await refineActionPlan({
+        userMessage: userMessage, // Original message for conversation history
+        contextualMessage: contextualMessage // Enhanced message for AI processing
+      })
       setUserMessage('')
     } catch (err) {
       console.error('Failed to refine action plan:', err)
