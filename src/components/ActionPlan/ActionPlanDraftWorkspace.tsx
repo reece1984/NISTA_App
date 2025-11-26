@@ -120,7 +120,7 @@ export default function ActionPlanDraftWorkspace({
     <Modal
       isOpen={true}
       onClose={onClose}
-      title={`Draft Action Plan - Assessment Run #${assessmentRunId}`}
+      title="Draft Action Plan"
       size="xl"
     >
       <div className="flex flex-col h-[80vh]">
