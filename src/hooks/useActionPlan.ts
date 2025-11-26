@@ -78,6 +78,25 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
       setIsGenerating(true)
       setGenerationProgress({ current: 0, total: 100 })
 
+      // Cancel any existing drafts for this assessment run
+      const { error: cancelError } = await supabase
+        .from('action_plan_drafts')
+        .update({ draft_status: 'cancelled' })
+        .eq('assessment_run_id', assessmentRunId)
+        .eq('draft_status', 'editing')
+
+      if (cancelError) {
+        console.warn('Failed to cancel existing drafts:', cancelError)
+      }
+
+      // Clear local state
+      setDraftId(null)
+      setActions([])
+      setConversationHistory([])
+
+      // Invalidate the existing draft query to refetch
+      queryClient.invalidateQueries({ queryKey: ['action-plan-draft', assessmentRunId] })
+
       // Get the database user ID from the users table
       let dbUserId: number | undefined
       if (user?.id) {
