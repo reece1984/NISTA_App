@@ -183,18 +183,66 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
         { role: 'user' as const, content: userMessage }
       ]
 
-      return n8nApi.refineActionPlan(draftId, userMessage, newConversation)
+      // Trigger N8N workflow
+      const response = await n8nApi.refineActionPlan(draftId, userMessage, newConversation)
+      console.log('N8N refine response:', response)
+
+      // Poll for updated draft (N8N updates asynchronously)
+      let pollCount = 0
+      const maxPolls = 30 // 30 polls × 1 second = 30 seconds max
+
+      return new Promise((resolve, reject) => {
+        const pollInterval = setInterval(async () => {
+          pollCount++
+
+          // Check if draft has been updated
+          const { data: updatedDraft } = await supabase
+            .from('action_plan_drafts')
+            .select('*')
+            .eq('id', draftId)
+            .single()
+
+          // Check if the conversation history has been updated (indicating N8N processed the request)
+          const historyLength = updatedDraft?.conversation_history?.length || 0
+          const expectedLength = newConversation.length + 1 // +1 for AI response
+
+          if (historyLength >= expectedLength || pollCount >= maxPolls) {
+            clearInterval(pollInterval)
+
+            if (updatedDraft) {
+              // Transform and update actions
+              if (updatedDraft.draft_data?.proposedActions) {
+                const transformedActions = updatedDraft.draft_data.proposedActions.map((action: any) => ({
+                  title: action.title,
+                  description: action.description,
+                  priority: action.priority,
+                  suggestedDueDate: action.suggested_due_date || action.suggestedDueDate,
+                  linkedAssessmentIds: action.linked_assessment_ids || action.linkedAssessmentIds || [],
+                  criteriaCategory: action.criteria_category || action.criteriaCategory,
+                  assignedTo: action.assigned_to || action.assignedTo
+                }))
+                setActions(transformedActions)
+              }
+
+              // Update conversation history
+              if (updatedDraft.conversation_history) {
+                setConversationHistory(updatedDraft.conversation_history)
+              }
+
+              resolve({
+                aiResponse: updatedDraft.conversation_history?.[updatedDraft.conversation_history.length - 1]?.content || 'Action plan has been updated.',
+                ...response
+              })
+            } else {
+              resolve(response)
+            }
+          }
+        }, 1000) // Poll every second
+      })
     },
     onSuccess: (data) => {
-      // Try both refinedActions and proposedActions (N8N might use either)
-      const newActions = data.refinedActions || data.proposedActions || actions
-      setActions(newActions)
-
-      // Only add AI response (user message already added in mutationFn)
-      setConversationHistory(prev => [
-        ...prev,
-        { role: 'assistant', content: data.aiResponse || 'Action plan has been updated.' }
-      ])
+      // Conversation history and actions are already updated in mutationFn via polling
+      console.log('Refinement complete:', data)
     },
     onError: (error) => {
       console.error('Failed to refine action plan:', error)
