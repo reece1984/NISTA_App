@@ -281,7 +281,7 @@ export default function UploadDocumentsModal({
           // Check if embeddings have been created for this file
           const { data: embeddings, error: pollError } = await supabase
             .from('document_embeddings')
-            .select('id, chunk_index')
+            .select('id')
             .eq('file_id', fileRecord.id)
 
           if (pollError) {
