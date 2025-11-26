@@ -51,9 +51,12 @@ interface AssessmentResultsProps {
   projectSummary?: ProjectSummary | null
   projectData?: any
   assessmentRunId?: number
-  viewMode?: 'full' | 'summary' | 'detail' // Control which parts to render
+  viewMode?: 'full' | 'summary' | 'detail' | 'dashboard' // Control which parts to render
   openActionPlanWorkspace?: boolean // External control to open the action plan workspace
   onActionPlanWorkspaceClose?: () => void // Callback when workspace is closed
+  onViewActionsClick?: () => void // Callback to navigate to actions tab
+  onRerunAssessment?: () => void // Callback to rerun assessment
+  isRunningAssessment?: boolean // Is assessment currently running
 }
 
 export default function AssessmentResults({
@@ -64,6 +67,7 @@ export default function AssessmentResults({
   viewMode = 'full', // Default to full view for backwards compatibility
   openActionPlanWorkspace = false,
   onActionPlanWorkspaceClose,
+  onViewActionsClick,
 }: AssessmentResultsProps) {
   const [filter, setFilter] = useState<'all' | 'green' | 'amber' | 'red'>('all')
   const [expandedId, setExpandedId] = useState<number | null>(null)
@@ -1227,6 +1231,7 @@ export default function AssessmentResults({
   // Determine what to show based on viewMode
   const showSummary = viewMode === 'full' || viewMode === 'summary'
   const showDetail = viewMode === 'full' || viewMode === 'detail'
+  const showDashboard = viewMode === 'dashboard'
 
   return (
     <div>
@@ -1250,30 +1255,14 @@ export default function AssessmentResults({
             <div className="flex gap-2">
               <button
                 onClick={() => {
-                  if (createdActions) {
-                    setShowActionsView(true)
-                  } else {
-                    setShowActionPlanWorkspace(true)
+                  if (onViewActionsClick) {
+                    onViewActionsClick()
                   }
                 }}
                 className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl hover:shadow-lg shadow-blue-500/30 transition-all font-semibold"
               >
-                {createdActions ? (
-                  <>
-                    <ClipboardList size={18} />
-                    View Actions
-                  </>
-                ) : existingDraft ? (
-                  <>
-                    <ClipboardList size={18} />
-                    View Draft
-                  </>
-                ) : (
-                  <>
-                    <Sparkles size={18} />
-                    Generate Action Plan
-                  </>
-                )}
+                <ClipboardList size={18} />
+                Action Plan
               </button>
               <button
                 onClick={exportToExcel}
@@ -1311,8 +1300,8 @@ export default function AssessmentResults({
         </div>
       )}
 
-      {/* Dashboard Statistics - Charts and Priority Actions - Show in summary and full view */}
-      {showSummary && totalAssessments > 0 && (
+      {/* Dashboard Statistics - Charts and Priority Actions - Show in dashboard view */}
+      {showDashboard && totalAssessments > 0 && (
         <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
           <RAGDonutChart
             ragCounts={ragCounts}

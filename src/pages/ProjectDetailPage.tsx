@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye, Upload, LayoutGrid, FileText, BarChart3, Target, Activity, Sparkles, FileBarChart, List, Kanban, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Play, Trash2, Loader2, ClipboardList, Eye, Upload, LayoutGrid, FileText, BarChart3, Target, Activity, Sparkles, FileBarChart, RefreshCw } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import Button from '../components/ui/Button'
@@ -16,11 +16,10 @@ import UploadDocumentsModal from '../components/UploadDocumentsModal'
 import { useDocuments } from '../hooks/useDocuments'
 import { useActions } from '../hooks/useActions'
 import { n8nApi } from '../services/n8nApi'
-import ActionKanbanBoard from '../components/ActionPlan/ActionKanbanBoard'
 import ActionTableView from '../components/ActionPlan/ActionTableView'
 import ActionDetailModal from '../components/ActionPlan/ActionDetailModal'
 
-type TabType = 'overview' | 'documents' | 'assessment-summary' | 'assessment-detail' | 'actions'
+type TabType = 'overview' | 'documents' | 'assessment-summary' | 'dashboard' | 'assessment-detail' | 'actions'
 
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -36,7 +35,6 @@ export default function ProjectDetailPage() {
   const [assessmentError, setAssessmentError] = useState('')
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null)
   const [assessmentProgress, setAssessmentProgress] = useState<{ current: number; total: number } | null>(null)
-  const [actionView, setActionView] = useState<'kanban' | 'table'>('kanban')
   const [selectedActionId, setSelectedActionId] = useState<number | null>(null)
   const [openActionPlanWorkspace, setOpenActionPlanWorkspace] = useState(false)
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -436,6 +434,7 @@ export default function ProjectDetailPage() {
     { id: 'overview' as TabType, label: 'Overview', icon: LayoutGrid },
     { id: 'documents' as TabType, label: 'Documents', icon: FileText, badge: documents.length },
     { id: 'assessment-summary' as TabType, label: 'Assessment Summary', icon: BarChart3, badge: hasAssessments ? projectData.assessments.length : undefined },
+    { id: 'dashboard' as TabType, label: 'Dashboard', icon: Activity, badge: hasAssessments ? projectData.assessments.length : undefined },
     { id: 'assessment-detail' as TabType, label: 'Assessment Detail', icon: FileBarChart, badge: hasAssessments ? projectData.assessments.length : undefined },
     { id: 'actions' as TabType, label: 'Actions', icon: Target, badge: actions.length > 0 ? actions.length : undefined },
   ]
@@ -858,6 +857,46 @@ export default function ProjectDetailPage() {
             </div>
           )}
 
+          {/* Dashboard Tab */}
+          {activeTab === 'dashboard' && (
+            <div className="p-8">
+              {hasAssessments ? (
+                <div>
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-bold text-text-primary mb-2">
+                      Assessment Dashboard
+                    </h2>
+                    <p className="text-text-secondary">
+                      Visual breakdown of assessment results and key metrics
+                    </p>
+                  </div>
+                  <AssessmentResults
+                    assessments={projectData.assessments}
+                    projectSummary={projectData.projectSummary}
+                    projectData={projectData}
+                    assessmentRunId={projectData.assessmentRunId}
+                    viewMode="dashboard"
+                    onViewActionsClick={() => setActiveTab('actions')}
+                    openActionPlanWorkspace={openActionPlanWorkspace}
+                    onActionPlanWorkspaceClose={() => setOpenActionPlanWorkspace(false)}
+                  />
+                </div>
+              ) : (
+                <div className="text-center py-16 bg-card rounded-xl border-2 border-dashed border-border">
+                  <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Activity className="text-accent" size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-text-primary mb-2">
+                    No Dashboard Data Yet
+                  </h3>
+                  <p className="text-text-secondary max-w-md mx-auto">
+                    Upload documents and run an assessment to see dashboard visualizations here
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Assessment Detail Tab */}
           {activeTab === 'assessment-detail' && (
             <div className="p-8">
@@ -918,30 +957,6 @@ export default function ProjectDetailPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                        <button
-                          onClick={() => setActionView('kanban')}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-all ${
-                            actionView === 'kanban'
-                              ? 'bg-white text-text-primary shadow-sm'
-                              : 'text-text-secondary hover:text-text-primary'
-                          }`}
-                        >
-                          <Kanban size={16} />
-                          Kanban
-                        </button>
-                        <button
-                          onClick={() => setActionView('table')}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-all ${
-                            actionView === 'table'
-                              ? 'bg-white text-text-primary shadow-sm'
-                              : 'text-text-secondary hover:text-text-primary'
-                          }`}
-                        >
-                          <List size={16} />
-                          Table
-                        </button>
-                      </div>
                       <button
                         onClick={() => {
                           setActiveTab('assessment-summary')
@@ -964,18 +979,11 @@ export default function ProjectDetailPage() {
                     </div>
                   </div>
 
-                  {/* Action Views */}
-                  {actionView === 'kanban' ? (
-                    <ActionKanbanBoard
-                      projectId={parseInt(id!)}
-                      onActionClick={setSelectedActionId}
-                    />
-                  ) : (
-                    <ActionTableView
-                      projectId={parseInt(id!)}
-                      onActionClick={setSelectedActionId}
-                    />
-                  )}
+                  {/* Action Table View */}
+                  <ActionTableView
+                    projectId={parseInt(id!)}
+                    onActionClick={setSelectedActionId}
+                  />
                 </div>
               ) : hasAssessments ? (
                 <div className="text-center py-20 bg-card rounded-xl border-2 border-dashed border-border">

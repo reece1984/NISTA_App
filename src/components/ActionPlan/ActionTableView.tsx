@@ -260,9 +260,6 @@ export default function ActionTableView({ projectId, onActionClick }: ActionTabl
                   <SortIcon field="dueDate" />
                 </button>
               </th>
-              <th className="px-4 py-3 text-left w-32">
-                <span className="font-semibold text-sm text-gray-700">Finding Links</span>
-              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -306,9 +303,6 @@ export default function ActionTableView({ projectId, onActionClick }: ActionTabl
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-700">
                   {action.dueDate ? format(parseISO(action.dueDate), 'MMM d, yyyy') : '-'}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-500">
-                  {action.linkedFindings?.length || 0}
                 </td>
               </tr>
             ))}
