@@ -232,29 +232,31 @@ export default function AssessmentCriteriaPage() {
 
             {/* PDF Reference Card */}
             <div className="mb-8 bg-gradient-to-br from-slate-700 to-slate-900 rounded-lg p-6 text-white">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center">
-                    <FileText size={24} className="text-white" />
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex items-start gap-4 flex-1">
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center">
+                      <FileText size={24} className="text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold mb-2">
+                      IPA {gateName} Review Workbook
+                    </h2>
+                    <p className="text-white/70 text-sm">
+                      Official guidance document containing detailed evidence requirements for each criterion
+                    </p>
                   </div>
                 </div>
-                <div className="flex-1">
-                  <h2 className="text-xl font-bold mb-1">
-                    IPA {gateName} Review Workbook
-                  </h2>
-                  <p className="text-white/70 text-sm mb-4">
-                    Official guidance document containing detailed evidence requirements for each criterion
-                  </p>
-                  <a
-                    href={pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-white text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-white/90 transition-colors"
-                  >
-                    View PDF
-                    <ExternalLink size={14} />
-                  </a>
-                </div>
+                <a
+                  href={pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-white text-slate-900 px-4 py-2 rounded font-semibold text-sm hover:bg-white/90 transition-colors flex-shrink-0"
+                >
+                  View PDF
+                  <ExternalLink size={14} />
+                </a>
               </div>
 
               {/* Stats Row */}
@@ -307,7 +309,7 @@ export default function AssessmentCriteriaPage() {
                         {/* Colored accent bar */}
                         <div className={`w-1.5 h-10 rounded-full ${categoryColor}`}></div>
 
-                        <div className="flex items-center gap-3 flex-1">
+                        <div className="flex flex-col gap-1 flex-1">
                           <h3 className="text-lg font-bold text-text-primary">
                             {group.category}
                           </h3>
@@ -383,10 +385,10 @@ export default function AssessmentCriteriaPage() {
                                 href={`${pdfUrl}#page=${pageRef}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium flex-shrink-0 transition-colors"
+                                className="flex items-center gap-0.5 text-xs text-blue-600 hover:text-blue-800 hover:underline flex-shrink-0 transition-colors"
                               >
                                 p.{pageRef}
-                                <ExternalLink size={14} />
+                                <ExternalLink size={12} />
                               </a>
                             </div>
                           )
