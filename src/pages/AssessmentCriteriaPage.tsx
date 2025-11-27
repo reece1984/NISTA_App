@@ -492,7 +492,7 @@ export default function AssessmentCriteriaPage() {
             )}
 
             {/* Statistics Panel */}
-            <div className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="mb-8 grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="card">
                 <div className="text-3xl font-bold text-text-primary">{stats.total}</div>
                 <div className="text-sm text-text-accent">Total Criteria</div>
@@ -504,10 +504,6 @@ export default function AssessmentCriteriaPage() {
               <div className="card">
                 <div className="text-3xl font-bold text-text-primary">{Object.keys(stats.dimensionCounts).length}</div>
                 <div className="text-sm text-text-accent">Dimensions</div>
-              </div>
-              <div className="card">
-                <div className="text-3xl font-bold text-text-primary">{stats.averageWeight}%</div>
-                <div className="text-sm text-text-accent">Avg Weight</div>
               </div>
             </div>
 
@@ -550,11 +546,6 @@ export default function AssessmentCriteriaPage() {
                                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold bg-rag-red/10 text-rag-red border border-rag-red/30">
                                   <AlertCircle size={12} />
                                   CRITICAL
-                                </span>
-                              )}
-                              {criterion.weight !== null && (
-                                <span className="text-xs font-medium text-text-accent bg-gray-100 px-2 py-1 rounded">
-                                  Weight: {criterion.weight}%
                                 </span>
                               )}
                             </div>
