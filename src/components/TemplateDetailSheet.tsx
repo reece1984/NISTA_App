@@ -203,11 +203,6 @@ export default function TemplateDetailSheet({
                                 </span>
                               )}
                             </div>
-                            {criterion.weight !== null && (
-                              <span className="text-xs font-medium text-text-secondary bg-gray-100 px-2 py-1 rounded flex-shrink-0">
-                                Weight: {criterion.weight}%
-                              </span>
-                            )}
                           </div>
 
                           {/* Description */}
