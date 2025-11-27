@@ -192,7 +192,7 @@ export default function AssessmentCriteriaPage() {
                   to="/dashboard"
                   className="text-sm text-white/85 hover:text-white transition-colors"
                 >
-                  Dashboard
+                  Projects
                 </Link>
                 <Link
                   to="/criteria"
