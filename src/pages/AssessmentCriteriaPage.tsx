@@ -1,26 +1,17 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronDown, ChevronUp, LogOut, FileText, ExternalLink, Info } from 'lucide-react'
+import { ChevronDown, ChevronUp, LogOut, FileText, ExternalLink } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase, type AssessmentTemplate } from '../lib/supabase'
 
-// Category colors
+// Category colors - matching the screenshot
 const CATEGORY_COLORS: Record<string, string> = {
-  Strategic: 'border-blue-500',
-  Governance: 'border-purple-500',
-  Economic: 'border-green-500',
-  Commercial: 'border-orange-500',
-  Financial: 'border-yellow-500',
-  Management: 'border-pink-500',
-}
-
-const CATEGORY_TEXT_COLORS: Record<string, string> = {
-  Strategic: 'text-blue-600',
-  Governance: 'text-purple-600',
-  Economic: 'text-green-600',
-  Commercial: 'text-orange-600',
-  Financial: 'text-yellow-600',
-  Management: 'text-pink-600',
+  Strategic: 'bg-blue-500',
+  Governance: 'bg-purple-500',
+  Economic: 'bg-green-500',
+  Commercial: 'bg-orange-500',
+  Financial: 'bg-yellow-500',
+  Management: 'bg-pink-500',
 }
 
 interface AssessmentCriterion {
@@ -96,9 +87,10 @@ export default function AssessmentCriteriaPage() {
       if (criteriaError) throw criteriaError
       setCriteria(criteriaData || [])
 
-      // Expand first category by default
+      // Expand all categories by default
       if (criteriaData && criteriaData.length > 0) {
-        setExpandedCategories(new Set([criteriaData[0].dimension]))
+        const allCategories = new Set(criteriaData.map(c => c.dimension))
+        setExpandedCategories(allCategories)
       }
     } catch (error) {
       console.error('Error fetching criteria:', error)
@@ -150,10 +142,10 @@ export default function AssessmentCriteriaPage() {
   // Mock stats - in real app these would come from assessment_runs data
   const stats = {
     total: criteria.length,
-    assessed: 0,
-    green: 0,
-    amber: 0,
-    red: 0,
+    assessed: 4,
+    green: 2,
+    amber: 1,
+    red: 1,
   }
 
   const pdfUrl = `/documents/IPA_Gate_Review_Process_-_Gate_${gateNumber}.pdf`
@@ -227,8 +219,8 @@ export default function AssessmentCriteriaPage() {
                       onClick={() => setSelectedTemplateId(template.id)}
                       className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
                         selectedTemplateId === template.id
-                          ? 'bg-accent text-white shadow-md'
-                          : 'bg-white text-text-accent hover:bg-gray-100 border border-border'
+                          ? 'bg-slate-800 text-white shadow-md'
+                          : 'bg-white text-text-accent hover:bg-gray-100 border border-gray-300'
                       }`}
                     >
                       G{gateNum}
@@ -239,8 +231,8 @@ export default function AssessmentCriteriaPage() {
             </div>
 
             {/* PDF Reference Card */}
-            <div className="mb-8 bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl p-6 text-white shadow-lg">
-              <div className="flex items-start gap-4">
+            <div className="mb-8 bg-gradient-to-br from-slate-700 to-slate-900 rounded-lg p-6 text-white">
+              <div className="flex items-start gap-4 mb-6">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center">
                     <FileText size={24} className="text-white" />
@@ -259,50 +251,53 @@ export default function AssessmentCriteriaPage() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-white text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-white/90 transition-colors"
                   >
-                    <FileText size={16} />
                     View PDF
                     <ExternalLink size={14} />
                   </a>
                 </div>
+              </div>
 
-                {/* Stats Row */}
-                <div className="hidden md:flex items-center gap-6 ml-auto">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">{stats.total}</div>
-                    <div className="text-xs text-white/60">Total</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">{stats.assessed}</div>
-                    <div className="text-xs text-white/60">Assessed</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 rounded-full bg-rag-green"></div>
-                      <span className="text-sm font-semibold">{stats.green}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 rounded-full bg-rag-amber"></div>
-                      <span className="text-sm font-semibold">{stats.amber}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 rounded-full bg-rag-red"></div>
-                      <span className="text-sm font-semibold">{stats.red}</span>
-                    </div>
-                  </div>
+              {/* Stats Row */}
+              <div className="flex items-center gap-8 pt-4 border-t border-white/20">
+                <div>
+                  <div className="text-3xl font-bold">{stats.total}</div>
+                  <div className="text-sm text-white/60">Total Criteria</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold">{stats.assessed}</div>
+                  <div className="text-sm text-white/60">Assessed</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-green-400">{stats.green}</div>
+                  <div className="text-sm text-white/60">Green Rating</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-amber-400">{stats.amber}</div>
+                  <div className="text-sm text-white/60">Amber Rating</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-red-400">{stats.red}</div>
+                  <div className="text-sm text-white/60">Red Rating</div>
                 </div>
               </div>
             </div>
 
             {/* Category Accordion */}
-            <div className="space-y-3">
+            <div className="space-y-4">
               {groupedCriteria.map((group) => {
                 const isExpanded = expandedCategories.has(group.category)
-                const categoryColor = CATEGORY_COLORS[group.category] || 'border-gray-500'
-                const categoryTextColor = CATEGORY_TEXT_COLORS[group.category] || 'text-gray-600'
-                const assessedCount = 0 // Mock - would come from real data
+                const categoryColor = CATEGORY_COLORS[group.category] || 'bg-gray-500'
+                const assessedCount = 2 // Mock - would come from real data
+
+                // Mock RAG status for display
+                const ragStatuses = group.criteria.map((_, idx) => {
+                  if (idx < 2) return 'green'
+                  if (idx < 3) return 'amber'
+                  return 'gray'
+                })
 
                 return (
-                  <div key={group.category} className="bg-white rounded-lg shadow-sm overflow-hidden border border-border">
+                  <div key={group.category} className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
                     {/* Category Header */}
                     <button
                       onClick={() => toggleCategory(group.category)}
@@ -310,54 +305,58 @@ export default function AssessmentCriteriaPage() {
                     >
                       <div className="flex items-center gap-4 flex-1">
                         {/* Colored accent bar */}
-                        <div className={`w-1 h-12 rounded-full ${categoryColor}`}></div>
+                        <div className={`w-1.5 h-10 rounded-full ${categoryColor}`}></div>
 
                         <div className="flex items-center gap-3 flex-1">
-                          <h3 className={`text-lg font-bold ${categoryTextColor}`}>
+                          <h3 className="text-lg font-bold text-text-primary">
                             {group.category}
                           </h3>
-                          <span className="text-sm text-text-accent">
+                          <span className="text-sm text-gray-500">
                             {assessedCount} of {group.criteria.length} criteria assessed
                           </span>
                         </div>
 
-                        {/* Mini RAG dots - placeholder */}
-                        <div className="flex items-center gap-1">
-                          {group.criteria.slice(0, Math.min(5, group.criteria.length)).map((_, idx) => (
-                            <div key={idx} className="w-2 h-2 rounded-full bg-gray-300"></div>
+                        {/* Mini RAG dots */}
+                        <div className="flex items-center gap-1.5">
+                          {ragStatuses.map((status, idx) => (
+                            <div
+                              key={idx}
+                              className={`w-2.5 h-2.5 rounded-full ${
+                                status === 'green'
+                                  ? 'bg-green-500'
+                                  : status === 'amber'
+                                  ? 'bg-amber-500'
+                                  : 'bg-gray-300'
+                              }`}
+                            ></div>
                           ))}
-                          {group.criteria.length > 5 && (
-                            <span className="text-xs text-text-accent ml-1">+{group.criteria.length - 5}</span>
-                          )}
                         </div>
                       </div>
 
                       {/* Chevron */}
                       {isExpanded ? (
-                        <ChevronUp size={20} className="text-text-accent ml-4" />
+                        <ChevronUp size={20} className="text-gray-400 ml-4" />
                       ) : (
-                        <ChevronDown size={20} className="text-text-accent ml-4" />
+                        <ChevronDown size={20} className="text-gray-400 ml-4" />
                       )}
                     </button>
 
                     {/* Expanded Criteria Rows */}
                     {isExpanded && (
-                      <div className="border-t border-border">
-                        {group.criteria.map((criterion) => {
-                          const categoryTextColor = CATEGORY_TEXT_COLORS[group.category] || 'text-gray-600'
-                          const pageRef = criterion.page_ref || Math.floor(Math.random() * 50) + 1 // Mock page ref
-                          const status = 'Not Started' // Mock status
+                      <div className="border-t border-gray-200">
+                        {group.criteria.map((criterion, idx) => {
+                          const pageRef = criterion.page_ref || 15 + idx // Mock page ref
+                          // Mock status based on index
+                          const status = idx < 2 ? 'Assessed' : idx < 3 ? 'In Progress' : 'Not Started'
+                          const ragStatus = idx < 2 ? (idx === 0 ? 'green' : 'amber') : 'gray'
 
                           return (
                             <div
                               key={criterion.id}
-                              className="px-6 py-4 hover:bg-gray-50 transition-colors border-b border-border last:border-b-0 flex items-center gap-4"
+                              className="px-6 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 flex items-center gap-4"
                             >
-                              {/* Rating dot */}
-                              <div className="w-3 h-3 rounded-full bg-gray-300 flex-shrink-0"></div>
-
                               {/* Criterion ID */}
-                              <span className={`font-mono text-sm font-bold ${categoryTextColor} flex-shrink-0 min-w-[60px]`}>
+                              <span className="font-semibold text-sm text-text-primary flex-shrink-0 min-w-[50px]">
                                 {criterion.criterion_code}
                               </span>
 
@@ -368,12 +367,12 @@ export default function AssessmentCriteriaPage() {
 
                               {/* Status badge */}
                               <span
-                                className={`px-3 py-1 rounded-full text-xs font-semibold flex-shrink-0 ${
+                                className={`px-3 py-1 rounded text-xs font-semibold flex-shrink-0 ${
                                   status === 'Assessed'
-                                    ? 'bg-slate-700 text-white'
+                                    ? 'bg-slate-800 text-white'
                                     : status === 'In Progress'
-                                    ? 'bg-amber-100 text-amber-700 border border-amber-300'
-                                    : 'bg-gray-100 text-text-accent'
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : 'bg-gray-100 text-gray-600'
                                 }`}
                               >
                                 {status}
@@ -384,7 +383,7 @@ export default function AssessmentCriteriaPage() {
                                 href={`${pdfUrl}#page=${pageRef}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-1 text-sm text-accent hover:text-accent/80 font-medium flex-shrink-0 transition-colors"
+                                className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium flex-shrink-0 transition-colors"
                               >
                                 p.{pageRef}
                                 <ExternalLink size={14} />
@@ -397,14 +396,6 @@ export default function AssessmentCriteriaPage() {
                   </div>
                 )
               })}
-            </div>
-
-            {/* Help Tip */}
-            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
-              <Info size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-blue-900">
-                <strong>Need evidence details?</strong> Click the page reference (p.XX) next to any criterion to jump directly to the evidence requirements in the official IPA guidance document.
-              </p>
             </div>
           </>
         )}

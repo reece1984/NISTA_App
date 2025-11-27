@@ -34,7 +34,9 @@
       "Bash(node --input-type=module -e \"\nimport { createClient } from ''@supabase/supabase-js'';\n\nconst supabase = createClient(\n  ''https://yondkevazznqclmrkidl.supabase.co'',\n  ''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvbmRrZXZhenpucWNsbXJraWRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MTIwODIsImV4cCI6MjA3NzM4ODA4Mn0.is59rcyg1sHFOHX3nen-NF8x9aCKUajb-2MacYUuMW4''\n);\n\nconst sql = \\`\nALTER TABLE actions DROP CONSTRAINT IF EXISTS actions_action_status_check;\nALTER TABLE actions ADD CONSTRAINT actions_action_status_check \n  CHECK (action_status IN (''not_started'', ''in_progress'', ''blocked'', ''completed'', ''cancelled'', ''wont_fix''));\n\\`;\n\nconst { data, error } = await supabase.rpc(''exec_sql'', { query: sql });\nconsole.log(''Result:'', data);\nif (error) console.error(''Error:'', error);\n\")",
       "Bash(then grep -E \"VITE_N8N\" .env)",
       "Bash(npx vercel:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(nul)",
+      "Bash(del nul)"
     ],
     "deny": [],
     "ask": []
