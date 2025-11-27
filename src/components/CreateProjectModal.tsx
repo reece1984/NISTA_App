@@ -2,14 +2,12 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Eye } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase, type AssessmentTemplate } from '../lib/supabase'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
 import Input from './ui/Input'
 import Label from './ui/Label'
-import TemplateDetailSheet from './TemplateDetailSheet'
 
 const projectSchema = z.object({
   templateId: z.preprocess(
@@ -58,7 +56,6 @@ export default function CreateProjectModal({
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [templates, setTemplates] = useState<AssessmentTemplate[]>([])
-  const [showTemplateDetail, setShowTemplateDetail] = useState(false)
   const { user } = useAuth()
 
   const {
@@ -66,13 +63,9 @@ export default function CreateProjectModal({
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
   } = useForm({
     resolver: zodResolver(projectSchema),
   })
-
-  const selectedTemplateId = watch('templateId')
-  const selectedTemplate = templates.find((t) => t.id === Number(selectedTemplateId))
 
   // Fetch templates on mount
   useEffect(() => {
@@ -196,16 +189,6 @@ export default function CreateProjectModal({
               {errors.templateId.message}
             </p>
           )}
-          {selectedTemplate && (
-            <button
-              type="button"
-              onClick={() => setShowTemplateDetail(true)}
-              className="mt-2 flex items-center gap-2 text-sm text-secondary hover:text-secondary/80 transition-colors"
-            >
-              <Eye size={16} />
-              View assessment criteria for this template
-            </button>
-          )}
         </div>
 
         <div>
@@ -260,14 +243,6 @@ export default function CreateProjectModal({
           </Button>
         </div>
       </form>
-
-      {/* Template Detail Sheet */}
-      <TemplateDetailSheet
-        isOpen={showTemplateDetail}
-        onClose={() => setShowTemplateDetail(false)}
-        templateId={selectedTemplate?.id || null}
-        templateName={selectedTemplate?.name || ''}
-      />
     </Modal>
   )
 }
