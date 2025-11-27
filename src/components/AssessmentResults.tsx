@@ -1283,10 +1283,9 @@ export default function AssessmentResults({
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h2 className="text-xl font-semibold text-slate-900 mb-1">Assessment Results</h2>
-              <p className="text-sm text-slate-500">Comprehensive analysis of {totalAssessments} criteria</p>
+              <h2 className="text-3xl font-bold text-slate-900 mb-1">Assessment Results</h2>
+              <p className="text-slate-600">Comprehensive analysis of {totalAssessments} criteria</p>
             </div>
-            {/* ALL export buttons are secondary style - equal weight */}
             <div className="flex gap-2">
               <button
                 onClick={() => {
@@ -1294,32 +1293,41 @@ export default function AssessmentResults({
                     onViewActionsClick()
                   }
                 }}
-                className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 px-3 py-2 rounded-lg font-medium text-sm transition-colors inline-flex items-center gap-2"
+                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl hover:shadow-lg shadow-blue-500/30 transition-all font-semibold"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
+                <ClipboardList size={18} />
                 Action Plan
               </button>
+              {onRerunAssessment && (
+                <button
+                  onClick={onRerunAssessment}
+                  disabled={isRunningAssessment}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white rounded-xl transition-all font-medium shadow-sm disabled:cursor-not-allowed"
+                  title="Re-run assessment with latest documents"
+                >
+                  {isRunningAssessment ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <RefreshCw size={18} />
+                  )}
+                  <span className="hidden sm:inline">{isRunningAssessment ? 'Running...' : 'Re-run'}</span>
+                </button>
+              )}
               <button
                 onClick={exportToExcel}
-                className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 px-3 py-2 rounded-lg font-medium text-sm transition-colors inline-flex items-center gap-2"
+                className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all font-medium shadow-sm"
                 title="Export to Excel"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                </svg>
-                Excel
+                <FileSpreadsheet size={18} />
+                <span className="hidden sm:inline">Excel</span>
               </button>
               <button
                 onClick={exportToPDF}
-                className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 px-3 py-2 rounded-lg font-medium text-sm transition-colors inline-flex items-center gap-2"
+                className="flex items-center gap-2 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl transition-all font-medium shadow-sm"
                 title="Export to PDF"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-                PDF
+                <FileDown size={18} />
+                <span className="hidden sm:inline">PDF</span>
               </button>
             </div>
           </div>

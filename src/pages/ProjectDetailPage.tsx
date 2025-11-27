@@ -622,27 +622,28 @@ export default function ProjectDetailPage() {
               {/* Assessment Template Info */}
               {projectData.assessment_templates && (
                 <section className="mb-8">
-                  <h2 className="text-xl font-semibold text-slate-900 mb-4">Assessment Template</h2>
-                  <div className="bg-white border border-slate-200 rounded-lg p-6">
+                  <h2 className="text-2xl font-bold text-text-primary mb-4">Assessment Template</h2>
+                  <div className="bg-white rounded-lg p-6 border-l-4 border-accent shadow-sm border border-border">
                     <div className="flex items-start gap-4">
-                      <span className="bg-[#C2713A] text-white text-xs font-medium px-2.5 py-1 rounded">
-                        Template
-                      </span>
-                      <div>
-                        <h3 className="font-semibold text-slate-900">{projectData.assessment_templates.name}</h3>
+                      <div className="flex-shrink-0">
+                        <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-bold bg-accent text-white">
+                          Template
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-text-primary mb-2">
+                          {projectData.assessment_templates.name}
+                        </h3>
                         {projectData.assessment_templates.description && (
-                          <p className="text-slate-600 text-sm mt-1">
+                          <p className="text-sm text-text-primary mb-3 leading-relaxed">
                             {projectData.assessment_templates.description}
                           </p>
                         )}
                         <Link
                           to="/criteria"
-                          className="text-slate-700 hover:text-[#C2713A] font-medium text-sm mt-3 inline-flex items-center gap-1 transition-colors"
+                          className="inline-flex items-center gap-2 text-sm text-accent hover:text-accent-hover transition-colors font-semibold"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
+                          <Eye size={16} />
                           View Template Criteria
                         </Link>
                       </div>
@@ -654,65 +655,72 @@ export default function ProjectDetailPage() {
               {/* Assessment At A Glance */}
               {projectData.projectSummary && (
                 <section className="mb-8">
-                  <h2 className="text-xl font-semibold text-slate-900 mb-6">Assessment At A Glance</h2>
-                  <div className="bg-white border border-slate-200 rounded-lg p-6">
-                    <div className="grid grid-cols-3 gap-6 mb-6">
+                  <h2 className="text-2xl font-bold text-text-primary mb-4">
+                    Assessment At A Glance
+                  </h2>
+                  <div className="bg-white rounded-lg p-6 border border-border shadow-sm">
+                    {/* Quick Stats Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                       {/* Overall Rating */}
-                      <div className="bg-slate-50 rounded-lg p-4">
-                        <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">Overall Rating</div>
-                        <div className="flex items-center gap-3">
-                          <span
-                            className={`text-sm font-bold px-3 py-1.5 rounded ${
-                              projectData.projectSummary.overall_rating === 'green'
-                                ? 'bg-green-600 text-white'
-                                : projectData.projectSummary.overall_rating === 'amber'
-                                ? 'bg-amber-600 text-white'
-                                : projectData.projectSummary.overall_rating === 'red'
-                                ? 'bg-red-600 text-white'
-                                : 'bg-gray-300 text-slate-900'
-                            }`}
-                          >
-                            {projectData.projectSummary.overall_rating.toUpperCase()}
-                          </span>
-                          <span className="text-slate-600 text-sm">22% Ready</span>
+                      <div className="bg-gray-50 rounded-lg p-4 border border-border">
+                        <div className="text-xs font-medium text-text-secondary mb-2 uppercase tracking-wider">
+                          Overall Rating
                         </div>
+                        <span
+                          className={`inline-block px-4 py-2 rounded-lg font-bold text-lg ${
+                            projectData.projectSummary.overall_rating === 'green'
+                              ? 'bg-emerald-600 text-white'
+                              : projectData.projectSummary.overall_rating === 'amber'
+                              ? 'bg-amber-600 text-white'
+                              : projectData.projectSummary.overall_rating === 'red'
+                              ? 'bg-red-600 text-white'
+                              : 'bg-gray-300 text-text-primary'
+                          }`}
+                        >
+                          {projectData.projectSummary.overall_rating.toUpperCase()}
+                        </span>
                       </div>
 
                       {/* Critical Issues */}
-                      <div className="bg-slate-50 rounded-lg p-4">
-                        <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">Critical Issues</div>
-                        <div className="text-2xl font-semibold text-red-600">
+                      <div className="bg-gray-50 rounded-lg p-4 border border-border">
+                        <div className="text-xs font-medium text-text-secondary mb-2 uppercase tracking-wider">
+                          Critical Issues
+                        </div>
+                        <div className="text-3xl font-bold text-red-600">
                           {projectData.assessments?.filter((a: any) => a.rag_rating === 'red').length || 0}
                         </div>
-                        <div className="text-sm text-slate-500">requiring action</div>
                       </div>
 
                       {/* Criteria Assessed */}
-                      <div className="bg-slate-50 rounded-lg p-4">
-                        <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">Criteria Assessed</div>
-                        <div className="text-2xl font-semibold text-slate-900">
+                      <div className="bg-gray-50 rounded-lg p-4 border border-border">
+                        <div className="text-xs font-medium text-text-secondary mb-2 uppercase tracking-wider">
+                          Criteria Assessed
+                        </div>
+                        <div className="text-3xl font-bold text-text-primary">
                           {projectData.assessments?.length || 0}
                         </div>
-                        <div className="text-sm text-slate-500">of {projectData.assessments?.length || 0} complete</div>
                       </div>
                     </div>
 
-                    <div className="text-sm text-slate-500 mb-4">
-                      Assessment Version: {projectData.assessments?.[0]?.assessment_run_id || 'N/A'} ·
+                    {/* Assessment Metadata */}
+                    <div className="flex items-center gap-4 mb-4 text-sm text-text-secondary pb-4 border-b border-border">
+                      <span>
+                        <span className="font-semibold">Assessment Version:</span> {projectData.assessments?.[0]?.assessment_run_id || 'N/A'}
+                      </span>
                       {projectData.projectSummary.created_at && (
-                        <> Completed: {new Date(projectData.projectSummary.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</>
+                        <span>
+                          <span className="font-semibold">Completed:</span> {new Date(projectData.projectSummary.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
                       )}
                     </div>
 
-                    {/* THIS IS THE ONE COPPER BUTTON ON THIS PAGE */}
+                    {/* Call to Action */}
                     <button
                       onClick={() => setActiveTab('assessment-summary')}
-                      className="bg-[#C2713A] hover:bg-[#A65F2E] text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors inline-flex items-center gap-2"
+                      className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
                       View Full Assessment
+                      <BarChart3 size={18} />
                     </button>
                   </div>
                 </section>
@@ -783,21 +791,19 @@ export default function ProjectDetailPage() {
             <div className="p-8">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-xl font-semibold text-slate-900">
+                  <h2 className="text-2xl font-bold text-text-primary">
                     Project Documents ({documents.length})
                   </h2>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <p className="text-sm text-text-secondary mt-1">
                     Upload up to 50 PDF documents for comprehensive assessment
                   </p>
                 </div>
                 <button
                   onClick={() => setShowUploadModal(true)}
-                  className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 px-4 py-2 rounded-lg font-medium text-sm transition-colors inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-5 py-2.5 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={documents.length >= 50}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                  </svg>
+                  <Upload size={18} />
                   Add Documents
                 </button>
               </div>
@@ -814,13 +820,13 @@ export default function ProjectDetailPage() {
               />
 
               {/* Run Assessment CTA */}
-              <div className="mt-8 bg-white border border-slate-200 rounded-lg p-5">
+              <div className="mt-8 bg-accent/5 rounded-lg p-6 border border-accent/30">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-slate-900">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-text-primary mb-2">
                       {hasAssessments ? 'Update Assessment' : 'Ready to assess your documents?'}
                     </h3>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <p className="text-text-primary">
                       {hasAssessments
                         ? 'Re-run the assessment with your latest documents or view current results'
                         : hasFiles
@@ -828,20 +834,17 @@ export default function ProjectDetailPage() {
                         : 'Upload at least one document to run the assessment'}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex gap-2">
                     {hasAssessments && (
                       <button
                         onClick={handleRerunAssessmentClick}
                         disabled={!hasFiles || runningAssessment}
-                        className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 px-4 py-2 rounded-lg font-medium text-sm transition-colors inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 bg-primary hover:bg-primary-dark disabled:bg-gray-400 text-white px-5 py-3 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md disabled:cursor-not-allowed"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
+                        <RefreshCw size={18} className={runningAssessment ? 'animate-spin' : ''} />
                         {runningAssessment ? 'Running...' : 'Re-run'}
                       </button>
                     )}
-                    {/* THIS IS THE ONE COPPER BUTTON ON THIS PAGE */}
                     <button
                       onClick={() => {
                         setActiveTab('assessment-summary')
@@ -850,12 +853,9 @@ export default function ProjectDetailPage() {
                         }, 100)
                       }}
                       disabled={!hasFiles}
-                      className="bg-[#C2713A] hover:bg-[#A65F2E] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-bold transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      <Play size={18} />
                       {hasAssessments ? 'View Results' : 'Go to Assessment'}
                     </button>
                   </div>

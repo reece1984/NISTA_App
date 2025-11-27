@@ -46,9 +46,9 @@ export default function DashboardPage() {
 
   const getStatusBadge = (status: string) => {
     const badges = {
-      draft: 'bg-slate-100 text-slate-600 border border-slate-200',
+      draft: 'bg-slate-100 text-slate-700 border border-slate-200',
       processing: 'bg-amber-50 text-amber-700 border border-amber-200',
-      completed: 'bg-slate-700 text-white',
+      completed: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
     }
     return badges[status as keyof typeof badges] || badges.draft
   }
@@ -138,65 +138,70 @@ export default function DashboardPage() {
         {!isLoading && projects && projects.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {/* Total Projects */}
-            <div className="bg-white border border-slate-200 rounded-lg p-5">
-              <div className="flex items-center justify-between mb-3">
-                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg>
-                <span className="text-xs text-slate-500 font-medium">Total</span>
+            <div className="bg-card rounded-lg p-6 shadow-sm border border-border hover:shadow-md hover:border-accent transition-all">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <FolderOpen className="text-text-primary" size={24} />
+                </div>
+                <span className="text-sm font-medium text-text-secondary">Total</span>
               </div>
-              <div className="text-2xl font-semibold text-slate-900">{stats.totalProjects}</div>
-              <div className="text-sm text-slate-500 mt-1">Projects</div>
+              <div className="text-3xl font-bold text-text-primary">{stats.totalProjects}</div>
+              <div className="text-sm text-text-secondary mt-1">Projects</div>
             </div>
 
             {/* Active Projects */}
-            <div className="bg-white border border-slate-200 rounded-lg p-5">
-              <div className="flex items-center justify-between mb-3">
-                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-                <span className="text-xs text-slate-500 font-medium">Active</span>
+            <div className="bg-card rounded-lg p-6 shadow-sm border border-border hover:shadow-md hover:border-accent transition-all">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="text-text-primary" size={24} />
+                </div>
+                <span className="text-sm font-medium text-text-secondary">Active</span>
               </div>
-              <div className="text-2xl font-semibold text-slate-900">{stats.activeProjects}</div>
-              <div className="text-sm text-slate-500 mt-1">In Progress</div>
+              <div className="text-3xl font-bold text-text-primary">{stats.activeProjects}</div>
+              <div className="text-sm text-text-secondary mt-1">In Progress</div>
             </div>
 
             {/* Critical Actions */}
-            <div className="bg-white border border-slate-200 rounded-lg p-5">
-              <div className="flex items-center justify-between mb-3">
-                <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <span className="text-xs text-slate-500 font-medium">Critical</span>
+            <div className="bg-card rounded-lg p-6 shadow-sm border border-border hover:shadow-md hover:border-accent transition-all">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <AlertCircle className="text-text-primary" size={24} />
+                </div>
+                <span className="text-sm font-medium text-text-secondary">Critical</span>
               </div>
-              <div className="text-2xl font-semibold text-amber-600">{stats.criticalActions}</div>
-              <div className="text-sm text-slate-500 mt-1">Actions</div>
+              <div className="text-3xl font-bold text-error">{stats.criticalActions}</div>
+              <div className="text-sm text-text-secondary mt-1">
+                {stats.overdueActions > 0 && (
+                  <span className="text-error font-medium">{stats.overdueActions} overdue</span>
+                )}
+                {stats.overdueActions === 0 && 'Actions'}
+              </div>
             </div>
 
             {/* Completed Actions */}
-            <div className="bg-white border border-slate-200 rounded-lg p-5">
-              <div className="flex items-center justify-between mb-3">
-                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-xs text-slate-500 font-medium">Done</span>
+            <div className="bg-card rounded-lg p-6 shadow-sm border border-border hover:shadow-md hover:border-accent transition-all">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <CheckCircle2 className="text-text-primary" size={24} />
+                </div>
+                <span className="text-sm font-medium text-text-secondary">Done</span>
               </div>
-              <div className="text-2xl font-semibold text-slate-900">{stats.completedActions}</div>
-              <div className="text-sm text-slate-500 mt-1">of {stats.totalActions} actions</div>
+              <div className="text-3xl font-bold text-success">{stats.completedActions}</div>
+              <div className="text-sm text-text-secondary mt-1">
+                of {stats.totalActions} actions
+              </div>
             </div>
           </div>
         )}
 
         {/* Projects Section Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-slate-900">Your Projects</h2>
+          <h2 className="text-2xl font-bold text-text-primary">Your Projects</h2>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-[#C2713A] hover:bg-[#A65F2E] text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors inline-flex items-center gap-2"
+            className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+            <Plus size={20} />
             Create Project
           </button>
         </div>
@@ -209,60 +214,81 @@ export default function DashboardPage() {
         ) : projects && projects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project) => (
-              <div
+              <Link
                 key={project.id}
-                className="bg-white border border-slate-200 rounded-lg p-5 hover:shadow-md hover:border-slate-300 transition-all"
+                to={`/projects/${project.id}`}
+                className="group bg-card rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer border border-border hover:border-accent"
               >
-                {/* Header row */}
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="font-semibold text-slate-900">{project.project_name}</h3>
-                  <span
-                    className={`px-2.5 py-1 text-xs font-medium rounded ${getStatusBadge(
-                      project.status
-                    )}`}
-                  >
-                    {project.status}
-                  </span>
-                </div>
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold text-text-primary group-hover:text-accent transition-colors">
+                      {project.project_name}
+                    </h3>
+                    <span
+                      className={`px-3 py-1 text-xs font-semibold rounded-md ${getStatusBadge(
+                        project.status
+                      )}`}
+                    >
+                      {project.status}
+                    </span>
+                  </div>
 
-                {/* Metadata row - simplified with dot separators */}
-                <div className="text-sm text-slate-500 mb-4">
-                  {project.project_value && `£${project.project_value}M value`}
-                  {project.project_value && project.project_sector && ' · '}
-                  {project.project_sector}
-                  {(project.project_value || project.project_sector) && ' · '}
-                  Created {formatDate(project.created_at)}
-                </div>
+                  <div className="space-y-3 text-sm mb-4">
+                    {project.project_value && (
+                      <div className="flex items-center gap-2 text-slate-600">
+                        <div className="w-6 h-6 bg-slate-100 rounded flex items-center justify-center flex-shrink-0">
+                          <span className="text-slate-700 font-bold text-xs">£</span>
+                        </div>
+                        <span>
+                          <span className="font-semibold text-slate-900">
+                            £{project.project_value.toLocaleString()}M
+                          </span>
+                          {' '}value
+                        </span>
+                      </div>
+                    )}
+                    {project.project_sector && (
+                      <div className="flex items-center gap-2 text-slate-600">
+                        <div className="w-6 h-6 bg-slate-100 rounded flex items-center justify-center flex-shrink-0">
+                          <FolderOpen className="text-slate-700" size={14} />
+                        </div>
+                        <span>{project.project_sector}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <div className="w-6 h-6 bg-slate-100 rounded flex items-center justify-center flex-shrink-0">
+                        <Clock className="text-slate-600" size={14} />
+                      </div>
+                      <span>Created {formatDate(project.created_at)}</span>
+                    </div>
+                  </div>
 
-                {/* Action link - NOT a styled button */}
-                <div className="pt-3 border-t border-slate-100">
-                  <Link
-                    to={`/projects/${project.id}`}
-                    className="text-slate-700 hover:text-[#C2713A] font-medium text-sm transition-colors inline-flex items-center gap-1"
-                  >
-                    View Project
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
+                  <div className="mt-5 pt-4 border-t border-border">
+                    <div className="flex items-center justify-between text-sm font-semibold text-text-primary group-hover:text-accent transition-colors">
+                      <span>View Project</span>
+                      <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 bg-white rounded-lg border-2 border-dashed border-slate-200">
-            <div className="w-20 h-20 bg-slate-100 rounded-lg flex items-center justify-center mx-auto mb-6">
-              <FolderOpen className="text-slate-400" size={36} />
+          <div className="text-center py-20 bg-card rounded-lg border-2 border-dashed border-border">
+            <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
+              <FolderOpen className="text-text-secondary" size={36} />
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-3">
+            <h3 className="text-2xl font-bold text-text-primary mb-3">
               No projects yet
             </h3>
-            <p className="text-lg text-slate-600 mb-8 max-w-md mx-auto">
+            <p className="text-lg text-text-secondary mb-8 max-w-md mx-auto">
               Create your first project to start tracking assessments and actions
             </p>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="inline-flex items-center gap-2 bg-[#C2713A] hover:bg-[#A65F2E] text-white px-8 py-4 rounded-lg font-medium text-lg transition-colors"
+              className="inline-flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all shadow-sm hover:shadow-md"
             >
               <Plus size={24} />
               Create Your First Project
