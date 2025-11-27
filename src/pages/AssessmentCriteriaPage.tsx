@@ -14,6 +14,16 @@ const CATEGORY_COLORS: Record<string, string> = {
   Management: 'bg-pink-500',
 }
 
+// Category text colors for criterion IDs
+const CATEGORY_TEXT_COLORS: Record<string, string> = {
+  Strategic: 'text-blue-500',
+  Governance: 'text-purple-500',
+  Economic: 'text-green-500',
+  Commercial: 'text-orange-500',
+  Financial: 'text-yellow-500',
+  Management: 'text-pink-500',
+}
+
 interface AssessmentCriterion {
   id: number
   criterion_code: string
@@ -321,6 +331,7 @@ export default function AssessmentCriteriaPage() {
               {groupedCriteria.map((group) => {
                 const isExpanded = expandedCategories.has(group.category)
                 const categoryColor = CATEGORY_COLORS[group.category] || 'bg-gray-500'
+                const categoryTextColor = CATEGORY_TEXT_COLORS[group.category] || 'text-gray-700'
                 const assessedCount = 2 // Mock - would come from real data
 
                 // Mock RAG status for display
@@ -339,22 +350,24 @@ export default function AssessmentCriteriaPage() {
                     {/* Category Header */}
                     <button
                       onClick={() => toggleCategory(group.category)}
-                      className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                      className="w-full px-6 py-4 flex items-center hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex items-center gap-4 flex-1">
                         {/* Colored accent bar */}
                         <div className={`w-1.5 h-10 rounded-full ${categoryColor}`}></div>
 
-                        <div className="flex flex-col gap-1 flex-1">
-                          <h3 className="text-lg font-bold text-text-primary">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-text-primary text-left">
                             {group.category}
                           </h3>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-gray-500 text-left">
                             {assessedCount} of {group.criteria.length} criteria assessed
                           </span>
                         </div>
+                      </div>
 
-                        {/* Mini RAG dots */}
+                      {/* Mini RAG dots and Chevron */}
+                      <div className="flex items-center gap-4 ml-auto">
                         <div className="flex items-center gap-1.5">
                           {ragStatuses.map((status, idx) => (
                             <div
@@ -369,14 +382,14 @@ export default function AssessmentCriteriaPage() {
                             ></div>
                           ))}
                         </div>
-                      </div>
 
-                      {/* Chevron */}
-                      {isExpanded ? (
-                        <ChevronUp size={20} className="text-gray-400 ml-4" />
-                      ) : (
-                        <ChevronDown size={20} className="text-gray-400 ml-4" />
-                      )}
+                        {/* Chevron */}
+                        {isExpanded ? (
+                          <ChevronUp size={20} className="text-gray-400" />
+                        ) : (
+                          <ChevronDown size={20} className="text-gray-400" />
+                        )}
+                      </div>
                     </button>
 
                     {/* Expanded Criteria Rows */}
@@ -393,8 +406,8 @@ export default function AssessmentCriteriaPage() {
                               key={criterion.id}
                               className="px-6 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 flex items-center gap-4"
                             >
-                              {/* Criterion ID */}
-                              <span className="font-semibold text-sm text-text-primary flex-shrink-0 min-w-[50px]">
+                              {/* Criterion ID - colored to match category */}
+                              <span className={`font-semibold text-sm ${categoryTextColor} flex-shrink-0 min-w-[50px]`}>
                                 {criterion.criterion_code}
                               </span>
 
@@ -422,7 +435,7 @@ export default function AssessmentCriteriaPage() {
                                   href={`${pdfUrl}#page=${pageRef}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-0.5 text-xs text-blue-600 hover:text-blue-800 hover:underline flex-shrink-0 transition-colors"
+                                  className="flex items-center gap-0.5 text-xs text-gray-500 hover:text-gray-700 hover:underline flex-shrink-0 transition-colors"
                                 >
                                   p.{pageRef}
                                   <ExternalLink size={12} />
