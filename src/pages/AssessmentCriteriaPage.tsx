@@ -236,55 +236,55 @@ export default function AssessmentCriteriaPage() {
           </div>
         ) : (
           <>
-            {/* Page Header */}
-            <div className="mb-8 flex items-start justify-between">
-              <div>
-                <h1 className="text-4xl font-bold text-text-primary mb-2">Gate Review Criteria</h1>
-                <p className="text-text-accent">
-                  Assessment criteria for {selectedTemplate?.name || 'Gate Review'}
-                </p>
-              </div>
+            {/* Page Header - White background with cleaner layout */}
+            <div className="bg-white border-b border-gray-200 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-6 mb-8">
+              <div className="max-w-7xl mx-auto">
+                <h1 className="text-3xl font-bold text-text-primary mb-1">Gate Review Criteria</h1>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-text-accent">
+                    Assessment criteria for {selectedTemplate?.name || 'Gate Review'}
+                  </p>
 
-              {/* Gate Selector Buttons */}
-              <div className="flex items-center gap-1">
-                {templates.map((template) => {
-                  // Check if template is PAR or Gate X
-                  const isPAR = template.name.toLowerCase().includes('par')
-                  const gateNum = template.name.match(/Gate (\d+)/)?.[1] || '0'
-                  const displayLabel = isPAR ? 'PAR' : `G${gateNum}`
+                  {/* Gate Selector Buttons */}
+                  <div className="flex items-center gap-2">
+                    {templates.map((template) => {
+                      // Check if template is PAR or Gate X
+                      const isPAR = template.name.toLowerCase().includes('par')
+                      const gateNum = template.name.match(/Gate (\d+)/)?.[1] || '0'
+                      const displayLabel = isPAR ? 'PAR' : `G${gateNum}`
 
-                  return (
-                    <button
-                      key={template.id}
-                      onClick={() => setSelectedTemplateId(template.id)}
-                      className={`px-3 py-1.5 text-xs font-medium transition-all ${
-                        selectedTemplateId === template.id
-                          ? 'bg-slate-800 text-white'
-                          : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
-                      }`}
-                    >
-                      {displayLabel}
-                    </button>
-                  )
-                })}
+                      return (
+                        <button
+                          key={template.id}
+                          onClick={() => setSelectedTemplateId(template.id)}
+                          className={`px-3 py-1 rounded text-xs font-semibold transition-all ${
+                            selectedTemplateId === template.id
+                              ? 'bg-slate-800 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {displayLabel}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* PDF Reference Card - Only show for Gate templates, not PAR */}
             {pdfUrl && (
-              <div className="mb-8 bg-gradient-to-br from-slate-700 to-slate-900 rounded-lg p-6 text-white">
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex items-start gap-4 flex-1">
+              <div className="mb-6 bg-slate-800 rounded-lg p-6 text-white">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start gap-3 flex-1">
                     <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center">
-                        <FileText size={24} className="text-white" />
-                      </div>
+                      <FileText size={20} className="text-white mt-1" />
                     </div>
                     <div className="flex-1">
-                      <h2 className="text-xl font-bold mb-2">
+                      <h2 className="text-base font-bold mb-1">
                         IPA {gateName} Review Workbook
                       </h2>
-                      <p className="text-white/70 text-sm">
+                      <p className="text-white/70 text-xs">
                         Official guidance document containing detailed evidence requirements for each criterion
                       </p>
                     </div>
@@ -293,34 +293,34 @@ export default function AssessmentCriteriaPage() {
                     href={pdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-white text-slate-900 px-4 py-2 rounded font-semibold text-sm hover:bg-white/90 transition-colors flex-shrink-0"
+                    className="inline-flex items-center gap-1.5 bg-white text-slate-900 px-3 py-1.5 rounded text-xs font-semibold hover:bg-white/90 transition-colors flex-shrink-0"
                   >
                     View PDF
-                    <ExternalLink size={14} />
+                    <ExternalLink size={12} />
                   </a>
                 </div>
 
                 {/* Stats Row */}
-                <div className="flex items-center gap-8 pt-4 border-t border-white/20">
+                <div className="flex items-center gap-6 pt-3 border-t border-white/20">
                   <div>
-                    <div className="text-3xl font-bold text-white">{stats.total}</div>
-                    <div className="text-sm text-white/60">Total Criteria</div>
+                    <div className="text-2xl font-bold text-white">{stats.total}</div>
+                    <div className="text-xs text-white/60">Total Criteria</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-white">{stats.assessed}</div>
-                    <div className="text-sm text-white/60">Assessed</div>
+                    <div className="text-2xl font-bold text-white">{stats.assessed}</div>
+                    <div className="text-xs text-white/60">Assessed</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-white">{stats.green}</div>
-                    <div className="text-sm text-green-400">Green Rating</div>
+                    <div className="text-2xl font-bold text-white">{stats.green}</div>
+                    <div className="text-xs text-green-400">Green Rating</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-white">{stats.amber}</div>
-                    <div className="text-sm text-amber-400">Amber Rating</div>
+                    <div className="text-2xl font-bold text-white">{stats.amber}</div>
+                    <div className="text-xs text-amber-400">Amber Rating</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-white">{stats.red}</div>
-                    <div className="text-sm text-red-400">Red Rating</div>
+                    <div className="text-2xl font-bold text-white">{stats.red}</div>
+                    <div className="text-xs text-red-400">Red Rating</div>
                   </div>
                 </div>
               </div>
