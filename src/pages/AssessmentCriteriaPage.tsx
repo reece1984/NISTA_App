@@ -356,11 +356,11 @@ export default function AssessmentCriteriaPage() {
                         {/* Colored accent bar */}
                         <div className={`w-1.5 h-10 rounded-full ${categoryColor}`}></div>
 
-                        <div className="flex-1">
-                          <h3 className="text-lg font-bold text-text-primary text-left">
+                        <div className="flex flex-col gap-1 items-start flex-1">
+                          <h3 className="text-lg font-bold text-text-primary">
                             {group.category}
                           </h3>
-                          <span className="text-sm text-gray-500 text-left">
+                          <span className="text-sm text-gray-500">
                             {assessedCount} of {group.criteria.length} criteria assessed
                           </span>
                         </div>
