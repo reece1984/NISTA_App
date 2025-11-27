@@ -236,7 +236,11 @@ export default function AssessmentCriteriaPage() {
               {/* Gate Selector Buttons */}
               <div className="flex items-center gap-2">
                 {templates.map((template) => {
+                  // Check if template is PAR or Gate X
+                  const isPAR = template.name.toLowerCase().includes('par')
                   const gateNum = template.name.match(/Gate (\d+)/)?.[1] || '0'
+                  const displayLabel = isPAR ? 'PAR' : `G${gateNum}`
+
                   return (
                     <button
                       key={template.id}
@@ -247,7 +251,7 @@ export default function AssessmentCriteriaPage() {
                           : 'bg-white text-text-accent hover:bg-gray-100 border border-gray-300'
                       }`}
                     >
-                      G{gateNum}
+                      {displayLabel}
                     </button>
                   )
                 })}
