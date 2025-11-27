@@ -236,7 +236,7 @@ export default function AssessmentCriteriaPage() {
               </div>
 
               {/* Gate Selector Buttons */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 {templates.map((template) => {
                   // Check if template is PAR or Gate X
                   const isPAR = template.name.toLowerCase().includes('par')
@@ -247,10 +247,10 @@ export default function AssessmentCriteriaPage() {
                     <button
                       key={template.id}
                       onClick={() => setSelectedTemplateId(template.id)}
-                      className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+                      className={`px-3 py-1.5 text-xs font-medium transition-all ${
                         selectedTemplateId === template.id
-                          ? 'bg-slate-800 text-white shadow-md'
-                          : 'bg-white text-text-accent hover:bg-gray-100 border border-gray-300'
+                          ? 'bg-slate-800 text-white'
+                          : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
                       }`}
                     >
                       {displayLabel}
@@ -293,24 +293,24 @@ export default function AssessmentCriteriaPage() {
                 {/* Stats Row */}
                 <div className="flex items-center gap-8 pt-4 border-t border-white/20">
                   <div>
-                    <div className="text-3xl font-bold">{stats.total}</div>
+                    <div className="text-3xl font-bold text-white">{stats.total}</div>
                     <div className="text-sm text-white/60">Total Criteria</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold">{stats.assessed}</div>
+                    <div className="text-3xl font-bold text-white">{stats.assessed}</div>
                     <div className="text-sm text-white/60">Assessed</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-green-400">{stats.green}</div>
-                    <div className="text-sm text-white/60">Green Rating</div>
+                    <div className="text-3xl font-bold text-white">{stats.green}</div>
+                    <div className="text-sm text-green-400">Green Rating</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-amber-400">{stats.amber}</div>
-                    <div className="text-sm text-white/60">Amber Rating</div>
+                    <div className="text-3xl font-bold text-white">{stats.amber}</div>
+                    <div className="text-sm text-amber-400">Amber Rating</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-red-400">{stats.red}</div>
-                    <div className="text-sm text-white/60">Red Rating</div>
+                    <div className="text-3xl font-bold text-white">{stats.red}</div>
+                    <div className="text-sm text-red-400">Red Rating</div>
                   </div>
                 </div>
               </div>
