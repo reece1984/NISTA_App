@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect, useMemo, useRef } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { ChevronDown, ChevronUp, LogOut, FileText, ExternalLink } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase, type AssessmentTemplate } from '../lib/supabase'
@@ -35,11 +35,13 @@ interface CategoryGroup {
 
 export default function AssessmentCriteriaPage() {
   const { user, signOut } = useAuth()
+  const [searchParams] = useSearchParams()
   const [templates, setTemplates] = useState<AssessmentTemplate[]>([])
   const [criteria, setCriteria] = useState<AssessmentCriterion[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null)
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
+  const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
   useEffect(() => {
     fetchTemplates()
@@ -87,15 +89,37 @@ export default function AssessmentCriteriaPage() {
       if (criteriaError) throw criteriaError
       setCriteria(criteriaData || [])
 
-      // Expand all categories by default
-      if (criteriaData && criteriaData.length > 0) {
-        const allCategories = new Set(criteriaData.map(c => c.dimension))
-        setExpandedCategories(allCategories)
+      // Handle URL parameter for category
+      const categoryParam = searchParams.get('category')
+
+      if (categoryParam && criteriaData && criteriaData.length > 0) {
+        // If category param exists, only expand that category
+        setExpandedCategories(new Set([categoryParam]))
+      } else {
+        // Otherwise expand all categories by default
+        if (criteriaData && criteriaData.length > 0) {
+          const allCategories = new Set(criteriaData.map(c => c.dimension))
+          setExpandedCategories(allCategories)
+        }
       }
     } catch (error) {
       console.error('Error fetching criteria:', error)
     }
   }
+
+  // Scroll to category when URL param changes
+  useEffect(() => {
+    const categoryParam = searchParams.get('category')
+    if (categoryParam && categoryRefs.current[categoryParam]) {
+      // Small delay to ensure the category is expanded and rendered
+      setTimeout(() => {
+        categoryRefs.current[categoryParam]?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        })
+      }, 100)
+    }
+  }, [searchParams, criteria])
 
   const handleSignOut = async () => {
     try {
@@ -299,7 +323,11 @@ export default function AssessmentCriteriaPage() {
                 })
 
                 return (
-                  <div key={group.category} className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+                  <div
+                    key={group.category}
+                    ref={(el) => (categoryRefs.current[group.category] = el)}
+                    className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200"
+                  >
                     {/* Category Header */}
                     <button
                       onClick={() => toggleCategory(group.category)}

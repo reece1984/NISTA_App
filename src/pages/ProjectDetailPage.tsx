@@ -9,7 +9,6 @@ import AssessmentResults from '../components/AssessmentResults'
 import Modal from '../components/ui/Modal'
 import Toast, { type ToastType } from '../components/ui/Toast'
 import ConfirmationDialog from '../components/ui/ConfirmationDialog'
-import TemplateDetailSheet from '../components/TemplateDetailSheet'
 import DocumentGuidancePanel from '../components/DocumentGuidancePanel'
 import DocumentsList from '../components/DocumentsList'
 import UploadDocumentsModal from '../components/UploadDocumentsModal'
@@ -29,7 +28,6 @@ export default function ProjectDetailPage() {
   const [runningAssessment, setRunningAssessment] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showRerunConfirmDialog, setShowRerunConfirmDialog] = useState(false)
-  const [showCriteriaSheet, setShowCriteriaSheet] = useState(false)
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [deletingDocumentId, setDeletingDocumentId] = useState<number | null>(null)
   const [assessmentError, setAssessmentError] = useState('')
@@ -641,13 +639,13 @@ export default function ProjectDetailPage() {
                             {projectData.assessment_templates.description}
                           </p>
                         )}
-                        <button
-                          onClick={() => setShowCriteriaSheet(true)}
+                        <Link
+                          to="/criteria"
                           className="inline-flex items-center gap-2 text-sm text-accent hover:text-accent-hover transition-colors font-semibold"
                         >
                           <Eye size={16} />
                           View Template Criteria
-                        </button>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -1200,16 +1198,6 @@ export default function ProjectDetailPage() {
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}
-        />
-      )}
-
-      {/* Template Criteria Sheet */}
-      {projectData.assessment_templates && (
-        <TemplateDetailSheet
-          isOpen={showCriteriaSheet}
-          onClose={() => setShowCriteriaSheet(false)}
-          templateId={projectData.assessment_templates.id}
-          templateName={projectData.assessment_templates.name}
         />
       )}
 
