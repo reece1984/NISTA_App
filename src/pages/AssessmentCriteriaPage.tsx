@@ -161,6 +161,7 @@ export default function AssessmentCriteriaPage() {
 
   const selectedTemplate = templates.find((t) => t.id === selectedTemplateId)
   const gateName = selectedTemplate?.name || 'Gate 0'
+  const isPAR = gateName.toLowerCase().includes('par')
   const gateNumber = gateName.match(/Gate (\d+)/)?.[1] || '0'
 
   // Mock stats - in real app these would come from assessment_runs data
@@ -172,7 +173,8 @@ export default function AssessmentCriteriaPage() {
     red: 1,
   }
 
-  const pdfUrl = `/documents/IPA_Gate_Review_Process_-_Gate_${gateNumber}.pdf`
+  // PAR template doesn't have a PDF, only Gate templates do
+  const pdfUrl = isPAR ? null : `/documents/IPA_Gate_Review_Process_-_Gate_${gateNumber}.pdf`
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -258,59 +260,61 @@ export default function AssessmentCriteriaPage() {
               </div>
             </div>
 
-            {/* PDF Reference Card */}
-            <div className="mb-8 bg-gradient-to-br from-slate-700 to-slate-900 rounded-lg p-6 text-white">
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex items-start gap-4 flex-1">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center">
-                      <FileText size={24} className="text-white" />
+            {/* PDF Reference Card - Only show for Gate templates, not PAR */}
+            {pdfUrl && (
+              <div className="mb-8 bg-gradient-to-br from-slate-700 to-slate-900 rounded-lg p-6 text-white">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-start gap-4 flex-1">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center">
+                        <FileText size={24} className="text-white" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="text-xl font-bold mb-2">
+                        IPA {gateName} Review Workbook
+                      </h2>
+                      <p className="text-white/70 text-sm">
+                        Official guidance document containing detailed evidence requirements for each criterion
+                      </p>
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <h2 className="text-xl font-bold mb-2">
-                      IPA {gateName} Review Workbook
-                    </h2>
-                    <p className="text-white/70 text-sm">
-                      Official guidance document containing detailed evidence requirements for each criterion
-                    </p>
+                  <a
+                    href={pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-white text-slate-900 px-4 py-2 rounded font-semibold text-sm hover:bg-white/90 transition-colors flex-shrink-0"
+                  >
+                    View PDF
+                    <ExternalLink size={14} />
+                  </a>
+                </div>
+
+                {/* Stats Row */}
+                <div className="flex items-center gap-8 pt-4 border-t border-white/20">
+                  <div>
+                    <div className="text-3xl font-bold">{stats.total}</div>
+                    <div className="text-sm text-white/60">Total Criteria</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold">{stats.assessed}</div>
+                    <div className="text-sm text-white/60">Assessed</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-green-400">{stats.green}</div>
+                    <div className="text-sm text-white/60">Green Rating</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-amber-400">{stats.amber}</div>
+                    <div className="text-sm text-white/60">Amber Rating</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-red-400">{stats.red}</div>
+                    <div className="text-sm text-white/60">Red Rating</div>
                   </div>
                 </div>
-                <a
-                  href={pdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-white text-slate-900 px-4 py-2 rounded font-semibold text-sm hover:bg-white/90 transition-colors flex-shrink-0"
-                >
-                  View PDF
-                  <ExternalLink size={14} />
-                </a>
               </div>
-
-              {/* Stats Row */}
-              <div className="flex items-center gap-8 pt-4 border-t border-white/20">
-                <div>
-                  <div className="text-3xl font-bold">{stats.total}</div>
-                  <div className="text-sm text-white/60">Total Criteria</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold">{stats.assessed}</div>
-                  <div className="text-sm text-white/60">Assessed</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-green-400">{stats.green}</div>
-                  <div className="text-sm text-white/60">Green Rating</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-amber-400">{stats.amber}</div>
-                  <div className="text-sm text-white/60">Amber Rating</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-red-400">{stats.red}</div>
-                  <div className="text-sm text-white/60">Red Rating</div>
-                </div>
-              </div>
-            </div>
+            )}
 
             {/* Category Accordion */}
             <div className="space-y-4">
@@ -412,16 +416,18 @@ export default function AssessmentCriteriaPage() {
                                 {status}
                               </span>
 
-                              {/* Page reference link */}
-                              <a
-                                href={`${pdfUrl}#page=${pageRef}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-0.5 text-xs text-blue-600 hover:text-blue-800 hover:underline flex-shrink-0 transition-colors"
-                              >
-                                p.{pageRef}
-                                <ExternalLink size={12} />
-                              </a>
+                              {/* Page reference link - Only show for Gate templates, not PAR */}
+                              {pdfUrl && (
+                                <a
+                                  href={`${pdfUrl}#page=${pageRef}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-0.5 text-xs text-blue-600 hover:text-blue-800 hover:underline flex-shrink-0 transition-colors"
+                                >
+                                  p.{pageRef}
+                                  <ExternalLink size={12} />
+                                </a>
+                              )}
                             </div>
                           )
                         })}
