@@ -237,37 +237,35 @@ export default function AssessmentCriteriaPage() {
         ) : (
           <>
             {/* Page Header - White background with cleaner layout */}
-            <div className="bg-white border-b border-gray-200 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-6 mb-8">
-              <div className="max-w-7xl mx-auto">
-                <h1 className="text-3xl font-bold text-text-primary mb-1">Gate Review Criteria</h1>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-text-accent">
-                    Assessment criteria for {selectedTemplate?.name || 'Gate Review'}
-                  </p>
+            <div className="bg-white border-b border-gray-200 py-6 mb-8">
+              <h1 className="text-3xl font-bold text-text-primary mb-1">Gate Review Criteria</h1>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-text-accent">
+                  Assessment criteria for {selectedTemplate?.name || 'Gate Review'}
+                </p>
 
-                  {/* Gate Selector Buttons */}
-                  <div className="flex items-center gap-2">
-                    {templates.map((template) => {
-                      // Check if template is PAR or Gate X
-                      const isPAR = template.name.toLowerCase().includes('par')
-                      const gateNum = template.name.match(/Gate (\d+)/)?.[1] || '0'
-                      const displayLabel = isPAR ? 'PAR' : `G${gateNum}`
+                {/* Gate Selector Buttons */}
+                <div className="flex items-center gap-2">
+                  {templates.map((template) => {
+                    // Check if template is PAR or Gate X
+                    const isPAR = template.name.toLowerCase().includes('par')
+                    const gateNum = template.name.match(/Gate (\d+)/)?.[1] || '0'
+                    const displayLabel = isPAR ? 'PAR' : `G${gateNum}`
 
-                      return (
-                        <button
-                          key={template.id}
-                          onClick={() => setSelectedTemplateId(template.id)}
-                          className={`px-3 py-1 rounded text-xs font-semibold transition-all ${
-                            selectedTemplateId === template.id
-                              ? 'bg-slate-800 text-white'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
-                        >
-                          {displayLabel}
-                        </button>
-                      )
-                    })}
-                  </div>
+                    return (
+                      <button
+                        key={template.id}
+                        onClick={() => setSelectedTemplateId(template.id)}
+                        className={`px-3 py-1 rounded text-xs font-semibold transition-all ${
+                          selectedTemplateId === template.id
+                            ? 'bg-slate-800 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {displayLabel}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             </div>
