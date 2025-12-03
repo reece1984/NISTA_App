@@ -30,6 +30,7 @@ export default function ProjectDetailPage() {
   const [showRerunConfirmDialog, setShowRerunConfirmDialog] = useState(false)
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [deletingDocumentId, setDeletingDocumentId] = useState<number | null>(null)
+  const [deletingProject, setDeletingProject] = useState(false)
   const [assessmentError, setAssessmentError] = useState('')
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null)
   const [assessmentProgress, setAssessmentProgress] = useState<{ current: number; total: number } | null>(null)
@@ -408,13 +409,161 @@ export default function ProjectDetailPage() {
 
   const handleDeleteProject = async () => {
     try {
-      const { error } = await supabase.from('projects').delete().eq('id', id!)
+      setDeletingProject(true)
+      setShowDeleteModal(false) // Close modal immediately for better UX
 
-      if (error) throw error
+      // Show loading toast
+      setToast({
+        message: 'Deleting project and related data...',
+        type: 'loading'
+      })
 
-      navigate('/dashboard')
+      // Parse the project ID as integer to ensure correct type
+      const projectId = parseInt(id!)
+
+      // We need to delete related tables in the correct order
+      // to avoid foreign key constraint violations
+      let deletionSteps = []
+      let hasErrors = false
+
+      // Step 1: Delete actions (if they exist)
+      try {
+        const { error: actionsError } = await supabase
+          .from('actions')
+          .delete()
+          .eq('project_id', projectId)
+
+        if (actionsError && actionsError.code !== 'PGRST116') {
+          console.error('Error deleting actions:', actionsError)
+          deletionSteps.push({ table: 'actions', error: actionsError.message })
+          // Continue anyway - some tables might not exist
+        } else {
+          deletionSteps.push({ table: 'actions', success: true })
+        }
+      } catch (e) {
+        console.error('Exception deleting actions:', e)
+      }
+
+      // Step 2: Delete assessments (main problematic table based on error)
+      try {
+        const { error: assessmentsError } = await supabase
+          .from('assessments')
+          .delete()
+          .eq('project_id', projectId)
+
+        if (assessmentsError && assessmentsError.code !== 'PGRST116') {
+          console.error('Error deleting assessments:', assessmentsError)
+          deletionSteps.push({ table: 'assessments', error: assessmentsError.message })
+          hasErrors = true // This is critical
+        } else {
+          deletionSteps.push({ table: 'assessments', success: true })
+        }
+      } catch (e) {
+        console.error('Exception deleting assessments:', e)
+        hasErrors = true
+      }
+
+      // Step 3: Delete assessment_runs
+      try {
+        const { error: runsError } = await supabase
+          .from('assessment_runs')
+          .delete()
+          .eq('project_id', projectId)
+
+        if (runsError && runsError.code !== 'PGRST116') {
+          console.error('Error deleting assessment_runs:', runsError)
+          deletionSteps.push({ table: 'assessment_runs', error: runsError.message })
+        } else {
+          deletionSteps.push({ table: 'assessment_runs', success: true })
+        }
+      } catch (e) {
+        console.error('Exception deleting assessment_runs:', e)
+      }
+
+      // Step 4: Delete project_summaries
+      try {
+        const { error: summariesError } = await supabase
+          .from('project_summaries')
+          .delete()
+          .eq('project_id', projectId)
+
+        if (summariesError && summariesError.code !== 'PGRST116') {
+          console.error('Error deleting project_summaries:', summariesError)
+          deletionSteps.push({ table: 'project_summaries', error: summariesError.message })
+        } else {
+          deletionSteps.push({ table: 'project_summaries', success: true })
+        }
+      } catch (e) {
+        console.error('Exception deleting project_summaries:', e)
+      }
+
+      // Step 5: Delete files
+      try {
+        const { error: filesError } = await supabase
+          .from('files')
+          .delete()
+          .eq('project_id', projectId)
+
+        if (filesError && filesError.code !== 'PGRST116') {
+          console.error('Error deleting files:', filesError)
+          deletionSteps.push({ table: 'files', error: filesError.message })
+        } else {
+          deletionSteps.push({ table: 'files', success: true })
+        }
+      } catch (e) {
+        console.error('Exception deleting files:', e)
+      }
+
+      // Log what we've done so far
+      console.log('Deletion steps completed:', deletionSteps)
+
+      // Step 6: Finally, try to delete the project
+      const { error: projectError } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', projectId)
+
+      if (projectError) {
+        console.error('Error deleting project:', projectError)
+        setDeletingProject(false)
+
+        // Check if it's a foreign key constraint
+        if (projectError.code === '23503' || projectError.message?.includes('foreign key constraint')) {
+          // Parse which table is causing the issue
+          const match = projectError.message?.match(/"([^"]+)"/g)
+          const tableName = match ? match[1]?.replace(/"/g, '') : 'related data'
+
+          setToast({
+            message: `Cannot delete project: ${tableName} still contains related data. Please try refreshing the page and trying again.`,
+            type: 'error'
+          })
+        } else {
+          setToast({
+            message: `Failed to delete project: ${projectError.message || 'Unknown error'}`,
+            type: 'error'
+          })
+        }
+        return
+      }
+
+      // Success - navigate to dashboard
+      setToast({
+        message: 'Project deleted successfully',
+        type: 'success'
+      })
+
+      // Small delay to show success message before navigation
+      setTimeout(() => {
+        navigate('/dashboard')
+      }, 750)
+
     } catch (err: any) {
-      console.error('Error deleting project:', err)
+      console.error('Unexpected error during deletion:', err)
+      setDeletingProject(false)
+      setToast({
+        message: `An unexpected error occurred: ${err.message || 'Please try again'}`,
+        type: 'error'
+      })
     }
   }
 
@@ -1168,9 +1317,10 @@ export default function ProjectDetailPage() {
           <Button
             variant="danger"
             onClick={handleDeleteProject}
+            disabled={deletingProject}
             className="flex-1"
           >
-            Delete Project
+            {deletingProject ? 'Deleting...' : 'Delete Project'}
           </Button>
         </div>
       </Modal>

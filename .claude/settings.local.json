@@ -36,7 +36,8 @@
       "Bash(npx vercel:*)",
       "Bash(cat:*)",
       "Bash(nul)",
-      "Bash(del nul)"
+      "Bash(del nul)",
+      "Bash(git revert:*)"
     ],
     "deny": [],
     "ask": []
