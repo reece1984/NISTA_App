@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { ChevronDown, ChevronUp, LogOut, FileText, ExternalLink } from 'lucide-react'
+import { ChevronDown, ChevronUp, LogOut, FileText, ExternalLink, AlertTriangle } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase, type AssessmentTemplate } from '../lib/supabase'
 
@@ -34,6 +34,7 @@ interface AssessmentCriterion {
   assessment_question: string
   weight: number | null
   is_critical: boolean
+  is_gateway_blocker?: boolean
   template_id: number
   page_ref?: number // PDF page reference
 }
@@ -174,13 +175,10 @@ export default function AssessmentCriteriaPage() {
   const isPAR = gateName.toLowerCase().includes('par')
   const gateNumber = gateName.match(/Gate (\d+)/)?.[1] || '0'
 
-  // Mock stats - in real app these would come from assessment_runs data
+  // Calculate stats from actual criteria data
   const stats = {
     total: criteria.length,
-    assessed: 4,
-    green: 2,
-    amber: 1,
-    red: 1,
+    critical: criteria.filter(c => c.is_critical || c.is_gateway_blocker).length,
   }
 
   // PAR template doesn't have a PDF, only Gate templates do
@@ -241,9 +239,19 @@ export default function AssessmentCriteriaPage() {
             <div className="flex items-center gap-2">
               {templates.map((template) => {
                 // Check if template is PAR or Gate X
-                const isPAR = template.name.toLowerCase().includes('par')
-                const gateNum = template.name.match(/Gate (\d+)/)?.[1] || '0'
-                const displayLabel = isPAR ? 'PAR' : `G${gateNum}`
+                const templateNameLower = template.name.toLowerCase()
+                const templateCodeLower = template.code?.toLowerCase() || ''
+                const isPAR = templateNameLower.includes('par') || templateCodeLower === 'par' || templateNameLower.includes('project assessment review')
+
+                let displayLabel = 'G0'
+                if (isPAR) {
+                  displayLabel = 'PAR'
+                } else {
+                  const gateNum = template.name.match(/Gate (\d+)/)?.[1]
+                  if (gateNum) {
+                    displayLabel = `G${gateNum}`
+                  }
+                }
 
                 return (
                   <button
@@ -305,20 +313,8 @@ export default function AssessmentCriteriaPage() {
                     <div className="text-slate-300 text-sm">Total Criteria</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold">{stats.assessed}</div>
-                    <div className="text-slate-300 text-sm">Assessed</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-green-400">{stats.green}</div>
-                    <div className="text-green-400 text-sm">Green Rating</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-amber-400">{stats.amber}</div>
-                    <div className="text-amber-400 text-sm">Amber Rating</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-red-400">{stats.red}</div>
-                    <div className="text-red-400 text-sm">Red Rating</div>
+                    <div className="text-2xl font-bold text-orange-400">{stats.critical}</div>
+                    <div className="text-orange-400 text-sm">Critical Criteria</div>
                   </div>
                 </div>
               </div>
@@ -330,14 +326,7 @@ export default function AssessmentCriteriaPage() {
                 const isExpanded = expandedCategories.has(group.category)
                 const categoryColor = CATEGORY_COLORS[group.category] || 'bg-gray-500'
                 const categoryTextColor = CATEGORY_TEXT_COLORS[group.category] || 'text-gray-700'
-                const assessedCount = 2 // Mock - would come from real data
-
-                // Mock RAG status for display
-                const ragStatuses = group.criteria.map((_, idx) => {
-                  if (idx < 2) return 'green'
-                  if (idx < 3) return 'amber'
-                  return 'gray'
-                })
+                const criticalCount = group.criteria.filter(c => c.is_critical || c.is_gateway_blocker).length
 
                 return (
                   <div
@@ -359,29 +348,13 @@ export default function AssessmentCriteriaPage() {
                             {group.category}
                           </h3>
                           <span className="text-sm text-gray-500">
-                            {assessedCount} of {group.criteria.length} criteria assessed
+                            {group.criteria.length} criteria{criticalCount > 0 && ` • ${criticalCount} critical`}
                           </span>
                         </div>
                       </div>
 
-                      {/* Mini RAG dots and Chevron */}
+                      {/* Chevron */}
                       <div className="flex items-center gap-4 ml-auto">
-                        <div className="flex items-center gap-1.5">
-                          {ragStatuses.map((status, idx) => (
-                            <div
-                              key={idx}
-                              className={`w-2.5 h-2.5 rounded-full ${
-                                status === 'green'
-                                  ? 'bg-green-500'
-                                  : status === 'amber'
-                                  ? 'bg-amber-500'
-                                  : 'bg-gray-300'
-                              }`}
-                            ></div>
-                          ))}
-                        </div>
-
-                        {/* Chevron */}
                         {isExpanded ? (
                           <ChevronUp size={20} className="text-gray-400" />
                         ) : (
@@ -393,11 +366,8 @@ export default function AssessmentCriteriaPage() {
                     {/* Expanded Criteria Rows */}
                     {isExpanded && (
                       <div className="border-t border-gray-200">
-                        {group.criteria.map((criterion, idx) => {
-                          const pageRef = criterion.page_ref || 15 + idx // Mock page ref
-                          // Mock status based on index
-                          const status = idx < 2 ? 'Assessed' : idx < 3 ? 'In Progress' : 'Not Started'
-                          const ragStatus = idx < 2 ? (idx === 0 ? 'green' : 'amber') : 'gray'
+                        {group.criteria.map((criterion) => {
+                          const isCritical = criterion.is_critical || criterion.is_gateway_blocker
 
                           return (
                             <div
@@ -414,30 +384,12 @@ export default function AssessmentCriteriaPage() {
                                 {criterion.assessment_question}
                               </p>
 
-                              {/* Status badge */}
-                              <span
-                                className={`px-3 py-1 rounded text-xs font-semibold flex-shrink-0 ${
-                                  status === 'Assessed'
-                                    ? 'bg-slate-800 text-white'
-                                    : status === 'In Progress'
-                                    ? 'bg-amber-100 text-amber-800'
-                                    : 'bg-gray-100 text-gray-600'
-                                }`}
-                              >
-                                {status}
-                              </span>
-
-                              {/* Page reference link - Only show for Gate templates, not PAR */}
-                              {pdfUrl && (
-                                <a
-                                  href={`${pdfUrl}#page=${pageRef}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center gap-0.5 text-xs text-gray-500 hover:text-gray-700 hover:underline flex-shrink-0 transition-colors"
-                                >
-                                  p.{pageRef}
-                                  <ExternalLink size={12} />
-                                </a>
+                              {/* Critical badge - Only show if criterion is critical or gateway blocker */}
+                              {isCritical && (
+                                <span className="px-3 py-1 rounded-full text-xs font-semibold flex-shrink-0 bg-orange-100 text-orange-700 border border-orange-200 flex items-center gap-1">
+                                  <AlertTriangle size={12} />
+                                  Critical
+                                </span>
                               )}
                             </div>
                           )

@@ -94,7 +94,7 @@ export default function DashboardPage() {
                   to="/dashboard"
                   className="px-4 py-2 text-sm font-semibold text-white border-b-2 border-accent transition-all"
                 >
-                  Dashboard
+                  Projects
                 </Link>
                 <Link
                   to="/criteria"

@@ -619,7 +619,7 @@ export default function ProjectDetailPage() {
         <div className="text-center">
           <p className="text-lg text-text-secondary mb-4">Project not found</p>
           <Link to="/dashboard">
-            <Button variant="primary">Back to Dashboard</Button>
+            <Button variant="primary">Back to Projects</Button>
           </Link>
         </div>
       </div>
@@ -662,7 +662,7 @@ export default function ProjectDetailPage() {
                   to="/dashboard"
                   className="px-4 py-2 text-sm font-medium text-white/85 hover:text-white hover:bg-white/10 rounded-lg transition-all"
                 >
-                  Dashboard
+                  Projects
                 </Link>
                 <Link
                   to="/criteria"
