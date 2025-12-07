@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HS2 Phase One FBC 2020 - Gateway Success</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --border: #e5e7eb;
+            
+            --ink: #0a1628;
+            --ink-light: #1a2a42;
+            --ink-subtle: #4a5568;
+            --text-muted: #6b7280;
+            
+            --copper: #c17f4e;
+            --copper-light: #d4956a;
+            --copper-dark: #a66a3d;
+            --copper-bg: rgba(193, 127, 78, 0.08);
+            --copper-border: rgba(193, 127, 78, 0.2);
+            
+            --green: #059669;
+            --green-light: #10b981;
+            --green-bg: rgba(5, 150, 105, 0.08);
+            --green-border: rgba(5, 150, 105, 0.2);
+            
+            --amber: #d97706;
+            --amber-bg: rgba(217, 119, 6, 0.08);
+            --amber-border: rgba(217, 119, 6, 0.2);
+            
+            --red: #dc2626;
+            --red-light: #ef4444;
+            --red-bg: rgba(220, 38, 38, 0.06);
+            --red-border: rgba(220, 38, 38, 0.15);
+            
+            --font-display: 'Fraunces', Georgia, serif;
+            --font-body: 'Source Sans 3', -apple-system, sans-serif;
+            
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--gray-50);
+            color: var(--ink);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* Navigation */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+        }
+        
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+        }
+        
+        .logo span {
+            color: var(--copper);
+        }
+        
+        .logo-subtitle {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 2px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--ink);
+            background: var(--gray-100);
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-email {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+        }
+        
+        .btn-ghost {
+            background: var(--white);
+            border: 1px solid var(--border);
+            color: var(--ink);
+        }
+        
+        .btn-ghost:hover {
+            background: var(--gray-100);
+        }
+        
+        .btn-danger-ghost {
+            background: transparent;
+            border: 1px solid var(--red-border);
+            color: var(--red);
+        }
+        
+        .btn-danger-ghost:hover {
+            background: var(--red-bg);
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+        
+        .breadcrumb a {
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            color: var(--copper);
+            text-decoration: underline;
+        }
+        
+        .breadcrumb svg {
+            width: 14px;
+            height: 14px;
+            opacity: 0.5;
+        }
+        
+        /* Project Header */
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        
+        .project-title {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-meta {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .meta-item svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
+        }
+        
+        .gate-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.75rem;
+            background: var(--ink);
+            border: none;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.35rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+        
+        .tab-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        
+        .tab-item:hover {
+            color: var(--ink);
+            background: var(--gray-100);
+        }
+        
+        .tab-item.active {
+            color: var(--ink);
+            background: var(--gray-200);
+            font-weight: 600;
+        }
+        
+        .tab-item svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+        
+        .tab-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background: var(--gray-200);
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        
+        .tab-item.active .tab-count {
+            background: var(--ink);
+            color: var(--white);
+        }
+        
+        /* Rating Hero - Redesigned */
+        .rating-hero {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        /* Clean Rating Card */
+        .rating-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .rating-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        
+        .rating-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+        
+        .rating-version {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .rating-indicator {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .rating-indicator.red {
+            background: var(--red);
+        }
+        
+        .rating-indicator.amber {
+            background: var(--amber);
+        }
+        
+        .rating-indicator.green {
+            background: var(--green);
+        }
+        
+        .rating-indicator svg {
+            width: 32px;
+            height: 32px;
+            color: white;
+        }
+        
+        .rating-info {
+            flex: 1;
+        }
+        
+        .rating-value {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.25rem;
+        }
+        
+        .rating-value.red { color: var(--red); }
+        .rating-value.amber { color: var(--amber); }
+        .rating-value.green { color: var(--green); }
+        
+        .rating-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .rating-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .rating-stat {
+            text-align: center;
+        }
+        
+        .rating-stat-value {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+        
+        .rating-stat-value.red { color: var(--red); }
+        .rating-stat-value.amber { color: var(--amber); }
+        .rating-stat-value.green { color: var(--green); }
+        
+        .rating-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        
+        /* Assessment Breakdown */
+        .breakdown-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .breakdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .breakdown-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        
+        .breakdown-legend {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+        
+        .legend-dot.green { background: var(--green); }
+        .legend-dot.amber { background: var(--amber); }
+        .legend-dot.red { background: var(--red); }
+        
+        .breakdown-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .bar-label {
+            width: 90px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--ink-subtle);
+        }
+        
+        .bar-container {
+            flex: 1;
+            height: 28px;
+            background: var(--gray-100);
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+        }
+        
+        .bar-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            min-width: 24px;
+        }
+        
+        .bar-segment.green { background: var(--green); }
+        .bar-segment.amber { background: var(--amber); }
+        .bar-segment.red { background: var(--red); }
+        
+        .bar-count {
+            width: 30px;
+            text-align: right;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        
+        /* Critical Findings Section */
+        .findings-section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-title .count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: var(--red);
+            color: white;
+            border-radius: 50%;
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .view-all-link {
+            font-size: 0.85rem;
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .view-all-link:hover {
+            color: var(--copper);
+            text-decoration: underline;
+        }
+        
+        .findings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .finding-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--red);
+            border-radius: 8px;
+            padding: 1.35rem 1.5rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .finding-card:hover {
+            border-color: var(--red-border);
+            border-left-color: var(--red);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .finding-card.amber {
+            border-left-color: var(--amber);
+        }
+        
+        .finding-card.amber:hover {
+            border-color: var(--amber-border);
+            border-left-color: var(--amber);
+        }
+        
+        .finding-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+        
+        .finding-code {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        
+        .finding-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        
+        .finding-badge.red {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+        
+        .finding-badge.amber {
+            background: var(--amber-bg);
+            color: var(--amber);
+        }
+        
+        .finding-title {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        
+        .finding-description {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        
+        .finding-category {
+            display: inline-block;
+            margin-top: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            background: var(--gray-100);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        
+        /* Info Grid */
+        .info-section {
+            margin-bottom: 2rem;
+        }
+        
+        .info-section-header {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 1rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .info-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .info-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.875rem;
+        }
+        
+        .info-card-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gray-100);
+            border-radius: 6px;
+            color: var(--ink);
+        }
+        
+        .info-card-icon svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .info-card-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        
+        .info-card-content {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-card-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .info-card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .info-card-link:hover {
+            color: var(--copper);
+            text-decoration: underline;
+        }
+        
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-primary {
+            background: var(--ink);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background: var(--ink-light);
+        }
+        
+        .btn-secondary {
+            background: var(--white);
+            border: 1px solid var(--border);
+            color: var(--ink);
+            padding: 0.75rem 1.5rem;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gray-100);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .rating-hero {
+                grid-template-columns: 1fr;
+            }
+            
+            .findings-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .project-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .project-meta {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .tab-nav {
+                padding: 0.25rem;
+            }
+            
+            .tab-item {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+            
+            .tab-item span:not(.tab-count) {
+                display: none;
+            }
+            
+            .rating-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .action-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <div>
+                <div class="logo">Gateway<span>Success</span></div>
+                <div class="logo-subtitle">IPA Gateway Assessment</div>
+            </div>
+            <div class="nav-links">
+                <a href="#projects" class="active">Projects</a>
+                <a href="#criteria">Criteria</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <span class="user-email">jamesreece@live.co.uk</span>
+            <button class="btn btn-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Sign Out
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="#projects">Projects</a>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"/>
+            </svg>
+            <span>HS2 Phase One FBC 2020</span>
+        </div>
+        
+        <!-- Project Header -->
+        <div class="project-header">
+            <div>
+                <h1 class="project-title">HS2 Phase One FBC 2020</h1>
+                <div class="project-meta">
+                    <span class="gate-badge">Gate 3: Investment Decision</span>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                        £50,000M
+                    </div>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="3" width="15" height="13"/>
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                            <circle cx="5.5" cy="18.5" r="2.5"/>
+                            <circle cx="18.5" cy="18.5" r="2.5"/>
+                        </svg>
+                        Transport
+                    </div>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        Assessed 6 Dec 2025
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-danger-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                Delete Project
+            </button>
+        </div>
+        
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                <span>Overview</span>
+            </button>
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                <span>Documents</span>
+                <span class="tab-count">1</span>
+            </button>
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                <span>Assessment Summary</span>
+                <span class="tab-count">20</span>
+            </button>
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                <span>Dashboard</span>
+                <span class="tab-count">20</span>
+            </button>
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                <span>Assessment Detail</span>
+                <span class="tab-count">20</span>
+            </button>
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                <span>Actions</span>
+            </button>
+        </div>
+        
+        <!-- Rating Hero -->
+        <div class="rating-hero">
+            <!-- Rating Card - Redesigned -->
+            <div class="rating-card">
+                <div class="rating-header">
+                    <span class="rating-title">Gateway Readiness</span>
+                    <span class="rating-version">v84 • 6 Dec 2025</span>
+                </div>
+                
+                <div class="rating-display">
+                    <div class="rating-indicator red">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                    </div>
+                    <div class="rating-info">
+                        <div class="rating-value red">RED</div>
+                        <div class="rating-subtitle">Significant issues to address</div>
+                    </div>
+                </div>
+                
+                <div class="rating-stats">
+                    <div class="rating-stat">
+                        <div class="rating-stat-value green">8</div>
+                        <div class="rating-stat-label">Green</div>
+                    </div>
+                    <div class="rating-stat">
+                        <div class="rating-stat-value amber">8</div>
+                        <div class="rating-stat-label">Amber</div>
+                    </div>
+                    <div class="rating-stat">
+                        <div class="rating-stat-value red">4</div>
+                        <div class="rating-stat-label">Red</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Assessment Breakdown -->
+            <div class="breakdown-card">
+                <div class="breakdown-header">
+                    <h3 class="breakdown-title">Assessment by Dimension</h3>
+                    <div class="breakdown-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot green"></div>
+                            Green
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot amber"></div>
+                            Amber
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot red"></div>
+                            Red
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="breakdown-bars">
+                    <div class="bar-row">
+                        <span class="bar-label">Strategic</span>
+                        <div class="bar-container">
+                            <div class="bar-segment green" style="width: 50%">2</div>
+                            <div class="bar-segment amber" style="width: 25%">1</div>
+                            <div class="bar-segment red" style="width: 25%">1</div>
+                        </div>
+                        <span class="bar-count">4</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">Economic</span>
+                        <div class="bar-container">
+                            <div class="bar-segment green" style="width: 20%">1</div>
+                            <div class="bar-segment amber" style="width: 40%">2</div>
+                            <div class="bar-segment red" style="width: 40%">2</div>
+                        </div>
+                        <span class="bar-count">5</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">Commercial</span>
+                        <div class="bar-container">
+                            <div class="bar-segment green" style="width: 60%">3</div>
+                            <div class="bar-segment amber" style="width: 40%">2</div>
+                        </div>
+                        <span class="bar-count">5</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">Financial</span>
+                        <div class="bar-container">
+                            <div class="bar-segment green" style="width: 33%">1</div>
+                            <div class="bar-segment amber" style="width: 33%">1</div>
+                            <div class="bar-segment red" style="width: 33%">1</div>
+                        </div>
+                        <span class="bar-count">3</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">Management</span>
+                        <div class="bar-container">
+                            <div class="bar-segment green" style="width: 67%">2</div>
+                            <div class="bar-segment amber" style="width: 33%">1</div>
+                        </div>
+                        <span class="bar-count">3</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Critical Findings -->
+        <div class="findings-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    Critical Findings
+                    <span class="count">4</span>
+                </h2>
+                <a href="#" class="view-all-link">
+                    View all findings
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </a>
+            </div>
+            
+            <div class="findings-grid">
+                <div class="finding-card">
+                    <div class="finding-header">
+                        <span class="finding-code">EC-1.9</span>
+                        <span class="finding-badge red">RED</span>
+                    </div>
+                    <div class="finding-title">Options Appraisal</div>
+                    <div class="finding-description">The evidence reveals a lack of a documented long-list and short-list options appraisal for the project.</div>
+                    <span class="finding-category">Economic Case</span>
+                </div>
+                
+                <div class="finding-card">
+                    <div class="finding-header">
+                        <span class="finding-code">MC-2.1B</span>
+                        <span class="finding-badge red">RED</span>
+                    </div>
+                    <div class="finding-title">Benefits Management</div>
+                    <div class="finding-description">The project lacks a detailed benefits management and realisation plan with documented ownership.</div>
+                    <span class="finding-category">Management Case</span>
+                </div>
+                
+                <div class="finding-card">
+                    <div class="finding-header">
+                        <span class="finding-code">SC-1.3B</span>
+                        <span class="finding-badge red">RED</span>
+                    </div>
+                    <div class="finding-title">Preferred Option Justification</div>
+                    <div class="finding-description">The project lacks a clear, documented justification of the preferred option against alternatives.</div>
+                    <span class="finding-category">Strategic Case</span>
+                </div>
+                
+                <div class="finding-card amber">
+                    <div class="finding-header">
+                        <span class="finding-code">FC-3.6</span>
+                        <span class="finding-badge amber">AMBER</span>
+                    </div>
+                    <div class="finding-title">Sensitivity Analysis</div>
+                    <div class="finding-description">There is no documented evidence of a sensitivity analysis being conducted to test key assumptions.</div>
+                    <span class="finding-category">Financial Case</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Project Details -->
+        <div class="info-section">
+            <h2 class="info-section-header">Project Details</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                        </div>
+                        <span class="info-card-title">Documents</span>
+                    </div>
+                    <div class="info-card-content">1 document uploaded</div>
+                    <div class="info-card-meta">FBC_HS2_Phase1_2020.pdf</div>
+                    <a href="#" class="info-card-link">
+                        Manage documents
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 20h9"/>
+                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                            </svg>
+                        </div>
+                        <span class="info-card-title">Assessment Template</span>
+                    </div>
+                    <div class="info-card-content">Gate 3: Investment Decision</div>
+                    <div class="info-card-meta">20 criteria • 5 critical</div>
+                    <a href="#" class="info-card-link">
+                        View template criteria
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </div>
+                        <span class="info-card-title">Assessment History</span>
+                    </div>
+                    <div class="info-card-content">Version 84</div>
+                    <div class="info-card-meta">Last run: 6 Dec 2025, 14:32</div>
+                    <a href="#" class="info-card-link">
+                        View history
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="20" x2="12" y2="10"/>
+                    <line x1="18" y1="20" x2="18" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="16"/>
+                </svg>
+                View Full Assessment
+            </button>
+            <button class="btn btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Export Report
+            </button>
+            <button class="btn btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10"/>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+                Re-run Assessment
+            </button>
+        </div>
+    </main>
+</body>
+</html>

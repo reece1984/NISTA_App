@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documents - HS2 Phase One FBC 2020 - Gateway Success</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --border: #e5e7eb;
+            
+            --ink: #0a1628;
+            --ink-light: #1a2a42;
+            --ink-subtle: #4a5568;
+            --text-muted: #6b7280;
+            
+            --copper: #c17f4e;
+            --copper-dark: #a66a3d;
+            
+            --green: #059669;
+            --green-bg: rgba(5, 150, 105, 0.08);
+            --green-border: rgba(5, 150, 105, 0.2);
+            
+            --amber: #d97706;
+            --amber-bg: rgba(217, 119, 6, 0.08);
+            --amber-border: rgba(217, 119, 6, 0.2);
+            
+            --red: #dc2626;
+            --red-bg: rgba(220, 38, 38, 0.06);
+            --red-border: rgba(220, 38, 38, 0.15);
+            
+            --blue: #2563eb;
+            --blue-bg: rgba(37, 99, 235, 0.08);
+            --blue-border: rgba(37, 99, 235, 0.2);
+            
+            --font-display: 'Fraunces', Georgia, serif;
+            --font-body: 'Source Sans 3', -apple-system, sans-serif;
+            
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--gray-50);
+            color: var(--ink);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* Navigation */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+        }
+        
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+        }
+        
+        .logo span {
+            color: var(--copper);
+        }
+        
+        .logo-subtitle {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 2px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--ink);
+            background: var(--gray-100);
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-email {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+        }
+        
+        .btn-ghost {
+            background: var(--white);
+            border: 1px solid var(--border);
+            color: var(--ink);
+        }
+        
+        .btn-ghost:hover {
+            background: var(--gray-100);
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Project Header */
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        
+        .project-title {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .gate-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.75rem;
+            background: var(--ink);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .meta-item svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
+        }
+        
+        .btn-danger-ghost {
+            background: transparent;
+            border: 1px solid var(--red-border);
+            color: var(--red);
+        }
+        
+        .btn-danger-ghost:hover {
+            background: var(--red-bg);
+        }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.35rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+        
+        .tab-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        
+        .tab-item:hover {
+            color: var(--ink);
+            background: var(--gray-100);
+        }
+        
+        .tab-item.active {
+            color: var(--ink);
+            background: var(--gray-200);
+            font-weight: 600;
+        }
+        
+        .tab-item svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+        
+        .tab-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background: var(--gray-200);
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        
+        .tab-item.active .tab-count {
+            background: var(--ink);
+            color: var(--white);
+        }
+        
+        /* Page Content Layout */
+        .page-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 1.5rem;
+        }
+        
+        /* Documents Section */
+        .documents-section {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        
+        .section-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        .btn-primary {
+            background: var(--ink);
+            color: var(--white);
+            padding: 0.6rem 1.25rem;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background: var(--ink-light);
+        }
+        
+        /* Upload Zone */
+        .upload-zone {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .upload-dropzone {
+            border: 2px dashed var(--gray-300);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .upload-dropzone:hover {
+            border-color: var(--ink);
+            background: var(--gray-50);
+        }
+        
+        .upload-dropzone.dragging {
+            border-color: var(--ink);
+            background: var(--blue-bg);
+        }
+        
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            background: var(--gray-100);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ink);
+        }
+        
+        .upload-text {
+            font-size: 0.95rem;
+            color: var(--ink);
+            margin-bottom: 0.25rem;
+        }
+        
+        .upload-text span {
+            color: var(--ink);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+        
+        .upload-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        /* Document List */
+        .document-list {
+            padding: 0.5rem 0;
+        }
+        
+        .document-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+            transition: background 0.15s ease;
+        }
+        
+        .document-item:last-child {
+            border-bottom: none;
+        }
+        
+        .document-item:hover {
+            background: var(--gray-50);
+        }
+        
+        .document-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--red-bg);
+            border: 1px solid var(--red-border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--red);
+            flex-shrink: 0;
+        }
+        
+        .document-icon.processed {
+            background: var(--green-bg);
+            border-color: var(--green-border);
+            color: var(--green);
+        }
+        
+        .document-icon.processing {
+            background: var(--blue-bg);
+            border-color: var(--blue-border);
+            color: var(--blue);
+        }
+        
+        .document-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .document-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .document-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .document-type {
+            padding: 0.15rem 0.5rem;
+            background: var(--gray-100);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        
+        .document-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .document-status.processed {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+        
+        .document-status.processing {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+        
+        .document-status.error {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+        
+        .document-status svg {
+            width: 12px;
+            height: 12px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .document-status.processing svg {
+            animation: spin 1s linear infinite;
+        }
+        
+        .document-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .action-btn:hover {
+            background: var(--gray-100);
+            border-color: var(--border);
+            color: var(--ink);
+        }
+        
+        .action-btn.delete:hover {
+            background: var(--red-bg);
+            border-color: var(--red-border);
+            color: var(--red);
+        }
+        
+        .action-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .sidebar-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        
+        .sidebar-card-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .sidebar-card-header svg {
+            width: 16px;
+            height: 16px;
+            color: var(--ink);
+        }
+        
+        .sidebar-card-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+        
+        .sidebar-card-content {
+            padding: 1.25rem;
+        }
+        
+        /* Recommended Documents */
+        .recommended-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .recommended-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .recommended-item:hover {
+            background: var(--gray-100);
+        }
+        
+        .recommended-check {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gray-300);
+            border-radius: 4px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+        
+        .recommended-check.checked {
+            background: var(--green);
+            border-color: var(--green);
+            color: white;
+        }
+        
+        .recommended-check svg {
+            width: 12px;
+            height: 12px;
+        }
+        
+        .recommended-info {
+            flex: 1;
+        }
+        
+        .recommended-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.15rem;
+        }
+        
+        .recommended-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        
+        /* Coverage Summary */
+        .coverage-summary {
+            text-align: center;
+        }
+        
+        .coverage-ring {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1rem;
+            position: relative;
+        }
+        
+        .coverage-ring svg {
+            transform: rotate(-90deg);
+        }
+        
+        .coverage-ring-bg {
+            fill: none;
+            stroke: var(--gray-200);
+            stroke-width: 8;
+        }
+        
+        .coverage-ring-fill {
+            fill: none;
+            stroke: var(--green);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 188.4; /* 75% = 251.2 * 0.25 */
+            transition: stroke-dashoffset 0.5s ease;
+        }
+        
+        .coverage-ring-fill.low {
+            stroke: var(--red);
+        }
+        
+        .coverage-ring-fill.medium {
+            stroke: var(--amber);
+        }
+        
+        .coverage-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+        
+        .coverage-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        
+        .coverage-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .coverage-stat-value {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+        
+        .coverage-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        
+        /* Assessment CTA */
+        .assessment-cta {
+            padding: 1.25rem;
+        }
+        
+        .cta-text {
+            font-size: 0.9rem;
+            color: var(--ink);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .btn-secondary {
+            background: var(--white);
+            border: 1px solid var(--border);
+            color: var(--ink);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gray-100);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            padding: 3rem 1.5rem;
+            text-align: center;
+        }
+        
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1.5rem;
+            background: var(--gray-100);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+        
+        .empty-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-description {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .page-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .sidebar-card {
+                flex: 1;
+                min-width: 280px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .project-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .project-meta {
+                flex-wrap: wrap;
+            }
+            
+            .document-item {
+                flex-wrap: wrap;
+            }
+            
+            .document-actions {
+                width: 100%;
+                justify-content: flex-end;
+                padding-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <div>
+                <div class="logo">Gateway<span>Success</span></div>
+                <div class="logo-subtitle">IPA Gateway Assessment</div>
+            </div>
+            <div class="nav-links">
+                <a href="#projects" class="active">Projects</a>
+                <a href="#criteria">Criteria</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <span class="user-email">jamesreece@live.co.uk</span>
+            <button class="btn btn-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Sign Out
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Project Header -->
+        <div class="project-header">
+            <div>
+                <h1 class="project-title">HS2 Phase One FBC 2020 - Gate 3</h1>
+                <div class="project-meta">
+                    <span class="gate-badge">Gate 3: Investment Decision</span>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                        £50,000M
+                    </div>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="3" width="15" height="13"/>
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                            <circle cx="5.5" cy="18.5" r="2.5"/>
+                            <circle cx="18.5" cy="18.5" r="2.5"/>
+                        </svg>
+                        Transport
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-danger-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                Delete Project
+            </button>
+        </div>
+        
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                <span>Overview</span>
+            </button>
+            <button class="tab-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                <span>Documents</span>
+                <span class="tab-count">1</span>
+            </button>
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                <span>Assessment Summary</span>
+                <span class="tab-count">20</span>
+            </button>
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                <span>Assessment Detail</span>
+                <span class="tab-count">20</span>
+            </button>
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                <span>Actions</span>
+            </button>
+        </div>
+        
+        <!-- Page Layout -->
+        <div class="page-layout">
+            <!-- Main Documents Section -->
+            <div class="documents-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Project Documents</h2>
+                        <p class="section-subtitle">Upload programme documents for AI-powered assessment</p>
+                    </div>
+                    <button class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        Upload Documents
+                    </button>
+                </div>
+                
+                <!-- Upload Zone -->
+                <div class="upload-zone">
+                    <div class="upload-dropzone">
+                        <div class="upload-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                        </div>
+                        <p class="upload-text">Drag and drop files here, or <span>browse</span></p>
+                        <p class="upload-hint">PDF, DOC, DOCX, XLS, XLSX up to 50MB each</p>
+                    </div>
+                </div>
+                
+                <!-- Document List -->
+                <div class="document-list">
+                    <div class="document-item">
+                        <div class="document-icon processed">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                        </div>
+                        <div class="document-info">
+                            <div class="document-name">HS2_Phase_One_Full_Business_Case_2020.pdf</div>
+                            <div class="document-meta">
+                                <span class="document-type">PDF</span>
+                                <span>42.3 MB</span>
+                                <span>Uploaded 3 days ago</span>
+                            </div>
+                        </div>
+                        <div class="document-status processed">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Processed
+                        </div>
+                        <div class="document-actions">
+                            <button class="action-btn" title="View document">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                    <polyline points="15 3 21 3 21 9"/>
+                                    <line x1="10" y1="14" x2="21" y2="3"/>
+                                </svg>
+                            </button>
+                            <button class="action-btn delete" title="Delete document">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Recommended Documents -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                        <span class="sidebar-card-title">Recommended for Gate 3</span>
+                    </div>
+                    <div class="sidebar-card-content">
+                        <div class="recommended-list">
+                            <div class="recommended-item">
+                                <div class="recommended-check checked">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                        <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                </div>
+                                <div class="recommended-info">
+                                    <div class="recommended-name">Full Business Case</div>
+                                    <div class="recommended-desc">Complete FBC with all five cases</div>
+                                </div>
+                            </div>
+                            <div class="recommended-item">
+                                <div class="recommended-check"></div>
+                                <div class="recommended-info">
+                                    <div class="recommended-name">Benefits Realisation Plan</div>
+                                    <div class="recommended-desc">Detailed benefits tracking approach</div>
+                                </div>
+                            </div>
+                            <div class="recommended-item">
+                                <div class="recommended-check"></div>
+                                <div class="recommended-info">
+                                    <div class="recommended-name">Risk Register</div>
+                                    <div class="recommended-desc">Current risk log with mitigations</div>
+                                </div>
+                            </div>
+                            <div class="recommended-item">
+                                <div class="recommended-check"></div>
+                                <div class="recommended-info">
+                                    <div class="recommended-name">Procurement Strategy</div>
+                                    <div class="recommended-desc">Commercial approach documentation</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Document Coverage -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span class="sidebar-card-title">Evidence Coverage</span>
+                    </div>
+                    <div class="sidebar-card-content">
+                        <div class="coverage-summary">
+                            <div class="coverage-ring">
+                                <svg width="100" height="100" viewBox="0 0 100 100">
+                                    <circle class="coverage-ring-bg" cx="50" cy="50" r="40"/>
+                                    <circle class="coverage-ring-fill low" cx="50" cy="50" r="40"/>
+                                </svg>
+                                <div class="coverage-value">25%</div>
+                            </div>
+                            <p class="coverage-label">of recommended documents uploaded</p>
+                            <div class="coverage-stats">
+                                <div>
+                                    <div class="coverage-stat-value">1</div>
+                                    <div class="coverage-stat-label">Uploaded</div>
+                                </div>
+                                <div>
+                                    <div class="coverage-stat-value">4</div>
+                                    <div class="coverage-stat-label">Recommended</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Assessment CTA -->
+                <div class="sidebar-card">
+                    <div class="assessment-cta">
+                        <p class="cta-text">Your documents have been processed and are ready for assessment.</p>
+                        <div class="cta-buttons">
+                            <button class="btn btn-primary btn-full">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                                </svg>
+                                Run Assessment
+                            </button>
+                            <button class="btn btn-secondary btn-full">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="20" x2="18" y2="10"/>
+                                    <line x1="12" y1="20" x2="12" y2="4"/>
+                                    <line x1="6" y1="20" x2="6" y2="14"/>
+                                </svg>
+                                View Results
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

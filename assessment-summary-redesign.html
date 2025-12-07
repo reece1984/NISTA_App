@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Summary - HS2 Phase One FBC 2020 - Gateway Success</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --border: #e5e7eb;
+            
+            --ink: #0a1628;
+            --ink-light: #1a2a42;
+            --ink-subtle: #4a5568;
+            --text-muted: #6b7280;
+            --text-body: #374151;
+            
+            --copper: #c17f4e;
+            --copper-dark: #a66a3d;
+            
+            --green: #059669;
+            --green-bg: rgba(5, 150, 105, 0.08);
+            --green-border: rgba(5, 150, 105, 0.2);
+            
+            --amber: #d97706;
+            --amber-bg: rgba(217, 119, 6, 0.08);
+            --amber-border: rgba(217, 119, 6, 0.2);
+            
+            --red: #dc2626;
+            --red-bg: rgba(220, 38, 38, 0.06);
+            --red-border: rgba(220, 38, 38, 0.15);
+            
+            --font-display: 'Fraunces', Georgia, serif;
+            --font-body: 'Source Sans 3', -apple-system, sans-serif;
+            
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--gray-50);
+            color: var(--ink);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* Navigation */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+        }
+        
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+        }
+        
+        .logo span {
+            color: var(--copper);
+        }
+        
+        .logo-subtitle {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 2px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--ink);
+            background: var(--gray-100);
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-email {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+        }
+        
+        .btn-ghost {
+            background: var(--white);
+            border: 1px solid var(--border);
+            color: var(--ink);
+        }
+        
+        .btn-ghost:hover {
+            background: var(--gray-100);
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Project Header */
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        
+        .project-title {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .gate-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.75rem;
+            background: var(--ink);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .meta-item svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
+        }
+        
+        .btn-danger-ghost {
+            background: transparent;
+            border: 1px solid var(--red-border);
+            color: var(--red);
+        }
+        
+        .btn-danger-ghost:hover {
+            background: var(--red-bg);
+        }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.35rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+        
+        .tab-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        
+        .tab-item:hover {
+            color: var(--ink);
+            background: var(--gray-100);
+        }
+        
+        .tab-item.active {
+            color: var(--ink);
+            background: var(--gray-200);
+            font-weight: 600;
+        }
+        
+        .tab-item svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+        
+        .tab-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background: var(--gray-200);
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        
+        .tab-item.active .tab-count {
+            background: var(--ink);
+            color: var(--white);
+        }
+        
+        /* Summary Document Layout */
+        .summary-document {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        
+        /* Document Header */
+        .doc-header {
+            padding: 2rem 2.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .doc-header-left {
+            flex: 1;
+        }
+        
+        .doc-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 0.25rem;
+        }
+        
+        .doc-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+        
+        .doc-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: var(--ink);
+            color: var(--white);
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background: var(--ink-light);
+        }
+        
+        .btn-secondary {
+            background: var(--white);
+            border: 1px solid var(--border);
+            color: var(--ink);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gray-100);
+        }
+        
+        /* Executive Summary Banner */
+        .exec-summary-banner {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 2rem;
+            padding: 2rem 2.5rem;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+        }
+        
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+        
+        .rating-badge {
+            width: 72px;
+            height: 72px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--white);
+        }
+        
+        .rating-badge.red { background: var(--red); }
+        .rating-badge.amber { background: var(--amber); }
+        .rating-badge.green { background: var(--green); }
+        
+        .rating-info h3 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 0.25rem;
+        }
+        
+        .rating-info p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .exec-summary-text {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text-body);
+            border-left: 3px solid var(--ink);
+            padding-left: 1.25rem;
+        }
+        
+        .exec-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding-left: 2rem;
+            border-left: 1px solid var(--border);
+        }
+        
+        .exec-stat {
+            text-align: center;
+        }
+        
+        .exec-stat-value {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1;
+        }
+        
+        .exec-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-top: 0.25rem;
+        }
+        
+        /* Document Body */
+        .doc-body {
+            padding: 2rem 2.5rem;
+        }
+        
+        /* Section */
+        .doc-section {
+            margin-bottom: 2.5rem;
+        }
+        
+        .doc-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--ink);
+        }
+        
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--ink);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+        }
+        
+        .section-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .section-icon.green { background: var(--green); }
+        .section-icon.red { background: var(--red); }
+        .section-icon.amber { background: var(--amber); }
+        
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        
+        .section-count {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        
+        /* Findings List */
+        .findings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .finding-item {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            border-left: 4px solid var(--green);
+        }
+        
+        .finding-item.red {
+            border-left-color: var(--red);
+            background: var(--red-bg);
+        }
+        
+        .finding-item.amber {
+            border-left-color: var(--amber);
+            background: var(--amber-bg);
+        }
+        
+        .finding-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        
+        .finding-code {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--ink);
+            font-family: var(--font-body);
+        }
+        
+        .finding-dimension {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        
+        .finding-rating {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            width: fit-content;
+        }
+        
+        .finding-rating.red {
+            background: var(--red);
+            color: white;
+        }
+        
+        .finding-rating.amber {
+            background: var(--amber);
+            color: white;
+        }
+        
+        .finding-rating.green {
+            background: var(--green);
+            color: white;
+        }
+        
+        .finding-content h4 {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+        
+        .finding-content p {
+            font-size: 0.9rem;
+            color: var(--text-body);
+            line-height: 1.6;
+        }
+        
+        /* Strengths Grid */
+        .strengths-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .strength-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: var(--green-bg);
+            border: 1px solid var(--green-border);
+            border-radius: 8px;
+        }
+        
+        .strength-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .strength-icon svg {
+            width: 12px;
+            height: 12px;
+        }
+        
+        .strength-content {
+            flex: 1;
+        }
+        
+        .strength-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.25rem;
+        }
+        
+        .strength-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        
+        .strength-ref {
+            font-size: 0.7rem;
+            color: var(--green);
+            font-weight: 600;
+            margin-top: 0.35rem;
+        }
+        
+        /* Recommendations */
+        .recommendations-list {
+            counter-reset: rec-counter;
+        }
+        
+        .recommendation-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            counter-increment: rec-counter;
+        }
+        
+        .recommendation-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .rec-number {
+            width: 32px;
+            height: 32px;
+            background: var(--ink);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .rec-content {
+            flex: 1;
+        }
+        
+        .rec-content p {
+            font-size: 0.95rem;
+            color: var(--text-body);
+            line-height: 1.7;
+        }
+        
+        .rec-priority {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 0.75rem;
+        }
+        
+        .rec-priority.critical {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+        
+        .rec-priority.high {
+            background: var(--amber-bg);
+            color: var(--amber);
+        }
+        
+        .rec-priority.medium {
+            background: var(--gray-100);
+            color: var(--text-muted);
+        }
+        
+        /* Document Footer */
+        .doc-footer {
+            padding: 1.5rem 2.5rem;
+            background: var(--gray-50);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .doc-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .doc-meta span {
+            margin-right: 1.5rem;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .top-nav,
+            .tab-nav,
+            .doc-actions,
+            .project-header > button {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 0;
+                max-width: none;
+            }
+            
+            .summary-document {
+                box-shadow: none;
+                border: none;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .exec-summary-banner {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .exec-stats {
+                flex-direction: row;
+                padding-left: 0;
+                border-left: none;
+                padding-top: 1rem;
+                border-top: 1px solid var(--border);
+            }
+            
+            .strengths-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .doc-header,
+            .doc-body {
+                padding: 1.5rem;
+            }
+            
+            .finding-item {
+                grid-template-columns: 1fr;
+            }
+            
+            .finding-meta {
+                flex-direction: row;
+                align-items: center;
+                gap: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <div>
+                <div class="logo">Gateway<span>Success</span></div>
+                <div class="logo-subtitle">IPA Gateway Assessment</div>
+            </div>
+            <div class="nav-links">
+                <a href="#projects" class="active">Projects</a>
+                <a href="#criteria">Criteria</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <span class="user-email">jamesreece@live.co.uk</span>
+            <button class="btn btn-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Sign Out
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Project Header -->
+        <div class="project-header">
+            <div>
+                <h1 class="project-title">HS2 Phase One FBC 2020 - Gate 3</h1>
+                <div class="project-meta">
+                    <span class="gate-badge">Gate 3: Investment Decision</span>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                        £50,000M
+                    </div>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="3" width="15" height="13"/>
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                            <circle cx="5.5" cy="18.5" r="2.5"/>
+                            <circle cx="18.5" cy="18.5" r="2.5"/>
+                        </svg>
+                        Transport
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-danger-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                Delete Project
+            </button>
+        </div>
+        
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                <span>Overview</span>
+            </button>
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                <span>Documents</span>
+                <span class="tab-count">1</span>
+            </button>
+            <button class="tab-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                <span>Assessment Summary</span>
+                <span class="tab-count">20</span>
+            </button>
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                <span>Dashboard</span>
+                <span class="tab-count">20</span>
+            </button>
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                <span>Assessment Detail</span>
+                <span class="tab-count">20</span>
+            </button>
+            <button class="tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                <span>Actions</span>
+            </button>
+        </div>
+        
+        <!-- Summary Document -->
+        <div class="summary-document">
+            <!-- Document Header -->
+            <div class="doc-header">
+                <div class="doc-header-left">
+                    <h2 class="doc-title">Gateway Assessment Report</h2>
+                    <p class="doc-subtitle">Comprehensive analysis of 20 criteria against IPA standards</p>
+                </div>
+                <div class="doc-actions">
+                    <button class="btn btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 4 23 10 17 10"/>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                        </svg>
+                        Re-run
+                    </button>
+                    <button class="btn btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Excel
+                    </button>
+                    <button class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        Export PDF
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Executive Summary Banner -->
+            <div class="exec-summary-banner">
+                <div class="rating-display">
+                    <div class="rating-badge red">RED</div>
+                    <div class="rating-info">
+                        <h3>Not Ready to Proceed</h3>
+                        <p>Critical issues require resolution</p>
+                    </div>
+                </div>
+                
+                <div class="exec-summary-text">
+                    The overall assessment rating for the HS2 project gate review is <strong>RED</strong> due to critical shortcomings in value for money and budgetary certainty. While the project demonstrates structured arrangements across multiple criteria, significant risks in financial viability and governance must be urgently addressed before proceeding.
+                </div>
+                
+                <div class="exec-stats">
+                    <div class="exec-stat">
+                        <div class="exec-stat-value">20</div>
+                        <div class="exec-stat-label">Assessed</div>
+                    </div>
+                    <div class="exec-stat">
+                        <div class="exec-stat-value" style="color: var(--red);">5</div>
+                        <div class="exec-stat-label">Critical</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Document Body -->
+            <div class="doc-body">
+                <!-- Key Strengths Section -->
+                <div class="doc-section">
+                    <div class="section-header">
+                        <div class="section-icon green">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <h3 class="section-title">Key Strengths</h3>
+                        <span class="section-count">6 criteria rated GREEN</span>
+                    </div>
+                    
+                    <div class="strengths-grid">
+                        <div class="strength-item">
+                            <div class="strength-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="strength-content">
+                                <div class="strength-title">Strategic Alignment</div>
+                                <div class="strength-desc">Strong alignment with government strategic objectives and policy drivers.</div>
+                                <div class="strength-ref">Criteria 156, 157</div>
+                            </div>
+                        </div>
+                        
+                        <div class="strength-item">
+                            <div class="strength-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="strength-content">
+                                <div class="strength-title">Benefits Framework</div>
+                                <div class="strength-desc">Clearly defined and measurable benefits realisation approach.</div>
+                                <div class="strength-ref">Criterion 10</div>
+                            </div>
+                        </div>
+                        
+                        <div class="strength-item">
+                            <div class="strength-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="strength-content">
+                                <div class="strength-title">Governance Structure</div>
+                                <div class="strength-desc">Well-established governance framework with clear accountability.</div>
+                                <div class="strength-ref">Criteria 16, 18</div>
+                            </div>
+                        </div>
+                        
+                        <div class="strength-item">
+                            <div class="strength-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="strength-content">
+                                <div class="strength-title">Procurement Strategy</div>
+                                <div class="strength-desc">Defined procurement strategy aligned with government policy.</div>
+                                <div class="strength-ref">Criterion 36</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Critical Issues Section -->
+                <div class="doc-section">
+                    <div class="section-header">
+                        <div class="section-icon red">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
+                            </svg>
+                        </div>
+                        <h3 class="section-title">Critical Issues</h3>
+                        <span class="section-count">5 criteria rated RED</span>
+                    </div>
+                    
+                    <div class="findings-list">
+                        <div class="finding-item red">
+                            <div class="finding-meta">
+                                <span class="finding-code">G3-2.1</span>
+                                <span class="finding-dimension">Economic Case</span>
+                                <span class="finding-rating red">Red</span>
+                            </div>
+                            <div class="finding-content">
+                                <h4>Value for Money Assessment</h4>
+                                <p>Phase One achieves a low BCR of 1.2 with substantial sensitivity to assumptions, undermining economic justification. The analysis does not adequately demonstrate value for money compared to alternative interventions.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="finding-item red">
+                            <div class="finding-meta">
+                                <span class="finding-code">G3-4.1</span>
+                                <span class="finding-dimension">Financial Case</span>
+                                <span class="finding-rating red">Red</span>
+                            </div>
+                            <div class="finding-content">
+                                <h4>Budget and Funding Certainty</h4>
+                                <p>Persistent cost pressures and lack of robust contingency assurance threaten project financial viability. Current funding envelope may be insufficient to deliver full scope.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="finding-item red">
+                            <div class="finding-meta">
+                                <span class="finding-code">G3-5.3</span>
+                                <span class="finding-dimension">Management Case</span>
+                                <span class="finding-rating red">Red</span>
+                            </div>
+                            <div class="finding-content">
+                                <h4>Governance and Control</h4>
+                                <p>Weak enforcement of change control processes, unclear roles in the HSMRP Group, and inconsistent stakeholder management raise material risks to delivery.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="finding-item red">
+                            <div class="finding-meta">
+                                <span class="finding-code">G3-2.3</span>
+                                <span class="finding-dimension">Economic Case</span>
+                                <span class="finding-rating red">Red</span>
+                            </div>
+                            <div class="finding-content">
+                                <h4>Economic Impact Quantification</h4>
+                                <p>Insufficient quantification of wider and transformational economic impacts limits confidence in the economic rationale for the preferred option.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="finding-item red">
+                            <div class="finding-meta">
+                                <span class="finding-code">G3-5.7</span>
+                                <span class="finding-dimension">Management Case</span>
+                                <span class="finding-rating red">Red</span>
+                            </div>
+                            <div class="finding-content">
+                                <h4>Schedule Risk Management</h4>
+                                <p>Schedule risk assessments lack external validation and comprehensive reporting. Critical path analysis does not adequately address interface risks.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recommendations Section -->
+                <div class="doc-section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="16" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                        </div>
+                        <h3 class="section-title">Recommendations</h3>
+                        <span class="section-count">Do not proceed until addressed</span>
+                    </div>
+                    
+                    <div class="recommendations-list">
+                        <div class="recommendation-item">
+                            <div class="rec-number">1</div>
+                            <div class="rec-content">
+                                <p><strong>Conduct a comprehensive reappraisal of the economic case</strong> to strengthen the valuation of wider benefits and ensure robustness of the VfM analysis, led by the Department's economic advisors.</p>
+                                <span class="rec-priority critical">Critical Priority</span>
+                            </div>
+                        </div>
+                        
+                        <div class="recommendation-item">
+                            <div class="rec-number">2</div>
+                            <div class="rec-content">
+                                <p><strong>Undertake a full financial review</strong> to confirm funding adequacy, contingency appropriateness, and improved cost-estimate maturity, with enhanced governance from the Shareholder Board.</p>
+                                <span class="rec-priority critical">Critical Priority</span>
+                            </div>
+                        </div>
+                        
+                        <div class="recommendation-item">
+                            <div class="rec-number">3</div>
+                            <div class="rec-content">
+                                <p><strong>Strengthen governance</strong> by clarifying roles and responsibilities within the HSMRP Group and rigorously enforcing change control and stakeholder management processes.</p>
+                                <span class="rec-priority high">High Priority</span>
+                            </div>
+                        </div>
+                        
+                        <div class="recommendation-item">
+                            <div class="rec-number">4</div>
+                            <div class="rec-content">
+                                <p><strong>Enhance schedule risk management</strong> with external validation and improved documentation. These actions must be completed and independently verified before authorising programme progression.</p>
+                                <span class="rec-priority high">High Priority</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Document Footer -->
+            <div class="doc-footer">
+                <div class="doc-meta">
+                    <span>Version 84</span>
+                    <span>Generated: 6 Dec 2025, 14:32</span>
+                    <span>Assessment ID: HS2-G3-2025-084</span>
+                </div>
+                <button class="btn btn-ghost">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                    </svg>
+                    Generate Action Plan
+                </button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

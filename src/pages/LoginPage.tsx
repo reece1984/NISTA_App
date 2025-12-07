@@ -39,7 +39,7 @@ export default function LoginPage() {
       setError('')
       setLoading(true)
       await signIn(data.email, data.password)
-      navigate('/dashboard')
+      navigate('/projects')
     } catch (err: any) {
       setError(err.message || 'Failed to sign in')
     } finally {

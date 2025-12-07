@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - HS2 Phase One FBC 2020 - Gateway Success</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --border: #e5e7eb;
+            
+            --ink: #0a1628;
+            --ink-light: #1a2a42;
+            --text-muted: #6b7280;
+            
+            --copper: #c17f4e;
+            
+            --green: #059669;
+            --green-bg: rgba(5, 150, 105, 0.08);
+            
+            --amber: #d97706;
+            --amber-bg: rgba(217, 119, 6, 0.08);
+            
+            --red: #dc2626;
+            --red-bg: rgba(220, 38, 38, 0.06);
+            --red-border: rgba(220, 38, 38, 0.15);
+            
+            --blue: #2563eb;
+            --blue-bg: rgba(37, 99, 235, 0.08);
+            
+            --font-display: 'Fraunces', Georgia, serif;
+            --font-body: 'Source Sans 3', -apple-system, sans-serif;
+            
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--gray-50);
+            color: var(--ink);
+            line-height: 1.6;
+        }
+        
+        /* Navigation */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-left { display: flex; align-items: center; gap: 2.5rem; }
+        
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        
+        .logo span { color: var(--copper); }
+        
+        .logo-subtitle {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .nav-links { display: flex; gap: 0.25rem; }
+        
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--ink);
+            background: var(--gray-100);
+        }
+        
+        .nav-right { display: flex; align-items: center; gap: 1rem; }
+        .user-email { color: var(--text-muted); font-size: 0.9rem; }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        
+        .btn-ghost {
+            background: var(--white);
+            border: 1px solid var(--border);
+            color: var(--ink);
+        }
+        
+        .btn-ghost:hover { background: var(--gray-100); }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Project Header */
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        
+        .project-title {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-meta { display: flex; align-items: center; gap: 1rem; }
+        
+        .gate-badge {
+            display: inline-flex;
+            padding: 0.35rem 0.75rem;
+            background: var(--ink);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .meta-item svg { width: 16px; height: 16px; opacity: 0.6; }
+        
+        .btn-danger-ghost {
+            background: transparent;
+            border: 1px solid var(--red-border);
+            color: var(--red);
+        }
+        
+        .btn-danger-ghost:hover { background: var(--red-bg); }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.35rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+        
+        .tab-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            white-space: nowrap;
+            transition: all 0.15s ease;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        
+        .tab-item:hover { color: var(--ink); background: var(--gray-100); }
+        .tab-item.active { color: var(--ink); background: var(--gray-200); font-weight: 600; }
+        .tab-item svg { width: 16px; height: 16px; opacity: 0.7; }
+        
+        .tab-count {
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background: var(--gray-200);
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab-item.active .tab-count { background: var(--ink); color: var(--white); }
+        
+        /* Dashboard Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .dashboard-title-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.25rem;
+        }
+        
+        .dashboard-title-section p { font-size: 0.9rem; color: var(--text-muted); }
+        
+        .dashboard-controls { display: flex; gap: 0.75rem; }
+        
+        .filter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--ink);
+            cursor: pointer;
+        }
+        
+        .filter-btn:hover { background: var(--gray-100); }
+        .filter-btn.active { background: var(--ink); border-color: var(--ink); color: var(--white); }
+        .filter-btn svg { width: 16px; height: 16px; }
+        
+        /* Filter Panel */
+        .filter-panel {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+        
+        .filter-panel.active { display: block; }
+        .filter-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .filter-group { display: flex; align-items: center; gap: 0.5rem; }
+        .filter-label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
+        .filter-chips { display: flex; gap: 0.35rem; }
+        
+        .filter-chip {
+            padding: 0.35rem 0.75rem;
+            background: var(--gray-100);
+            border: 1px solid transparent;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        
+        .filter-chip:hover { background: var(--gray-200); }
+        .filter-chip.active { background: var(--ink); color: white; }
+        .filter-chip.green.active { background: var(--green); }
+        .filter-chip.amber.active { background: var(--amber); }
+        .filter-chip.red.active { background: var(--red); }
+        
+        /* KPI Cards */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .kpi-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .kpi-card.selected { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+        
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        
+        .kpi-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+        
+        .kpi-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .kpi-icon.green { background: var(--green-bg); color: var(--green); }
+        .kpi-icon.amber { background: var(--amber-bg); color: var(--amber); }
+        .kpi-icon.red { background: var(--red-bg); color: var(--red); }
+        .kpi-icon svg { width: 16px; height: 16px; }
+        
+        .kpi-value {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+        
+        .kpi-value.green { color: var(--green); }
+        .kpi-value.amber { color: var(--amber); }
+        .kpi-value.red { color: var(--red); }
+        
+        .kpi-subtitle { font-size: 0.8rem; color: var(--text-muted); }
+        
+        .kpi-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .kpi-trend.up { background: var(--green-bg); color: var(--green); }
+        .kpi-trend.down { background: var(--red-bg); color: var(--red); }
+        .kpi-trend.neutral { background: var(--gray-100); color: var(--text-muted); }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 380px;
+            gap: 1.5rem;
+        }
+        
+        .dashboard-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        
+        .card-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem; }
+        
+        .card-action {
+            font-size: 0.8rem;
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .card-action:hover { color: var(--copper); }
+        
+        .card-body { padding: 1.25rem; }
+        
+        /* RAG Chart */
+        .rag-chart { display: flex; flex-direction: column; gap: 1rem; }
+        
+        .rag-donut {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .rag-donut svg { transform: rotate(-90deg); }
+        
+        .donut-segment {
+            fill: none;
+            stroke-width: 32;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .donut-segment:hover { stroke-width: 36; filter: brightness(1.1); }
+        
+        .donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .donut-center-value {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+        
+        .donut-center-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        
+        .rag-legend { display: flex; justify-content: center; gap: 1.5rem; }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.35rem 0.6rem;
+            border-radius: 6px;
+        }
+        
+        .legend-item:hover { background: var(--gray-100); }
+        
+        .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+        .legend-dot.green { background: var(--green); }
+        .legend-dot.amber { background: var(--amber); }
+        .legend-dot.red { background: var(--red); }
+        
+        .legend-text { font-size: 0.85rem; color: var(--ink); }
+        .legend-value { font-weight: 700; }
+        
+        /* Dimension Bars */
+        .dimension-bars { display: flex; flex-direction: column; gap: 1rem; }
+        
+        .dimension-row {
+            cursor: pointer;
+            padding: 0.5rem;
+            margin: -0.5rem;
+            border-radius: 6px;
+        }
+        
+        .dimension-row:hover { background: var(--gray-50); }
+        
+        .dimension-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .dimension-name { font-size: 0.85rem; font-weight: 600; color: var(--ink); }
+        .dimension-count { font-size: 0.8rem; color: var(--text-muted); }
+        
+        .dimension-bar {
+            height: 24px;
+            background: var(--gray-100);
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+        }
+        
+        .bar-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            min-width: 24px;
+        }
+        
+        .bar-segment.green { background: var(--green); }
+        .bar-segment.amber { background: var(--amber); }
+        .bar-segment.red { background: var(--red); }
+        
+        /* Priority Actions */
+        .priority-list { display: flex; flex-direction: column; gap: 0.75rem; }
+        
+        .priority-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            border-left: 4px solid var(--red);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .priority-item:hover { background: var(--gray-100); transform: translateX(4px); }
+        .priority-item.amber { border-left-color: var(--amber); }
+        
+        .priority-rank {
+            width: 24px;
+            height: 24px;
+            background: var(--ink);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .priority-content { flex: 1; min-width: 0; }
+        
+        .priority-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.35rem;
+        }
+        
+        .priority-code { font-size: 0.75rem; font-weight: 700; color: var(--ink); }
+        
+        .priority-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+        }
+        
+        .priority-badge.critical { background: var(--red-bg); color: var(--red); }
+        .priority-badge.red { background: var(--red); color: white; }
+        .priority-badge.amber { background: var(--amber); color: white; }
+        
+        .priority-title { font-size: 0.9rem; font-weight: 600; color: var(--ink); margin-bottom: 0.25rem; }
+        
+        .priority-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .priority-arrow { color: var(--text-muted); align-self: center; }
+        .priority-arrow svg { width: 16px; height: 16px; }
+        
+        .view-more {
+            text-align: center;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+            margin-top: 0.75rem;
+        }
+        
+        .view-more-btn {
+            font-size: 0.8rem;
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .view-more-btn:hover { color: var(--copper); }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .dashboard-grid { grid-template-columns: 1fr 1fr; }
+            .dashboard-grid > *:nth-child(3) { grid-column: span 2; }
+        }
+        
+        @media (max-width: 1024px) {
+            .kpi-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content { padding: 1rem; }
+            .nav-links { display: none; }
+            .kpi-row { grid-template-columns: 1fr; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .dashboard-grid > *:nth-child(3) { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-left">
+            <div>
+                <div class="logo">Gateway<span>Success</span></div>
+                <div class="logo-subtitle">IPA Gateway Assessment</div>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="active">Projects</a>
+                <a href="#">Criteria</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <span class="user-email">jamesreece@live.co.uk</span>
+            <button class="btn btn-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Sign Out
+            </button>
+        </div>
+    </nav>
+    
+    <main class="main-content">
+        <div class="project-header">
+            <div>
+                <h1 class="project-title">HS2 Phase One FBC 2020 - Gate 3</h1>
+                <div class="project-meta">
+                    <span class="gate-badge">Gate 3: Investment Decision</span>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                        £50,000M
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-danger-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                Delete Project
+            </button>
+        </div>
+        
+        <div class="tab-nav">
+            <button class="tab-item"><span>Overview</span></button>
+            <button class="tab-item"><span>Documents</span><span class="tab-count">1</span></button>
+            <button class="tab-item"><span>Assessment Summary</span><span class="tab-count">20</span></button>
+            <button class="tab-item active"><span>Dashboard</span><span class="tab-count">20</span></button>
+            <button class="tab-item"><span>Assessment Detail</span><span class="tab-count">20</span></button>
+            <button class="tab-item"><span>Actions</span></button>
+        </div>
+        
+        <div class="dashboard-header">
+            <div class="dashboard-title-section">
+                <h2>Assessment Dashboard</h2>
+                <p>Visual analysis of assessment results • Click any element to filter</p>
+            </div>
+            <div class="dashboard-controls">
+                <button class="filter-btn" id="filterToggle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                    </svg>
+                    Filters
+                </button>
+                <button class="filter-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Export
+                </button>
+            </div>
+        </div>
+        
+        <div class="filter-panel" id="filterPanel">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <span class="filter-label">Rating:</span>
+                    <div class="filter-chips">
+                        <button class="filter-chip active">All</button>
+                        <button class="filter-chip green">Green</button>
+                        <button class="filter-chip amber">Amber</button>
+                        <button class="filter-chip red">Red</button>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <span class="filter-label">Dimension:</span>
+                    <div class="filter-chips">
+                        <button class="filter-chip active">All</button>
+                        <button class="filter-chip">Strategic</button>
+                        <button class="filter-chip">Economic</button>
+                        <button class="filter-chip">Commercial</button>
+                        <button class="filter-chip">Financial</button>
+                        <button class="filter-chip">Management</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">Overall Rating</span>
+                    <div class="kpi-icon red">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value red">RED</div>
+                <div class="kpi-subtitle">Not ready to proceed</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">Green Criteria</span>
+                    <div class="kpi-icon green">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value green">6</div>
+                <div class="kpi-subtitle">30% of criteria</div>
+                <span class="kpi-trend up">↑ +2 vs last run</span>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">Amber Criteria</span>
+                    <div class="kpi-icon amber">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value amber">9</div>
+                <div class="kpi-subtitle">45% of criteria</div>
+                <span class="kpi-trend neutral">— No change</span>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-label">Red Criteria</span>
+                    <div class="kpi-icon red">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value red">5</div>
+                <div class="kpi-subtitle">25% of criteria</div>
+                <span class="kpi-trend down">↓ +1 vs last run</span>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">RAG Distribution</h3>
+                        <p class="card-subtitle">Assessment breakdown by status</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="rag-chart">
+                        <div class="rag-donut">
+                            <svg width="180" height="180" viewBox="0 0 180 180">
+                                <circle class="donut-segment" cx="90" cy="90" r="70" stroke="#059669" stroke-dasharray="132 308"/>
+                                <circle class="donut-segment" cx="90" cy="90" r="70" stroke="#d97706" stroke-dasharray="198 242" stroke-dashoffset="-132"/>
+                                <circle class="donut-segment" cx="90" cy="90" r="70" stroke="#dc2626" stroke-dasharray="110 330" stroke-dashoffset="-330"/>
+                            </svg>
+                            <div class="donut-center">
+                                <div class="donut-center-value">20</div>
+                                <div class="donut-center-label">Criteria</div>
+                            </div>
+                        </div>
+                        <div class="rag-legend">
+                            <div class="legend-item"><div class="legend-dot green"></div><span class="legend-text"><span class="legend-value">6</span> Green</span></div>
+                            <div class="legend-item"><div class="legend-dot amber"></div><span class="legend-text"><span class="legend-value">9</span> Amber</span></div>
+                            <div class="legend-item"><div class="legend-dot red"></div><span class="legend-text"><span class="legend-value">5</span> Red</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Assessment by Dimension</h3>
+                        <p class="card-subtitle">Performance across the five cases</p>
+                    </div>
+                    <a href="#" class="card-action">View detail →</a>
+                </div>
+                <div class="card-body">
+                    <div class="dimension-bars">
+                        <div class="dimension-row">
+                            <div class="dimension-header"><span class="dimension-name">Strategic</span><span class="dimension-count">4 criteria</span></div>
+                            <div class="dimension-bar">
+                                <div class="bar-segment green" style="width:50%">2</div>
+                                <div class="bar-segment amber" style="width:25%">1</div>
+                                <div class="bar-segment red" style="width:25%">1</div>
+                            </div>
+                        </div>
+                        <div class="dimension-row">
+                            <div class="dimension-header"><span class="dimension-name">Economic</span><span class="dimension-count">5 criteria</span></div>
+                            <div class="dimension-bar">
+                                <div class="bar-segment green" style="width:20%">1</div>
+                                <div class="bar-segment amber" style="width:40%">2</div>
+                                <div class="bar-segment red" style="width:40%">2</div>
+                            </div>
+                        </div>
+                        <div class="dimension-row">
+                            <div class="dimension-header"><span class="dimension-name">Commercial</span><span class="dimension-count">4 criteria</span></div>
+                            <div class="dimension-bar">
+                                <div class="bar-segment green" style="width:50%">2</div>
+                                <div class="bar-segment amber" style="width:50%">2</div>
+                            </div>
+                        </div>
+                        <div class="dimension-row">
+                            <div class="dimension-header"><span class="dimension-name">Financial</span><span class="dimension-count">3 criteria</span></div>
+                            <div class="dimension-bar">
+                                <div class="bar-segment amber" style="width:67%">2</div>
+                                <div class="bar-segment red" style="width:33%">1</div>
+                            </div>
+                        </div>
+                        <div class="dimension-row">
+                            <div class="dimension-header"><span class="dimension-name">Management</span><span class="dimension-count">4 criteria</span></div>
+                            <div class="dimension-bar">
+                                <div class="bar-segment green" style="width:25%">1</div>
+                                <div class="bar-segment amber" style="width:50%">2</div>
+                                <div class="bar-segment red" style="width:25%">1</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Priority Actions</h3>
+                        <p class="card-subtitle">Critical items requiring attention</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="priority-list">
+                        <div class="priority-item">
+                            <div class="priority-rank">1</div>
+                            <div class="priority-content">
+                                <div class="priority-header">
+                                    <span class="priority-code">G3-2.1</span>
+                                    <span class="priority-badge critical">Critical</span>
+                                    <span class="priority-badge red">Red</span>
+                                </div>
+                                <div class="priority-title">Value for Money Assessment</div>
+                                <div class="priority-desc">BCR of 1.2 with substantial sensitivity undermines economic justification...</div>
+                            </div>
+                            <div class="priority-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+                        </div>
+                        <div class="priority-item">
+                            <div class="priority-rank">2</div>
+                            <div class="priority-content">
+                                <div class="priority-header">
+                                    <span class="priority-code">G3-4.1</span>
+                                    <span class="priority-badge critical">Critical</span>
+                                    <span class="priority-badge red">Red</span>
+                                </div>
+                                <div class="priority-title">Budget and Funding Certainty</div>
+                                <div class="priority-desc">Persistent cost pressures and lack of robust contingency...</div>
+                            </div>
+                            <div class="priority-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+                        </div>
+                        <div class="priority-item amber">
+                            <div class="priority-rank">3</div>
+                            <div class="priority-content">
+                                <div class="priority-header">
+                                    <span class="priority-code">G3-1.2</span>
+                                    <span class="priority-badge critical">Critical</span>
+                                    <span class="priority-badge amber">Amber</span>
+                                </div>
+                                <div class="priority-title">Benefits Realisation Plan</div>
+                                <div class="priority-desc">Structured approach but accountability needs strengthening...</div>
+                            </div>
+                            <div class="priority-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+                        </div>
+                    </div>
+                    <div class="view-more">
+                        <a href="#" class="view-more-btn">View all 14 actions →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        document.getElementById('filterToggle').addEventListener('click', function() {
+            document.getElementById('filterPanel').classList.toggle('active');
+            this.classList.toggle('active');
+        });
+        
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.parentElement.querySelectorAll('.filter-chip').forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        document.querySelectorAll('.kpi-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -6,9 +6,20 @@ import ScrollToTop from './components/ScrollToTop'
 // Pages
 import SignUpPage from './pages/SignUpPage'
 import LoginPage from './pages/LoginPage'
-import DashboardPage from './pages/DashboardPage'
-import ProjectDetailPage from './pages/ProjectDetailPage'
+import ProjectsLanding from './pages/ProjectsLanding'
 import AssessmentCriteriaPage from './pages/AssessmentCriteriaPage'
+
+// Layout components
+import Layout from './components/Layout'
+import ProjectLayout from './components/ProjectLayout'
+
+// Project pages
+import OverviewPage from './pages/project/OverviewPage'
+import DocumentsPage from './pages/project/DocumentsPage'
+import SummaryPage from './pages/project/SummaryPage'
+import DetailPage from './pages/project/DetailPage'
+import ActionsPage from './pages/project/ActionsPage'
+import SettingsPage from './pages/project/SettingsPage'
 
 // Create a client
 const queryClient = new QueryClient({
@@ -52,7 +63,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (user) {
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to="/projects" replace />
   }
 
   return <>{children}</>
@@ -71,7 +82,7 @@ function RootRedirect() {
   }
 
   if (user) {
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to="/projects" replace />
   }
 
   return <Navigate to="/login" replace />
@@ -83,6 +94,8 @@ function AppRoutes() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<RootRedirect />} />
+
+        {/* Public routes */}
         <Route
           path="/signup"
           element={
@@ -99,30 +112,36 @@ function AppRoutes() {
             </PublicRoute>
           }
         />
+
+        {/* Protected routes with sidebar layout */}
         <Route
-          path="/dashboard"
+          path="/"
           element={
             <ProtectedRoute>
-              <DashboardPage />
+              <Layout />
             </ProtectedRoute>
           }
-        />
-        <Route
-          path="/projects/:id"
-          element={
-            <ProtectedRoute>
-              <ProjectDetailPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/criteria"
-          element={
-            <ProtectedRoute>
-              <AssessmentCriteriaPage />
-            </ProtectedRoute>
-          }
-        />
+        >
+          {/* Projects list (no project selected) */}
+          <Route path="projects" element={<ProjectsLanding />} />
+
+          {/* Criteria page (no project context) */}
+          <Route path="criteria" element={<AssessmentCriteriaPage />} />
+
+          {/* Project routes with ProjectLayout (header + content) */}
+          <Route path="project/:id" element={<ProjectLayout />}>
+            <Route index element={<Navigate to="overview" replace />} />
+            <Route path="overview" element={<OverviewPage />} />
+            <Route path="documents" element={<DocumentsPage />} />
+            <Route path="summary" element={<SummaryPage />} />
+            <Route path="detail" element={<DetailPage />} />
+            <Route path="actions" element={<ActionsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
+        </Route>
+
+        {/* Redirect old dashboard route to new projects route */}
+        <Route path="/dashboard" element={<Navigate to="/projects" replace />} />
       </Routes>
     </>
   )

@@ -1,4 +1,5 @@
-import { type ReactNode } from 'react'
+import { type ReactNode, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { cn } from '../../lib/utils'
 
@@ -17,6 +18,17 @@ export default function Modal({
   title,
   size = 'md',
 }: ModalProps) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   const sizes = {
@@ -26,7 +38,7 @@ export default function Modal({
     xl: 'max-w-6xl',
   }
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-screen items-center justify-center p-4">
         {/* Backdrop */}
@@ -63,4 +75,6 @@ export default function Modal({
       </div>
     </div>
   )
+
+  return createPortal(modalContent, document.body)
 }

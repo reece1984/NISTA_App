@@ -41,7 +41,7 @@ export default function SignUpPage() {
       setError('')
       setLoading(true)
       await signUp(data.email, data.password)
-      navigate('/dashboard')
+      navigate('/projects')
     } catch (err: any) {
       setError(err.message || 'Failed to create account')
     } finally {

@@ -41,6 +41,12 @@ export type Project = {
   project_sector: string | null
   template_id: number | null
   status: 'draft' | 'processing' | 'completed'
+  sponsoring_organisation?: string | null
+  delivery_organisation?: string | null
+  gateway_review_date?: string | null
+  previous_rating?: string | null
+  report_template_url?: string | null
+  report_template_name?: string | null
   created_at: string
   updated_at: string
 }

@@ -611,13 +611,14 @@ export default function AssessmentDetail({
 
                 {/* Criteria List */}
                 {isExpanded && (
-                  <div style={{ padding: '0 2.5rem 1.5rem' }}>
-                    {criteria.map(criterion => {
+                  <div style={{ padding: '1.5rem 2.5rem 1.5rem' }}>
+                    {criteria.map((criterion, index) => {
                       const criterionId = criterion.id || `${dimension}-${criteria.indexOf(criterion)}`
                       const isExpanded = expandedCriteria.includes(criterionId)
                       const rating = criterion.rag_rating || 'Amber'
                       const confidence = String(criterion.confidence || 'Medium')
                       const isCritical = criterion.is_critical || criterion.assessment_criteria?.is_critical
+                      const isLastCriterion = index === criteria.length - 1
 
                       return (
                         <div
@@ -627,7 +628,7 @@ export default function AssessmentDetail({
                             border: '1px solid #e5e7eb',
                             borderLeft: `4px solid ${getRatingColor(rating)}`,
                             borderRadius: '10px',
-                            marginBottom: '1rem',
+                            marginBottom: isLastCriterion ? '0' : '1rem',
                             overflow: 'hidden',
                             transition: 'all 0.2s ease'
                           }}
@@ -658,9 +659,11 @@ export default function AssessmentDetail({
                                 color: '#0a1628',
                                 background: '#f3f4f6',
                                 padding: '0.35rem 0.6rem',
-                                borderRadius: '4px'
+                                borderRadius: '4px',
+                                minWidth: '60px',
+                                textAlign: 'center'
                               }}>
-                                G{project.template_name?.match(/\d/)?.[0] || '3'}-{dimension.charAt(0)}.{criteria.indexOf(criterion) + 1}
+                                {criterion.criterion_code || criterion.assessment_criteria?.criterion_code || `G${project.template_name?.match(/\d/)?.[0] || '3'}-${dimension.charAt(0)}.${criteria.indexOf(criterion) + 1}`}
                               </span>
                               <span style={{
                                 fontFamily: 'Fraunces, Georgia, serif',

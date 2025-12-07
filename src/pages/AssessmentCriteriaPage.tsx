@@ -1,28 +1,7 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import { ChevronDown, ChevronUp, LogOut, FileText, ExternalLink, AlertTriangle } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { FileText, ExternalLink, AlertTriangle, X } from 'lucide-react'
 import { supabase, type AssessmentTemplate } from '../lib/supabase'
-
-// Category colors - matching the screenshot
-const CATEGORY_COLORS: Record<string, string> = {
-  Strategic: 'bg-blue-500',
-  Governance: 'bg-purple-500',
-  Economic: 'bg-green-500',
-  Commercial: 'bg-orange-500',
-  Financial: 'bg-yellow-500',
-  Management: 'bg-pink-500',
-}
-
-// Category text colors for criterion IDs
-const CATEGORY_TEXT_COLORS: Record<string, string> = {
-  Strategic: 'text-blue-500',
-  Governance: 'text-purple-500',
-  Economic: 'text-green-500',
-  Commercial: 'text-orange-500',
-  Financial: 'text-yellow-500',
-  Management: 'text-pink-500',
-}
 
 interface AssessmentCriterion {
   id: number
@@ -36,7 +15,7 @@ interface AssessmentCriterion {
   is_critical: boolean
   is_gateway_blocker?: boolean
   template_id: number
-  page_ref?: number // PDF page reference
+  page_ref?: number
 }
 
 interface CategoryGroup {
@@ -45,103 +24,83 @@ interface CategoryGroup {
 }
 
 export default function AssessmentCriteriaPage() {
-  const { user, signOut } = useAuth()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [templates, setTemplates] = useState<AssessmentTemplate[]>([])
   const [criteria, setCriteria] = useState<AssessmentCriterion[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null)
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
-  const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({})
+
+  // Initialize expanded categories when criteria changes
+  useEffect(() => {
+    if (criteria.length > 0) {
+      const categories = [...new Set(criteria.map(c => c.category))]
+      setExpandedCategories(new Set(categories))
+    }
+  }, [criteria])
 
   useEffect(() => {
     fetchTemplates()
   }, [])
 
   useEffect(() => {
-    if (selectedTemplateId) {
-      fetchCriteriaForTemplate(selectedTemplateId)
-    } else {
-      setCriteria([])
+    if (templates.length === 0) return
+
+    const templateId = searchParams.get('template')
+    if (templateId) {
+      const id = parseInt(templateId)
+      const foundTemplate = templates.find(t => t.id === id)
+      if (foundTemplate) {
+        setSelectedTemplateId(id)
+      } else {
+        // If template ID from URL doesn't exist, use first template
+        setSelectedTemplateId(templates[0].id)
+      }
+    } else if (selectedTemplateId === null) {
+      // Only set default template if none is selected
+      setSelectedTemplateId(templates[0].id)
     }
-  }, [selectedTemplateId])
+  }, [searchParams, templates]) // Removed selectedTemplateId to prevent circular dependency
+
+  useEffect(() => {
+    if (selectedTemplateId) {
+      fetchCriteria(selectedTemplateId)
+      // Only update URL if it doesn't already match to prevent loops
+      const currentTemplateId = searchParams.get('template')
+      if (currentTemplateId !== selectedTemplateId.toString()) {
+        setSearchParams({ template: selectedTemplateId.toString() })
+      }
+    }
+  }, [selectedTemplateId, searchParams, setSearchParams])
 
   const fetchTemplates = async () => {
-    try {
-      setLoading(true)
-      const { data: templatesData, error: templatesError } = await supabase
-        .from('assessment_templates')
-        .select('*')
-        .eq('is_active', true)
-        .order('id')
+    const { data, error } = await supabase
+      .from('assessment_templates')
+      .select('*')
+      .order('name')
 
-      if (templatesError) throw templatesError
-      setTemplates(templatesData || [])
-
-      // Auto-select first template
-      if (templatesData && templatesData.length > 0) {
-        setSelectedTemplateId(templatesData[0].id)
-      }
-    } catch (error) {
-      console.error('Error fetching templates:', error)
-    } finally {
-      setLoading(false)
+    if (!error && data) {
+      setTemplates(data)
     }
   }
 
-  const fetchCriteriaForTemplate = async (templateId: number) => {
-    try {
-      const { data: criteriaData, error: criteriaError } = await supabase
-        .from('assessment_criteria')
-        .select('*')
-        .eq('template_id', templateId)
-        .order('criterion_code')
+  const fetchCriteria = async (templateId: number) => {
+    setLoading(true)
+    const { data, error } = await supabase
+      .from('assessment_criteria')
+      .select('*')
+      .eq('template_id', templateId)
+      .order('category')
+      .order('criterion_code')
 
-      if (criteriaError) throw criteriaError
-      setCriteria(criteriaData || [])
-
-      // Handle URL parameter for category
-      const categoryParam = searchParams.get('category')
-
-      if (categoryParam && criteriaData && criteriaData.length > 0) {
-        // If category param exists, only expand that category
-        setExpandedCategories(new Set([categoryParam]))
-      } else {
-        // Otherwise expand all categories by default
-        if (criteriaData && criteriaData.length > 0) {
-          const allCategories = new Set(criteriaData.map(c => c.dimension))
-          setExpandedCategories(allCategories)
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching criteria:', error)
+    if (!error && data) {
+      setCriteria(data)
     }
-  }
-
-  // Scroll to category when URL param changes
-  useEffect(() => {
-    const categoryParam = searchParams.get('category')
-    if (categoryParam && categoryRefs.current[categoryParam]) {
-      // Small delay to ensure the category is expanded and rendered
-      setTimeout(() => {
-        categoryRefs.current[categoryParam]?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        })
-      }, 100)
-    }
-  }, [searchParams, criteria])
-
-  const handleSignOut = async () => {
-    try {
-      await signOut()
-    } catch (error) {
-      console.error('Error signing out:', error)
-    }
+    setLoading(false)
   }
 
   const toggleCategory = (category: string) => {
-    setExpandedCategories((prev) => {
+    setExpandedCategories(prev => {
       const newSet = new Set(prev)
       if (newSet.has(category)) {
         newSet.delete(category)
@@ -153,256 +112,465 @@ export default function AssessmentCriteriaPage() {
   }
 
   // Group criteria by category
-  const groupedCriteria: CategoryGroup[] = useMemo(() => {
-    const groups: Record<string, AssessmentCriterion[]> = {}
+  const groupedCriteria: CategoryGroup[] = criteria.reduce((acc: CategoryGroup[], criterion) => {
+    const existing = acc.find(g => g.category === criterion.category)
+    if (existing) {
+      existing.criteria.push(criterion)
+    } else {
+      acc.push({
+        category: criterion.category,
+        criteria: [criterion]
+      })
+    }
+    return acc
+  }, [])
 
-    criteria.forEach((criterion) => {
-      const category = criterion.dimension || 'Other'
-      if (!groups[category]) {
-        groups[category] = []
-      }
-      groups[category].push(criterion)
-    })
-
-    return Object.entries(groups).map(([category, criteria]) => ({
-      category,
-      criteria,
-    }))
-  }, [criteria])
-
-  const selectedTemplate = templates.find((t) => t.id === selectedTemplateId)
+  const selectedTemplate = templates.find(t => t.id === selectedTemplateId)
   const gateName = selectedTemplate?.name || 'Gate 0'
   const isPAR = gateName.toLowerCase().includes('par')
   const gateNumber = gateName.match(/Gate (\d+)/)?.[1] || '0'
 
-  // Calculate stats from actual criteria data
+  // Calculate stats
   const stats = {
     total: criteria.length,
-    critical: criteria.filter(c => c.is_critical || c.is_gateway_blocker).length,
+    critical: criteria.filter(c => c.is_critical && !c.is_gateway_blocker).length,
+    blockers: criteria.filter(c => c.is_gateway_blocker).length
   }
 
-  // PAR template doesn't have a PDF, only Gate templates do
   const pdfUrl = isPAR ? null : `/documents/IPA_Gate_Review_Process_-_Gate_${gateNumber}.pdf`
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-primary border-b border-white/10 shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-6">
-              <Link to="/dashboard" className="flex items-center gap-2">
-                <div>
-                  <div className="text-xl font-semibold text-white">Gateway Success</div>
-                  <div className="text-xs text-white/70">NISTA/PAR Assessment</div>
-                </div>
-              </Link>
-              <nav className="hidden md:flex items-center gap-4">
-                <Link
-                  to="/dashboard"
-                  className="text-sm text-white/85 hover:text-white transition-colors"
-                >
-                  Projects
-                </Link>
-                <Link
-                  to="/criteria"
-                  className="text-sm text-white font-medium border-b-2 border-accent"
-                >
-                  Criteria
-                </Link>
-              </nav>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-white/70 hidden sm:inline">{user?.email}</span>
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white/85 hover:text-white px-3 py-2 rounded-lg font-medium text-sm transition-all"
-              >
-                <LogOut size={16} />
-                <span className="hidden sm:inline">Sign Out</span>
-              </button>
-            </div>
+    <div style={{ padding: '2rem 2.5rem', maxWidth: '1200px', margin: '0 auto', background: 'var(--gray-50)', minHeight: '100vh' }}>
+        {/* Page Header */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: '1.5rem'
+        }}>
+          <div>
+            <h1 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '1.75rem',
+              fontWeight: 600,
+              letterSpacing: '-0.02em',
+              color: 'var(--ink)',
+              marginBottom: '0.25rem'
+            }}>
+              Gate Review Criteria
+            </h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+              Assessment criteria for {selectedTemplate?.name || 'Gate Review'}
+            </p>
           </div>
-        </div>
-      </header>
 
-      {/* Page Header - WHITE background, separate from the dark card */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-6 py-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold text-slate-900">Gate Review Criteria</h1>
-              <p className="text-slate-600 mt-1">Assessment criteria for {selectedTemplate?.name || 'Gate Review'}</p>
-            </div>
+          {/* Gate Selector */}
+          <div style={{
+            display: 'flex',
+            gap: '0.35rem',
+            background: 'var(--white)',
+            padding: '0.35rem',
+            borderRadius: '8px',
+            border: '1px solid var(--border)'
+          }}>
+            {templates.map(template => {
+              const templateNameLower = template.name.toLowerCase()
+              const templateCodeLower = template.code?.toLowerCase() || ''
+              const isTemplatePAR = templateNameLower.includes('par') ||
+                                   templateCodeLower === 'par' ||
+                                   templateNameLower.includes('project assessment review')
 
-            {/* Gate Selector */}
-            <div className="flex items-center gap-2">
-              {templates.map((template) => {
-                // Check if template is PAR or Gate X
-                const templateNameLower = template.name.toLowerCase()
-                const templateCodeLower = template.code?.toLowerCase() || ''
-                const isPAR = templateNameLower.includes('par') || templateCodeLower === 'par' || templateNameLower.includes('project assessment review')
-
-                let displayLabel = 'G0'
-                if (isPAR) {
-                  displayLabel = 'PAR'
-                } else {
-                  const gateNum = template.name.match(/Gate (\d+)/)?.[1]
-                  if (gateNum) {
-                    displayLabel = `G${gateNum}`
-                  }
+              let displayLabel = 'G0'
+              if (isTemplatePAR) {
+                displayLabel = 'PAR'
+              } else {
+                const gateNum = template.name.match(/Gate (\d+)/)?.[1]
+                if (gateNum) {
+                  displayLabel = `G${gateNum}`
                 }
+              }
 
-                return (
-                  <button
-                    key={template.id}
-                    onClick={() => setSelectedTemplateId(template.id)}
-                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                      selectedTemplateId === template.id
-                        ? 'bg-slate-900 text-white'
-                        : 'text-slate-600 hover:bg-slate-100 border border-slate-200'
-                    }`}
-                  >
-                    {displayLabel}
-                  </button>
-                )
-              })}
-            </div>
+              const isActive = selectedTemplateId === template.id
+
+              return (
+                <button
+                  key={template.id}
+                  onClick={() => setSelectedTemplateId(template.id)}
+                  style={{
+                    padding: '0.5rem 0.9rem',
+                    background: isActive ? 'var(--ink)' : 'transparent',
+                    border: 'none',
+                    borderRadius: '5px',
+                    color: isActive ? 'var(--white)' : 'var(--text-muted)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={e => {
+                    if (!isActive) {
+                      e.currentTarget.style.color = 'var(--ink)'
+                      e.currentTarget.style.background = 'var(--gray-100)'
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!isActive) {
+                      e.currentTarget.style.color = 'var(--text-muted)'
+                      e.currentTarget.style.background = 'transparent'
+                    }
+                  }}
+                >
+                  {displayLabel}
+                </button>
+              )
+            })}
           </div>
         </div>
-      </div>
 
-      {/* Main Content Area - grey background */}
-      <main className="max-w-6xl mx-auto px-6 py-8">
         {loading ? (
-          <div className="text-center py-12">
-            <div className="text-lg text-text-accent">Loading...</div>
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+            Loading criteria...
           </div>
         ) : (
           <>
-            {/* PDF Reference Card - DARK slate, sits inside the grey content area */}
+            {/* Info Card - Only show if PDF is available */}
             {pdfUrl && (
-              <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-lg p-5 mb-8 text-white">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-white/10 rounded-lg">
-                      <FileText className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg">IPA {gateName} Review Workbook</h3>
-                      <p className="text-slate-300 text-sm mt-1">
-                        Official guidance document containing detailed evidence requirements for each criterion
-                      </p>
-                    </div>
-                  </div>
-                  <a
-                    href={pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 bg-white text-slate-800 rounded-lg font-medium text-sm hover:bg-slate-100 transition-colors"
-                  >
-                    View PDF
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </div>
-
-                {/* Stats Row */}
-                <div className="flex gap-8 mt-6 pt-5 border-t border-white/20">
-                  <div>
-                    <div className="text-2xl font-bold">{stats.total}</div>
-                    <div className="text-slate-300 text-sm">Total Criteria</div>
+              <div style={{
+                background: 'var(--white)',
+                border: '1px solid var(--border)',
+                borderRadius: '10px',
+                padding: '1.25rem 1.5rem',
+                marginBottom: '1rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                boxShadow: 'var(--shadow-sm)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{
+                    width: '44px',
+                    height: '44px',
+                    background: 'rgba(10, 22, 40, 0.05)',
+                    border: '1px solid rgba(10, 22, 40, 0.12)',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--ink)'
+                  }}>
+                    <FileText size={22} />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-orange-400">{stats.critical}</div>
-                    <div className="text-orange-400 text-sm">Critical Criteria</div>
+                    <h3 style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      color: 'var(--ink)',
+                      marginBottom: '0.15rem'
+                    }}>
+                      IPA {selectedTemplate?.name} Review Workbook
+                    </h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                      Official guidance document with detailed evidence requirements
+                    </p>
                   </div>
                 </div>
+                <a
+                  href={pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.6rem 1rem',
+                    background: 'var(--white)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '6px',
+                    color: 'var(--ink)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = 'var(--gray-100)'
+                    e.currentTarget.style.borderColor = 'var(--ink-subtle)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'var(--white)'
+                    e.currentTarget.style.borderColor = 'var(--border)'
+                  }}
+                >
+                  View PDF
+                  <ExternalLink size={14} />
+                </a>
               </div>
             )}
 
-            {/* Category Accordion */}
-            <div className="space-y-4">
-              {groupedCriteria.map((group) => {
-                const isExpanded = expandedCategories.has(group.category)
-                const categoryColor = CATEGORY_COLORS[group.category] || 'bg-gray-500'
-                const categoryTextColor = CATEGORY_TEXT_COLORS[group.category] || 'text-gray-700'
-                const criticalCount = group.criteria.filter(c => c.is_critical || c.is_gateway_blocker).length
+            {/* Stats Card */}
+            <div style={{
+              background: 'var(--white)',
+              border: '1px solid var(--border)',
+              borderRadius: '10px',
+              padding: '1.25rem 1.5rem',
+              marginBottom: '2rem',
+              boxShadow: 'var(--shadow-sm)'
+            }}>
+              <div style={{ display: 'flex', gap: '3rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '1.5rem',
+                    fontWeight: 700,
+                    color: 'var(--ink)'
+                  }}>
+                    {stats.total}
+                  </span>
+                  <span style={{
+                    fontSize: '0.75rem',
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    fontWeight: 500
+                  }}>
+                    Total Criteria
+                  </span>
+                </div>
+                {stats.critical > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '1.5rem',
+                      fontWeight: 700,
+                      color: 'var(--red)'
+                    }}>
+                      {stats.critical}
+                    </span>
+                    <span style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--text-muted)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em',
+                      fontWeight: 500
+                    }}>
+                      Critical
+                    </span>
+                  </div>
+                )}
+                {stats.blockers > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '1.5rem',
+                      fontWeight: 700,
+                      color: 'var(--red)'
+                    }}>
+                      {stats.blockers}
+                    </span>
+                    <span style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--text-muted)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em',
+                      fontWeight: 500
+                    }}>
+                      Gateway Blockers
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
 
-                return (
+            {/* Category Sections */}
+            {groupedCriteria.map(group => {
+              const isExpanded = expandedCategories.has(group.category)
+              const criticalCount = group.criteria.filter(c => c.is_critical || c.is_gateway_blocker).length
+
+              return (
+                <div
+                  key={group.category}
+                  style={{
+                    background: 'var(--white)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '10px',
+                    marginBottom: '0.75rem',
+                    overflow: 'hidden',
+                    boxShadow: 'var(--shadow-sm)',
+                    transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = '#d0cec9'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'var(--border)'
+                  }}
+                >
                   <div
-                    key={group.category}
-                    ref={(el) => (categoryRefs.current[group.category] = el)}
-                    className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200"
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '1rem 1.25rem',
+                      cursor: 'pointer',
+                      transition: 'background 0.15s ease'
+                    }}
+                    onClick={() => toggleCategory(group.category)}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = 'var(--gray-100)'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = 'transparent'
+                    }}
                   >
-                    {/* Category Header */}
-                    <button
-                      onClick={() => toggleCategory(group.category)}
-                      className="w-full px-6 py-4 flex items-center hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-center gap-4 flex-1">
-                        {/* Colored accent bar */}
-                        <div className={`w-1.5 h-10 rounded-full ${categoryColor}`}></div>
-
-                        <div className="flex flex-col gap-1 items-start flex-1">
-                          <h3 className="text-lg font-bold text-text-primary">
-                            {group.category}
-                          </h3>
-                          <span className="text-sm text-gray-500">
-                            {group.criteria.length} criteria{criticalCount > 0 && ` • ${criticalCount} critical`}
-                          </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
+                      <div style={{
+                        width: '4px',
+                        height: '36px',
+                        background: 'var(--ink)',
+                        borderRadius: '2px'
+                      }} />
+                      <div>
+                        <div style={{
+                          fontFamily: 'var(--font-display)',
+                          fontSize: '1.05rem',
+                          fontWeight: 600,
+                          color: 'var(--ink)'
+                        }}>
+                          {group.category}
+                        </div>
+                        <div style={{
+                          fontSize: '0.8rem',
+                          color: 'var(--text-muted)',
+                          marginTop: '0.15rem'
+                        }}>
+                          {group.criteria.length} criteria
+                          {criticalCount > 0 && (
+                            <>
+                              {' • '}
+                              <span style={{ color: 'var(--red)', fontWeight: 500 }}>
+                                {criticalCount} critical
+                              </span>
+                            </>
+                          )}
                         </div>
                       </div>
-
-                      {/* Chevron */}
-                      <div className="flex items-center gap-4 ml-auto">
-                        {isExpanded ? (
-                          <ChevronUp size={20} className="text-gray-400" />
-                        ) : (
-                          <ChevronDown size={20} className="text-gray-400" />
-                        )}
-                      </div>
-                    </button>
-
-                    {/* Expanded Criteria Rows */}
-                    {isExpanded && (
-                      <div className="border-t border-gray-200">
-                        {group.criteria.map((criterion) => {
-                          const isCritical = criterion.is_critical || criterion.is_gateway_blocker
-
-                          return (
-                            <div
-                              key={criterion.id}
-                              className="px-6 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 flex items-center gap-4"
-                            >
-                              {/* Criterion ID - colored to match category */}
-                              <span className={`font-semibold text-sm ${categoryTextColor} flex-shrink-0 min-w-[50px]`}>
-                                {criterion.criterion_code}
-                              </span>
-
-                              {/* Question text */}
-                              <p className="text-sm text-text-primary flex-1 leading-relaxed">
-                                {criterion.assessment_question}
-                              </p>
-
-                              {/* Critical badge - Only show if criterion is critical or gateway blocker */}
-                              {isCritical && (
-                                <span className="px-3 py-1 rounded-full text-xs font-semibold flex-shrink-0 bg-orange-100 text-orange-700 border border-orange-200 flex items-center gap-1">
-                                  <AlertTriangle size={12} />
-                                  Critical
-                                </span>
-                              )}
-                            </div>
-                          )
-                        })}
-                      </div>
-                    )}
+                    </div>
+                    <div style={{
+                      width: '28px',
+                      height: '28px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--text-muted)',
+                      background: 'var(--gray-100)',
+                      borderRadius: '6px',
+                      transition: 'all 0.2s ease',
+                      transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)'
+                    }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </div>
                   </div>
-                )
-              })}
-            </div>
+
+                  {/* Criteria List */}
+                  {isExpanded && (
+                    <div style={{ borderTop: '1px solid var(--border-light)' }}>
+                      {group.criteria.map((criterion, index) => {
+                        const isCritical = criterion.is_critical && !criterion.is_gateway_blocker
+                        const isBlocker = criterion.is_gateway_blocker
+
+                        return (
+                          <div
+                            key={criterion.id}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              padding: '0.875rem 1.25rem',
+                              borderBottom: index < group.criteria.length - 1 ? '1px solid var(--border-light)' : 'none',
+                              transition: 'background 0.15s ease'
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.background = 'var(--gray-50)'
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.background = 'transparent'
+                            }}
+                          >
+                            <span style={{
+                              fontFamily: 'var(--font-body)',
+                              fontSize: '0.8rem',
+                              fontWeight: 600,
+                              color: 'var(--ink)',
+                              width: '65px',
+                              flexShrink: 0
+                            }}>
+                              {criterion.criterion_code}
+                            </span>
+                            <span style={{
+                              flex: 1,
+                              fontSize: '0.9rem',
+                              color: 'var(--ink-light)',
+                              paddingRight: '1rem',
+                              lineHeight: 1.5
+                            }}>
+                              {criterion.assessment_question}
+                            </span>
+                            {isCritical && (
+                              <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.3rem',
+                                padding: '0.25rem 0.65rem',
+                                background: 'var(--red-bg)',
+                                border: '1px solid var(--red-border)',
+                                borderRadius: '100px',
+                                fontSize: '0.7rem',
+                                fontWeight: 600,
+                                color: 'var(--red)',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.02em'
+                              }}>
+                                <AlertTriangle size={11} />
+                                Critical
+                              </span>
+                            )}
+                            {isBlocker && (
+                              <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.3rem',
+                                padding: '0.25rem 0.65rem',
+                                background: 'rgba(220, 38, 38, 0.12)',
+                                border: '1px solid rgba(220, 38, 38, 0.3)',
+                                borderRadius: '100px',
+                                fontSize: '0.7rem',
+                                fontWeight: 600,
+                                color: 'var(--red)',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.02em'
+                              }}>
+                                <X size={11} />
+                                Blocker
+                              </span>
+                            )}
+                            {!isCritical && !isBlocker && (
+                              <span style={{ width: '75px' }} />
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </>
         )}
-      </main>
     </div>
   )
 }

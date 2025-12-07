@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Overview - HS2 Phase One FBC 2020 - Gateway Success</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --border: #e5e7eb;
+            
+            --ink: #0a1628;
+            --ink-light: #1a2a42;
+            --text-muted: #6b7280;
+            --text-body: #374151;
+            
+            --copper: #c17f4e;
+            
+            --green: #059669;
+            --green-bg: rgba(5, 150, 105, 0.08);
+            --green-border: rgba(5, 150, 105, 0.2);
+            
+            --amber: #d97706;
+            --amber-bg: rgba(217, 119, 6, 0.08);
+            --amber-border: rgba(217, 119, 6, 0.2);
+            
+            --red: #dc2626;
+            --red-bg: rgba(220, 38, 38, 0.06);
+            --red-border: rgba(220, 38, 38, 0.15);
+            
+            --font-display: 'Fraunces', Georgia, serif;
+            --font-body: 'Source Sans 3', -apple-system, sans-serif;
+            
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--gray-50);
+            color: var(--ink);
+            line-height: 1.6;
+        }
+        
+        /* Navigation */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .nav-left { display: flex; align-items: center; gap: 2.5rem; }
+        
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        
+        .logo span { color: var(--copper); }
+        
+        .logo-subtitle {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .nav-links { display: flex; gap: 0.25rem; }
+        
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--ink);
+            background: var(--gray-100);
+        }
+        
+        .nav-right { display: flex; align-items: center; gap: 1rem; }
+        .user-email { color: var(--text-muted); font-size: 0.9rem; }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            text-decoration: none;
+        }
+        
+        .btn-ghost {
+            background: var(--white);
+            border: 1px solid var(--border);
+            color: var(--ink);
+        }
+        
+        .btn-ghost:hover { background: var(--gray-100); }
+        
+        .btn-primary {
+            background: var(--ink);
+            color: var(--white);
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover { background: var(--ink-light); }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Project Header */
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        
+        .project-title {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-meta { display: flex; align-items: center; gap: 1rem; }
+        
+        .gate-badge {
+            display: inline-flex;
+            padding: 0.35rem 0.75rem;
+            background: var(--ink);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .meta-item svg { width: 16px; height: 16px; opacity: 0.6; }
+        
+        .btn-danger-ghost {
+            background: transparent;
+            border: 1px solid var(--red-border);
+            color: var(--red);
+        }
+        
+        .btn-danger-ghost:hover { background: var(--red-bg); }
+        
+        /* Tab Navigation - REDUCED TABS */
+        .tab-nav {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.35rem;
+            margin-bottom: 2rem;
+        }
+        
+        .tab-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.15s ease;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        
+        .tab-item:hover { color: var(--ink); background: var(--gray-100); }
+        .tab-item.active { color: var(--ink); background: var(--gray-200); font-weight: 600; }
+        
+        .tab-count {
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background: var(--gray-200);
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab-item.active .tab-count { background: var(--ink); color: var(--white); }
+        
+        /* Hero Section - Gateway Readiness + Quick Stats */
+        .hero-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* Gateway Readiness Card */
+        .readiness-card {
+            padding: 1.5rem;
+        }
+        
+        .readiness-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+        
+        .readiness-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+        
+        .readiness-version {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .readiness-content {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .rating-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .rating-icon.red { background: var(--red); }
+        .rating-icon.amber { background: var(--amber); }
+        .rating-icon.green { background: var(--green); }
+        
+        .rating-icon svg { width: 28px; height: 28px; color: white; }
+        
+        .rating-info h2 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+        
+        .rating-info h2.red { color: var(--red); }
+        .rating-info h2.amber { color: var(--amber); }
+        .rating-info h2.green { color: var(--green); }
+        
+        .rating-info p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        /* RAG Summary - inline stats */
+        .rag-summary {
+            display: flex;
+            gap: 1.5rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .rag-stat {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .rag-stat-value {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        
+        .rag-stat-value.green { color: var(--green); }
+        .rag-stat-value.amber { color: var(--amber); }
+        .rag-stat-value.red { color: var(--red); }
+        
+        .rag-stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        .rag-stat-trend {
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 0.35rem;
+        }
+        
+        .rag-stat-trend.up { color: var(--green); }
+        .rag-stat-trend.down { color: var(--red); }
+        .rag-stat-trend.neutral { color: var(--text-muted); }
+        
+        /* Dimension Breakdown Card */
+        .dimension-card {
+            padding: 1.5rem;
+        }
+        
+        .dimension-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+        
+        .dimension-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        
+        .dimension-legend {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            color: var(--text-muted);
+        }
+        
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+        
+        .legend-dot.green { background: var(--green); }
+        .legend-dot.amber { background: var(--amber); }
+        .legend-dot.red { background: var(--red); }
+        
+        /* Dimension Bars */
+        .dimension-bars { display: flex; flex-direction: column; gap: 0.75rem; }
+        
+        .dimension-row {
+            display: grid;
+            grid-template-columns: 90px 1fr 40px;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .dimension-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--ink);
+        }
+        
+        .dimension-bar {
+            height: 28px;
+            background: var(--gray-100);
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+        }
+        
+        .bar-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            min-width: 28px;
+        }
+        
+        .bar-segment.green { background: var(--green); }
+        .bar-segment.amber { background: var(--amber); }
+        .bar-segment.red { background: var(--red); }
+        
+        .dimension-total {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: right;
+        }
+        
+        /* Priority Issues Section */
+        .section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-title .count-badge {
+            width: 22px;
+            height: 22px;
+            background: var(--red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .section-link {
+            font-size: 0.85rem;
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .section-link:hover { color: var(--copper); }
+        .section-link svg { width: 16px; height: 16px; }
+        
+        /* Issues Grid - 2 columns for top issues */
+        .issues-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .issue-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            border-left: 4px solid var(--red);
+            transition: all 0.2s ease;
+        }
+        
+        .issue-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .issue-card.amber { border-left-color: var(--amber); }
+        
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+        
+        .issue-code {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+        
+        .issue-badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: white;
+        }
+        
+        .issue-badge.red { background: var(--red); }
+        .issue-badge.amber { background: var(--amber); }
+        
+        .issue-title {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+        
+        .issue-description {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .issue-dimension {
+            display: inline-block;
+            margin-top: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--gray-100);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+        
+        /* Project Details Section */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .detail-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+        
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .detail-header svg {
+            width: 16px;
+            height: 16px;
+            color: var(--text-muted);
+        }
+        
+        .detail-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+        
+        .detail-value {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.25rem;
+        }
+        
+        .detail-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .detail-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .detail-link:hover { color: var(--copper); }
+        .detail-link svg { width: 14px; height: 14px; }
+        
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1.25rem 0;
+            border-top: 1px solid var(--border);
+            margin-top: 1rem;
+        }
+        
+        .btn-lg {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-section { grid-template-columns: 1fr; }
+            .issues-grid { grid-template-columns: 1fr; }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content { padding: 1rem; }
+            .details-grid { grid-template-columns: 1fr; }
+            .rag-summary { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <div>
+                <div class="logo">Gateway<span>Success</span></div>
+                <div class="logo-subtitle">IPA Gateway Assessment</div>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="active">Projects</a>
+                <a href="#">Criteria</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <span class="user-email">jamesreece@live.co.uk</span>
+            <button class="btn btn-ghost">Sign Out</button>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Project Header -->
+        <div class="project-header">
+            <div>
+                <h1 class="project-title">HS2 Phase One FBC 2020 - Gate 3</h1>
+                <div class="project-meta">
+                    <span class="gate-badge">Gate 3: Investment Decision</span>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                        £50,000M
+                    </div>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="3" width="15" height="13"/>
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                        </svg>
+                        Transport
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-danger-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                Delete Project
+            </button>
+        </div>
+        
+        <!-- Tab Navigation - REDUCED: Removed Dashboard tab -->
+        <div class="tab-nav">
+            <button class="tab-item active"><span>Overview</span></button>
+            <button class="tab-item"><span>Documents</span><span class="tab-count">1</span></button>
+            <button class="tab-item"><span>Assessment Summary</span><span class="tab-count">20</span></button>
+            <button class="tab-item"><span>Assessment Detail</span><span class="tab-count">20</span></button>
+            <button class="tab-item"><span>Actions</span></button>
+        </div>
+        
+        <!-- Hero Section: Readiness + Dimensions side by side -->
+        <div class="hero-section">
+            <!-- Gateway Readiness Card -->
+            <div class="card readiness-card">
+                <div class="readiness-header">
+                    <span class="readiness-label">Gateway Readiness</span>
+                    <span class="readiness-version">v84 • 6 Dec 2025</span>
+                </div>
+                
+                <div class="readiness-content">
+                    <div class="rating-icon red">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </div>
+                    <div class="rating-info">
+                        <h2 class="red">RED</h2>
+                        <p>Not ready to proceed • Significant issues to address</p>
+                    </div>
+                </div>
+                
+                <div class="rag-summary">
+                    <div class="rag-stat">
+                        <div class="rag-stat-value green">0</div>
+                        <div class="rag-stat-label">Green</div>
+                        <div class="rag-stat-trend neutral">—</div>
+                    </div>
+                    <div class="rag-stat">
+                        <div class="rag-stat-value amber">18</div>
+                        <div class="rag-stat-label">Amber</div>
+                        <div class="rag-stat-trend down">+1 vs last</div>
+                    </div>
+                    <div class="rag-stat">
+                        <div class="rag-stat-value red">2</div>
+                        <div class="rag-stat-label">Red</div>
+                        <div class="rag-stat-trend down">+1 vs last</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Assessment by Dimension Card -->
+            <div class="card dimension-card">
+                <div class="dimension-header">
+                    <span class="dimension-title">Assessment by Dimension</span>
+                    <div class="dimension-legend">
+                        <span class="legend-item"><span class="legend-dot green"></span> Green</span>
+                        <span class="legend-item"><span class="legend-dot amber"></span> Amber</span>
+                        <span class="legend-item"><span class="legend-dot red"></span> Red</span>
+                    </div>
+                </div>
+                
+                <div class="dimension-bars">
+                    <div class="dimension-row">
+                        <span class="dimension-name">Strategic</span>
+                        <div class="dimension-bar">
+                            <div class="bar-segment amber" style="width: 100%">3</div>
+                        </div>
+                        <span class="dimension-total">3</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span class="dimension-name">Economic</span>
+                        <div class="dimension-bar">
+                            <div class="bar-segment amber" style="width: 67%">2</div>
+                            <div class="bar-segment red" style="width: 33%">1</div>
+                        </div>
+                        <span class="dimension-total">3</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span class="dimension-name">Commercial</span>
+                        <div class="dimension-bar">
+                            <div class="bar-segment amber" style="width: 100%">4</div>
+                        </div>
+                        <span class="dimension-total">4</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span class="dimension-name">Financial</span>
+                        <div class="dimension-bar">
+                            <div class="bar-segment amber" style="width: 75%">3</div>
+                            <div class="bar-segment red" style="width: 25%">1</div>
+                        </div>
+                        <span class="dimension-total">4</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span class="dimension-name">Management</span>
+                        <div class="dimension-bar">
+                            <div class="bar-segment amber" style="width: 100%">6</div>
+                        </div>
+                        <span class="dimension-total">6</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Priority Issues Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    Priority Issues
+                    <span class="count-badge">2</span>
+                </h2>
+                <a href="#" class="section-link">
+                    View all findings
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </a>
+            </div>
+            
+            <div class="issues-grid">
+                <div class="issue-card">
+                    <div class="issue-header">
+                        <span class="issue-code">G3-2.1</span>
+                        <span class="issue-badge red">Red</span>
+                    </div>
+                    <div class="issue-title">Final VfM Assessment</div>
+                    <div class="issue-description">The assessment reveals critical gaps in the Value for Money (VfM) evaluation, notably that HS2 Phase One achieves a BCR of only 1.2 with substantial sensitivity to assumptions.</div>
+                    <span class="issue-dimension">Economic</span>
+                </div>
+                
+                <div class="issue-card">
+                    <div class="issue-header">
+                        <span class="issue-code">G3-4.1</span>
+                        <span class="issue-badge red">Red</span>
+                    </div>
+                    <div class="issue-title">Budget Confirmation</div>
+                    <div class="issue-description">Evidence reveals significant challenges associated with budget confirmation and funding certainty. Persistent cost pressures and lack of robust contingency assurance threaten financial viability.</div>
+                    <span class="issue-dimension">Financial</span>
+                </div>
+                
+                <div class="issue-card amber">
+                    <div class="issue-header">
+                        <span class="issue-code">G3-1.2</span>
+                        <span class="issue-badge amber">Amber</span>
+                    </div>
+                    <div class="issue-title">Benefits Realisation Plan</div>
+                    <div class="issue-description">The evidence supports a structured approach to benefits realisation, including defined accountability, benefits-led decisions, and continuous improvement mechanisms.</div>
+                    <span class="issue-dimension">Strategic</span>
+                </div>
+                
+                <div class="issue-card amber">
+                    <div class="issue-header">
+                        <span class="issue-code">G3-1.3</span>
+                        <span class="issue-badge amber">Amber</span>
+                    </div>
+                    <div class="issue-title">Stakeholder Commitment</div>
+                    <div class="issue-description">Evidence suggests that HS2 Ltd has developed a structured approach to stakeholder management, aiming to clarify roles and responsibilities in engagement.</div>
+                    <span class="issue-dimension">Strategic</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Project Details Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Project Details</h2>
+            </div>
+            
+            <div class="details-grid">
+                <div class="detail-card">
+                    <div class="detail-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        <span class="detail-label">Documents</span>
+                    </div>
+                    <div class="detail-value">1 document uploaded</div>
+                    <div class="detail-meta">HS2_Phase_One_Full_Business_Case_2020.pdf</div>
+                    <a href="#" class="detail-link">
+                        Manage documents
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <div class="detail-card">
+                    <div class="detail-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                        <span class="detail-label">Assessment Template</span>
+                    </div>
+                    <div class="detail-value">Gate 3: Investment Decision</div>
+                    <div class="detail-meta">20 criteria • 0 critical</div>
+                    <a href="#" class="detail-link">
+                        View template criteria
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <div class="detail-card">
+                    <div class="detail-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span class="detail-label">Assessment History</span>
+                    </div>
+                    <div class="detail-value">Version 84</div>
+                    <div class="detail-meta">Last run: 6 Dec 2025, 14:32</div>
+                    <a href="#" class="detail-link">
+                        View history
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="btn btn-primary btn-lg">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                View Full Assessment
+            </button>
+            <button class="btn btn-ghost btn-lg">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Export Report
+            </button>
+            <button class="btn btn-ghost btn-lg">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10"/>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+                Re-run Assessment
+            </button>
+        </div>
+    </main>
+</body>
+</html>
