@@ -47,6 +47,27 @@ export default function DetailPage() {
           .eq('assessment_run_id', assessmentRunId)
 
         assessments = assessmentsData || []
+
+        // Fetch evidence requirements for each criterion
+        if (assessments.length > 0) {
+          const criterionIds = assessments.map(a => a.criterion_id).filter(Boolean)
+
+          if (criterionIds.length > 0) {
+            const { data: evidenceReqs } = await supabase
+              .from('evidence_requirements')
+              .select('*')
+              .in('criterion_id', criterionIds)
+              .order('display_order')
+
+            // Merge evidence requirements into each assessment
+            assessments = assessments.map(assessment => ({
+              ...assessment,
+              evidence_requirements: evidenceReqs?.filter(
+                er => er.criterion_id === assessment.criterion_id
+              ) || []
+            }))
+          }
+        }
       }
 
       return {

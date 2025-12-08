@@ -2,6 +2,8 @@ import React, { useState, useMemo, useRef } from 'react'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import * as XLSX from 'xlsx'
+import { EvidenceAssessmentSection } from './assessment/EvidenceAssessmentSection'
+import { PathToGreenSection } from './assessment/PathToGreenSection'
 
 interface AssessmentDetailProps {
   project: any
@@ -975,6 +977,24 @@ export default function AssessmentDetail({
                                       ))}
                                     </div>
                                   </div>
+                                )}
+
+                                {/* Evidence Assessment Section */}
+                                {criterion.evidence_requirements && criterion.evidence_requirements.length > 0 && (
+                                  <EvidenceAssessmentSection
+                                    evidenceRequirements={criterion.evidence_requirements}
+                                    evidenceAssessment={criterion.evidence_assessment || []}
+                                  />
+                                )}
+
+                                {/* Path to GREEN Section */}
+                                {criterion.assessment_criteria?.quality_rubric?.GREEN && (
+                                  <PathToGreenSection
+                                    rating={rating}
+                                    evidenceRequirements={criterion.evidence_requirements || []}
+                                    evidenceAssessment={criterion.evidence_assessment || []}
+                                    greenStandard={criterion.assessment_criteria.quality_rubric.GREEN}
+                                  />
                                 )}
 
                                 {/* Recommendation Section */}
