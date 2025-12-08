@@ -112,8 +112,14 @@ export default function CreateProjectModal({
     resolver: zodResolver(projectSchema),
   })
 
-  // Debug form errors
-  console.log('Form errors:', JSON.stringify(errors, null, 2))
+  // Debug form errors - extract just the messages to avoid circular reference issues
+  const errorMessages = Object.entries(errors).reduce((acc, [key, value]) => {
+    acc[key] = value?.message || 'Invalid'
+    return acc
+  }, {} as Record<string, string>)
+  if (Object.keys(errorMessages).length > 0) {
+    console.log('Form validation errors:', errorMessages)
+  }
 
   const gatewayReviewDate = watch('gatewayReviewDate')
 
