@@ -113,7 +113,7 @@ export default function CreateProjectModal({
   })
 
   // Debug form errors
-  console.log('Form errors:', errors)
+  console.log('Form errors:', JSON.stringify(errors, null, 2))
 
   const gatewayReviewDate = watch('gatewayReviewDate')
 
