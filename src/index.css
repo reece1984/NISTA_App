@@ -49,7 +49,7 @@
 
     color-scheme: light;
     color: var(--ink);
-    background-color: var(--cream);
+    background-color: #f1f5f9;
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -91,4 +91,28 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Custom scrollbar styling for dashboard components */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Firefox support */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
 }

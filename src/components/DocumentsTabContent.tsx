@@ -12,6 +12,7 @@ interface DocumentsTabContentProps {
   hasAssessments: boolean
   hasFiles: boolean
   runningAssessment: boolean
+  assessmentProgress?: { current: number; total: number } | null
   onUploadClick: () => void
   onDeleteDocument: (document: any) => void
   deletingDocumentId: number | null
@@ -27,6 +28,7 @@ export default function DocumentsTabContent({
   hasAssessments,
   hasFiles,
   runningAssessment,
+  assessmentProgress,
   onUploadClick,
   onDeleteDocument,
   deletingDocumentId,
@@ -58,7 +60,7 @@ export default function DocumentsTabContent({
   return (
     <div style={{
       padding: '2rem',
-      background: 'var(--gray-50)',
+      background: '#f1f5f9',
       minHeight: '600px'
     }}>
       {/* Page Layout */}
@@ -637,6 +639,71 @@ export default function DocumentsTabContent({
                     </>
                   )}
                 </button>
+
+                {/* Progress Bar - shown when assessment is running */}
+                {runningAssessment && assessmentProgress && (
+                  <div style={{
+                    background: 'var(--gray-100)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '8px',
+                    padding: '1rem',
+                    marginTop: '0.5rem'
+                  }}>
+                    <div style={{ marginBottom: '0.75rem' }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '0.5rem'
+                      }}>
+                        <span style={{
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          color: 'var(--copper)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem'
+                        }}>
+                          <Loader2 size={14} className="animate-spin" />
+                          Assessing criteria...
+                        </span>
+                        <span style={{
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          color: 'var(--ink)'
+                        }}>
+                          {assessmentProgress.current} of {assessmentProgress.total}
+                        </span>
+                      </div>
+                      <div style={{
+                        width: '100%',
+                        height: '12px',
+                        background: 'var(--gray-200)',
+                        borderRadius: '100px',
+                        overflow: 'hidden'
+                      }}>
+                        <div
+                          style={{
+                            height: '100%',
+                            background: 'linear-gradient(90deg, var(--copper) 0%, var(--copper-light) 100%)',
+                            width: `${Math.round((assessmentProgress.current / assessmentProgress.total) * 100)}%`,
+                            transition: 'width 0.5s ease-out',
+                            borderRadius: '100px'
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <p style={{
+                      fontSize: '0.7rem',
+                      color: 'var(--text-muted)',
+                      textAlign: 'center',
+                      margin: 0
+                    }}>
+                      {Math.round((assessmentProgress.current / assessmentProgress.total) * 100)}% complete • This may take 2-5 minutes
+                    </p>
+                  </div>
+                )}
+
                 {hasAssessments && (
                   <button
                     onClick={onViewResults}

@@ -15,7 +15,7 @@ export default function Layout() {
         flexDirection: 'column',
         minWidth: 0,
         overflow: 'auto',
-        background: 'var(--gray-50)'
+        background: '#f1f5f9'
       }}>
         <Outlet />
       </main>

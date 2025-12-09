@@ -9,7 +9,7 @@ export default function ActionsPage() {
   const [selectedActionId, setSelectedActionId] = useState<number | null>(null)
 
   return (
-    <div style={{ padding: '2rem', background: 'var(--gray-50)', minHeight: '600px' }}>
+    <div style={{ padding: '2rem', background: '#f1f5f9', minHeight: '600px' }}>
       <ActionKanbanBoard
         projectId={projectId}
         onActionClick={(actionId) => setSelectedActionId(actionId)}

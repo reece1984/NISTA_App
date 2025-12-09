@@ -177,34 +177,6 @@ export default function ProjectLayout() {
           gap: '0.5rem'
         }}>
           <button
-            onClick={handleRerunAssessment}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              padding: '0.4rem 0.75rem',
-              borderRadius: '6px',
-              fontSize: '0.8rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-              border: 'none',
-              background: 'transparent',
-              color: 'var(--text-muted)'
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = 'var(--gray-100)'
-              e.currentTarget.style.color = 'var(--ink)'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.color = 'var(--text-muted)'
-            }}
-          >
-            <RefreshCw size={14} />
-            Re-run
-          </button>
-          <button
             onClick={handleExport}
             style={{
               display: 'inline-flex',
@@ -231,6 +203,33 @@ export default function ProjectLayout() {
           >
             <Download size={14} />
             Export
+          </button>
+          <button
+            onClick={handleRerunAssessment}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              padding: '0.5rem 0.9rem',
+              borderRadius: '6px',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              border: 'none',
+              background: 'var(--ink)',
+              color: 'var(--white)',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'var(--ink-light)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'var(--ink)'
+            }}
+          >
+            <RefreshCw size={14} />
+            Re-run Assessment
           </button>
           <button
             onClick={() => setShowDeleteModal(true)}
@@ -266,7 +265,7 @@ export default function ProjectLayout() {
         flex: 1,
         overflowY: 'auto',
         padding: '1.25rem 1.5rem',
-        background: 'var(--gray-50)'
+        background: '#f1f5f9'
       }}>
         <Outlet />
       </div>
