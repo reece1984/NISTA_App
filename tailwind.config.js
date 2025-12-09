@@ -13,6 +13,10 @@ export default {
         accent: '#c17a4a', // Copper
         'accent-hover': '#a66339', // Copper hover
         secondary: '#c17a4a', // Copper (for consistency)
+        copper: '#c2703e', // Copper for evidence requirements
+        'copper-light': '#d4a574', // Light copper for gradients
+        navy: '#0f172a', // Dark navy
+        'navy-light': '#1e293b', // Light navy
         success: '#00703c',
         warning: '#f47738',
         error: '#d4351c',
@@ -25,6 +29,9 @@ export default {
         'text-secondary': '#6b7280',
         border: '#e5e7eb',
         'border-default': '#d1d5db',
+      },
+      animation: {
+        'bounce-slow': 'bounce 2s infinite',
       },
     },
   },

@@ -3,8 +3,28 @@ import type { EvidenceRequirement, EvidenceAssessmentItem } from '../../types/as
 interface Props {
   rating: 'GREEN' | 'AMBER' | 'RED'
   evidenceRequirements: EvidenceRequirement[]
-  evidenceAssessment: EvidenceAssessmentItem[]
-  greenStandard: string
+  evidenceAssessment: EvidenceAssessmentItem[] | string | null | undefined
+  greenStandard: string | any
+}
+
+/**
+ * Safely parse evidence_assessment data which may be:
+ * - JSON string (from database)
+ * - Already parsed array
+ * - null/undefined
+ */
+const parseEvidenceAssessment = (data: string | any[] | null | undefined): EvidenceAssessmentItem[] => {
+  if (!data) return []
+  if (Array.isArray(data)) return data
+  if (typeof data === 'string') {
+    try {
+      const parsed = JSON.parse(data)
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
+  }
+  return []
 }
 
 export function PathToGreenSection({
@@ -16,6 +36,14 @@ export function PathToGreenSection({
   // Don't show if already GREEN
   if (rating === 'GREEN') return null
 
+  // Safely parse evidence assessment data
+  const parsedAssessment = parseEvidenceAssessment(evidenceAssessment)
+
+  // Safely convert greenStandard to string if it's an object
+  const greenStandardText = typeof greenStandard === 'string'
+    ? greenStandard
+    : greenStandard?.definition || greenStandard?.text || JSON.stringify(greenStandard)
+
   // Collect all gaps
   const gaps: Array<{
     indicator: string
@@ -24,14 +52,29 @@ export function PathToGreenSection({
   }> = []
 
   evidenceRequirements.forEach(req => {
-    const assessment = evidenceAssessment.find(
+    const assessment = parsedAssessment.find(
       ea => ea.evidence_requirement_id === req.id
     )
-    const missingIndicators = assessment?.missing_indicators ?? req.quality_indicators
+    const rawMissingIndicators = assessment?.missing_indicators ?? req.quality_indicators
+
+    // Normalize indicators to ensure they're strings (may contain objects from DB)
+    const missingIndicators = Array.isArray(rawMissingIndicators)
+      ? rawMissingIndicators
+      : []
 
     missingIndicators.forEach(indicator => {
+      // Safely convert any indicator to string
+      let indicatorText = ''
+      if (typeof indicator === 'string') {
+        indicatorText = indicator
+      } else if (indicator && typeof indicator === 'object') {
+        indicatorText = indicator.definition || indicator.text || JSON.stringify(indicator)
+      } else {
+        indicatorText = String(indicator || '')
+      }
+
       gaps.push({
-        indicator,
+        indicator: indicatorText,
         evidenceText: req.evidence_text,
         isMandatory: req.is_mandatory
       })
@@ -83,7 +126,7 @@ export function PathToGreenSection({
           <p className="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">
             GREEN Standard
           </p>
-          <p className="text-sm text-green-800">{greenStandard}</p>
+          <p className="text-sm text-green-800">{greenStandardText}</p>
         </div>
       </div>
     </>
