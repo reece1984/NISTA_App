@@ -222,12 +222,11 @@ export default function Sidebar() {
             }}>
               Project
             </div>
-            <NavItem to={`/project/${projectId}/overview`} icon={LayoutGrid} label="Overview" />
-            <NavItem to={`/project/${projectId}/documents`} icon={FileText} label="Documents" count={projectData?.documentsCount} />
-            <NavItem to={`/project/${projectId}/summary`} icon={FileText} label="Assessment Summary" count={projectData?.assessmentsCount} />
-            <NavItem to={`/project/${projectId}/detail`} icon={List} label="Assessment Detail" count={projectData?.assessmentsCount} />
+            <NavItem to={`/project/${projectId}/readiness`} icon={LayoutGrid} label="Readiness" />
+            <NavItem to={`/project/${projectId}/evidence`} icon={FileText} label="Evidence" count={projectData?.documentsCount} />
+            <NavItem to={`/project/${projectId}/findings`} icon={BarChart3} label="Findings" count={projectData?.assessmentsCount} />
             <NavItem to={`/project/${projectId}/actions`} icon={CheckSquare} label="Actions" count={projectData?.actionsCount} />
-            <NavItem to={`/project/${projectId}/settings`} icon={Settings} label="Project Settings" />
+            <NavItem to={`/project/${projectId}/settings`} icon={Settings} label="Settings" />
           </div>
         )}
 

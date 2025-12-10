@@ -20,7 +20,8 @@
       "Bash(start \"C:\\Users\\james\\OneDrive\\Documents\\JR Automations (OneDrive)\\NISTA_App\\actions-designs\\actions-draft-review.html\")",
       "Bash(start \"C:\\Users\\james\\OneDrive\\Documents\\JR Automations (OneDrive)\\NISTA_App\\actions-designs\\actions-populated-table.html\")",
       "Bash(start \"C:\\Users\\james\\OneDrive\\Documents\\JR Automations (OneDrive)\\NISTA_App\\actions-designs\\actions-detail-modal.html\")",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

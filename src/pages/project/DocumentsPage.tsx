@@ -228,9 +228,9 @@ export default function DocumentsPage() {
               type: 'success'
             })
 
-            // Navigate to overview after short delay
+            // Navigate to readiness after short delay
             setTimeout(() => {
-              navigate(`/project/${id}/overview`)
+              navigate(`/project/${id}/readiness`)
             }, 1500)
           }
         } catch (error: any) {
@@ -267,7 +267,7 @@ export default function DocumentsPage() {
   }
 
   const handleViewResults = () => {
-    navigate(`/project/${id}/overview`)
+    navigate(`/project/${id}/readiness`)
   }
 
   const handleUploadSuccess = async () => {

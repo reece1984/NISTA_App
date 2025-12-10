@@ -16,6 +16,7 @@ import ProjectLayout from './components/ProjectLayout'
 // Project pages
 import OverviewPage from './pages/project/OverviewPage'
 import DocumentsPage from './pages/project/DocumentsPage'
+import FindingsPage from './pages/project/FindingsPage'
 import SummaryPage from './pages/project/SummaryPage'
 import DetailPage from './pages/project/DetailPage'
 import ActionsPageV3 from './components/actions/ActionsPageV3'
@@ -130,13 +131,18 @@ function AppRoutes() {
 
           {/* Project routes with ProjectLayout (header + content) */}
           <Route path="project/:id" element={<ProjectLayout />}>
-            <Route index element={<Navigate to="overview" replace />} />
-            <Route path="overview" element={<OverviewPage />} />
-            <Route path="documents" element={<DocumentsPage />} />
-            <Route path="summary" element={<SummaryPage />} />
-            <Route path="detail" element={<DetailPage />} />
+            <Route index element={<Navigate to="readiness" replace />} />
+            <Route path="readiness" element={<OverviewPage />} />
+            <Route path="evidence" element={<DocumentsPage />} />
+            <Route path="findings" element={<FindingsPage />} />
             <Route path="actions" element={<ActionsPageV3 />} />
             <Route path="settings" element={<SettingsPage />} />
+
+            {/* Redirects from old routes to new routes */}
+            <Route path="overview" element={<Navigate to="../readiness" replace />} />
+            <Route path="documents" element={<Navigate to="../evidence" replace />} />
+            <Route path="summary" element={<Navigate to="../findings" replace />} />
+            <Route path="detail" element={<Navigate to="../findings" replace />} />
           </Route>
         </Route>
 

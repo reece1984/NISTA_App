@@ -123,15 +123,15 @@ export function DashboardOverview({
   }
 
   const handleViewDetails = () => {
-    navigate(`/projects/${project.id}/assessment`)
+    navigate(`/project/${project.id}/findings`)
   }
 
   const handleViewDocuments = () => {
-    navigate(`/projects/${project.id}/documents`)
+    navigate(`/project/${project.id}/evidence`)
   }
 
   const handleGapClick = (gapId: number) => {
-    navigate(`/projects/${project.id}/assessment`)
+    navigate(`/project/${project.id}/findings`)
   }
 
   const handleGenerateContent = () => {
