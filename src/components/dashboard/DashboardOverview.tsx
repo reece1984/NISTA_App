@@ -1,7 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { ReadinessHero } from './ReadinessHero'
-import { CountdownTimer } from './CountdownTimer'
-import { CriteriaStatus } from './CriteriaStatus'
+import { GatewayReadinessHero } from './GatewayReadinessHero'
 import { DocumentActivity } from './DocumentActivity'
 import { CriticalGaps } from './CriticalGaps'
 import { ActionPlanSummary } from './ActionPlanSummary'
@@ -152,34 +150,32 @@ export function DashboardOverview({
   }
 
   return (
-    <div className="p-8 max-w-[1600px] mx-auto">
-
-      {/* ROW 1: Primary Metrics + AI Insights (PROMOTED) */}
-      <div className="grid grid-cols-12 gap-6 mb-6">
-        <ReadinessHero
+    <div className="space-y-6 p-6">
+      {/* Row 1: Hero section - two columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
+        {/* Left: Combined Gateway Readiness + Time to Gate */}
+        <GatewayReadinessHero
           readinessPercent={readinessPercent}
           predictedRAG={predictedRAG as any}
           weeklyChange={placeholderData.weeklyChange}
           forecastDate={placeholderData.forecastDate}
           daysAheadSchedule={placeholderData.daysAheadSchedule}
-        />
-        <CountdownTimer
           daysRemaining={placeholderData.daysRemaining}
           targetDate={placeholderData.targetDate}
         />
+
+        {/* Right: AI Insights */}
         <AIInsights
           insights={placeholderData.aiInsights}
           onAskAdvisor={handleAskAdvisor}
         />
       </div>
 
-      {/* ROW 2: Full-Width Readiness Trend */}
-      <div className="grid grid-cols-12 gap-6 mb-6">
-        <ReadinessTrend />
-      </div>
+      {/* Row 2: Trend chart - full width */}
+      <ReadinessTrend />
 
-      {/* ROW 3: Activity & Actions */}
-      <div className="grid grid-cols-12 gap-6">
+      {/* Row 3: Three supporting panels */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <CriticalGaps
           gaps={criticalGaps}
           onGapClick={handleGapClick}

@@ -25,7 +25,7 @@ export function ReadinessTrend({}: ReadinessTrendProps) {
   ]
 
   return (
-    <div className="col-span-8 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+    <div className="bg-white rounded-lg border border-slate-200 p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-sm font-bold text-navy uppercase tracking-wide">Readiness Trend</h2>
