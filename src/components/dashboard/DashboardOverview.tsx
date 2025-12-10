@@ -150,31 +150,37 @@ export function DashboardOverview({
   }
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Row 1: Hero section - two columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
-        {/* Left: Combined Gateway Readiness + Time to Gate */}
-        <GatewayReadinessHero
-          readinessPercent={readinessPercent}
-          predictedRAG={predictedRAG as any}
-          weeklyChange={placeholderData.weeklyChange}
-          forecastDate={placeholderData.forecastDate}
-          daysAheadSchedule={placeholderData.daysAheadSchedule}
-          daysRemaining={placeholderData.daysRemaining}
-          targetDate={placeholderData.targetDate}
-        />
+    <div className="p-6">
+      {/* Top section: Gateway Readiness + Readiness Trend (left) | AI Insights spanning both rows (right) */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] lg:grid-rows-[auto_1fr] gap-6 mb-6">
+        {/* Top-left: Gateway Readiness Hero */}
+        <div className="col-start-1 row-start-1">
+          <GatewayReadinessHero
+            readinessPercent={readinessPercent}
+            predictedRAG={predictedRAG as any}
+            weeklyChange={placeholderData.weeklyChange}
+            forecastDate={placeholderData.forecastDate}
+            daysAheadSchedule={placeholderData.daysAheadSchedule}
+            daysRemaining={placeholderData.daysRemaining}
+            targetDate={placeholderData.targetDate}
+          />
+        </div>
 
-        {/* Right: AI Insights */}
-        <AIInsights
-          insights={placeholderData.aiInsights}
-          onAskAdvisor={handleAskAdvisor}
-        />
+        {/* Right side: AI Insights - spans both rows */}
+        <div className="lg:col-start-2 lg:row-start-1 lg:row-span-2">
+          <AIInsights
+            insights={placeholderData.aiInsights}
+            onAskAdvisor={handleAskAdvisor}
+          />
+        </div>
+
+        {/* Bottom-left: Readiness Trend */}
+        <div className="col-start-1 lg:row-start-2">
+          <ReadinessTrend />
+        </div>
       </div>
 
-      {/* Row 2: Trend chart - full width */}
-      <ReadinessTrend />
-
-      {/* Row 3: Three supporting panels */}
+      {/* Bottom row: Three supporting panels */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <CriticalGaps
           gaps={criticalGaps}
