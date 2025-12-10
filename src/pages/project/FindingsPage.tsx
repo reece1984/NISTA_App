@@ -1,20 +1,25 @@
-import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
-import AssessmentSummary from '../../components/AssessmentSummary'
-import AssessmentDetail from '../../components/AssessmentDetail'
+import { ExecutiveSummary } from '../../components/findings/ExecutiveSummary'
+import { DetailedFindings } from '../../components/findings/DetailedFindings'
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog'
 import Toast, { type ToastType } from '../../components/ui/Toast'
+import ExportReportModal from '../../components/ExportReportModal'
 import { n8nApi } from '../../services/n8nApi'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { RefreshCw, Download, FileText } from 'lucide-react'
 
 export default function FindingsPage() {
   const { id } = useParams<{ id: string }>()
+  const location = useLocation()
+  const navigate = useNavigate()
   const [showRerunDialog, setShowRerunDialog] = useState(false)
+  const [showExportModal, setShowExportModal] = useState(false)
   const [runningAssessment, setRunningAssessment] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null)
   const [summaryCollapsed, setSummaryCollapsed] = useState(false)
+  const [expandedCriteria, setExpandedCriteria] = useState<number[]>([])
 
   // Fetch project data with assessments
   const { data: projectData, isLoading, refetch } = useQuery({
@@ -81,6 +86,38 @@ export default function FindingsPage() {
 
   const hasAssessments = projectData?.assessments && projectData.assessments.length > 0
 
+  // Auto-expand RED and AMBER criteria on initial load
+  useEffect(() => {
+    if (projectData?.assessments) {
+      const nonGreenIds = projectData.assessments
+        .filter((a: any) => a.rag_rating?.toUpperCase() !== 'GREEN')
+        .map((a: any) => a.id)
+      setExpandedCriteria(nonGreenIds)
+    }
+  }, [projectData?.assessments])
+
+  // Handle deep linking from URL params
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const criterionId = params.get('criterion')
+
+    if (criterionId) {
+      const id = parseInt(criterionId, 10)
+      // Ensure criterion is expanded
+      setExpandedCriteria(prev =>
+        prev.includes(id) ? prev : [...prev, id]
+      )
+
+      // Scroll to criterion after render
+      setTimeout(() => {
+        document.getElementById(`criterion-${id}`)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        })
+      }, 100)
+    }
+  }, [location.search])
+
   const handleRerunAssessment = async () => {
     if (!projectData) return
     setShowRerunDialog(false)
@@ -114,45 +151,52 @@ export default function FindingsPage() {
   }
 
   const handleExportPDF = () => {
-    console.log('Export PDF')
-    setToast({ message: 'PDF export coming soon', type: 'info' })
+    setShowExportModal(true)
   }
 
-  const handleGenerateActionPlan = () => {
-    console.log('Generate Action Plan')
-    setToast({ message: 'Action plan generation coming soon', type: 'info' })
+  const handleCriterionClick = (criterionId: number) => {
+    // Ensure criterion is expanded
+    if (!expandedCriteria.includes(criterionId)) {
+      setExpandedCriteria([...expandedCriteria, criterionId])
+    }
+
+    // Scroll to criterion
+    setTimeout(() => {
+      document.getElementById(`criterion-${criterionId}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }, 100)
+  }
+
+  const handleCreateAction = (recommendation: any) => {
+    console.log('Create action from recommendation:', recommendation)
+    setToast({ message: 'Action creation coming soon', type: 'info' })
   }
 
   if (isLoading) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        Loading findings...
+      <div className="p-8 text-center">
+        <div className="text-lg text-slate-600">Loading findings...</div>
       </div>
     )
   }
 
   if (!projectData) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        Project not found
+      <div className="p-8 text-center">
+        <div className="text-lg text-slate-600">Project not found</div>
       </div>
     )
   }
 
   if (!hasAssessments) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <p style={{ marginBottom: '1rem' }}>No assessment has been run yet</p>
+      <div className="p-8 text-center">
+        <p className="text-lg text-slate-600 mb-4">No assessment has been run yet</p>
         <button
           onClick={() => setShowRerunDialog(true)}
-          style={{
-            padding: '0.5rem 1rem',
-            background: 'var(--copper)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer'
-          }}
+          className="px-4 py-2 bg-copper text-white rounded-lg hover:bg-[#a85d32] transition-colors"
         >
           Run First Assessment
         </button>
@@ -161,123 +205,58 @@ export default function FindingsPage() {
   }
 
   return (
-    <div style={{ padding: '1.5rem' }}>
+    <div className="p-6">
       {/* Page Header */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <h1 style={{
-          fontSize: '1.25rem',
-          fontWeight: 600,
-          color: 'var(--ink)',
-          marginBottom: '0.25rem'
-        }}>
-          Findings
-        </h1>
-        <p style={{
-          fontSize: '0.875rem',
-          color: 'var(--text-muted)'
-        }}>
-          Comprehensive analysis of {projectData.assessments.length} criteria against IPA standards
-        </p>
-      </div>
-
-      {/* Executive Summary Section - Collapsible */}
-      <div style={{
-        background: 'white',
-        border: '1px solid var(--border)',
-        borderRadius: '8px',
-        marginBottom: '1.5rem',
-        overflow: 'hidden'
-      }}>
-        <button
-          onClick={() => setSummaryCollapsed(!summaryCollapsed)}
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '1rem 1.5rem',
-            background: summaryCollapsed ? 'var(--bg-subtle)' : 'white',
-            border: 'none',
-            borderBottom: summaryCollapsed ? 'none' : '1px solid var(--border)',
-            cursor: 'pointer',
-            transition: 'background 0.15s ease'
-          }}
-          onMouseEnter={(e) => {
-            if (summaryCollapsed) e.currentTarget.style.background = 'var(--bg-hover)'
-          }}
-          onMouseLeave={(e) => {
-            if (summaryCollapsed) e.currentTarget.style.background = 'var(--bg-subtle)'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            {summaryCollapsed ? (
-              <ChevronRight size={20} style={{ color: 'var(--text-muted)' }} />
-            ) : (
-              <ChevronDown size={20} style={{ color: 'var(--text-muted)' }} />
-            )}
-            <h2 style={{
-              fontSize: '1rem',
-              fontWeight: 600,
-              color: 'var(--ink)'
-            }}>
-              Executive Summary
-            </h2>
-          </div>
-          <span style={{
-            fontSize: '0.875rem',
-            color: 'var(--text-muted)'
-          }}>
-            {summaryCollapsed ? 'Expand' : 'Collapse'}
-          </span>
-        </button>
-
-        {!summaryCollapsed && (
-          <div style={{ padding: '1.5rem' }}>
-            <AssessmentSummary
-              project={projectData}
-              assessmentResults={projectData.assessments}
-              onRerunAssessment={() => setShowRerunDialog(true)}
-              onExportExcel={handleExportExcel}
-              onExportPDF={handleExportPDF}
-              onGenerateActionPlan={handleGenerateActionPlan}
-              runningAssessment={runningAssessment}
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Detailed Findings Section */}
-      <div style={{
-        background: 'white',
-        border: '1px solid var(--border)',
-        borderRadius: '8px',
-        overflow: 'hidden'
-      }}>
-        <div style={{
-          padding: '1rem 1.5rem',
-          borderBottom: '1px solid var(--border)',
-          background: 'white'
-        }}>
-          <h2 style={{
-            fontSize: '1rem',
-            fontWeight: 600,
-            color: 'var(--ink)'
-          }}>
-            Detailed Findings
-          </h2>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Findings</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Comprehensive analysis of {projectData.assessments.length} criteria against IPA standards
+          </p>
         </div>
 
-        <div style={{ padding: '1.5rem' }}>
-          <AssessmentDetail
-            project={projectData}
-            assessmentResults={projectData.assessments}
-            onRerunAssessment={() => setShowRerunDialog(true)}
-            onExportExcel={handleExportExcel}
-            onExportPDF={handleExportPDF}
-            runningAssessment={runningAssessment}
-          />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowRerunDialog(true)}
+            disabled={runningAssessment}
+            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <RefreshCw className={`w-4 h-4 ${runningAssessment ? 'animate-spin' : ''}`} />
+            Re-run
+          </button>
+          <button
+            onClick={handleExportExcel}
+            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Excel
+          </button>
+          <button
+            onClick={handleExportPDF}
+            className="px-4 py-2 text-sm font-medium text-white bg-copper rounded-md hover:bg-[#a85d32] transition-colors flex items-center gap-2"
+          >
+            <FileText className="w-4 h-4" />
+            Export PDF
+          </button>
         </div>
       </div>
+
+      {/* Executive Summary (collapsible) */}
+      <ExecutiveSummary
+        assessments={projectData.assessments}
+        isCollapsed={summaryCollapsed}
+        onToggle={() => setSummaryCollapsed(!summaryCollapsed)}
+        onCriterionClick={handleCriterionClick}
+        onCreateAction={handleCreateAction}
+      />
+
+      {/* Detailed Findings */}
+      <DetailedFindings
+        assessments={projectData.assessments}
+        expandedCriteria={expandedCriteria}
+        setExpandedCriteria={setExpandedCriteria}
+        onCreateAction={handleCreateAction}
+      />
 
       {/* Rerun Confirmation Dialog */}
       <ConfirmationDialog
@@ -289,6 +268,13 @@ export default function FindingsPage() {
         onConfirm={handleRerunAssessment}
         onCancel={() => setShowRerunDialog(false)}
         variant="primary"
+      />
+
+      {/* Export Report Modal */}
+      <ExportReportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        project={projectData}
       />
 
       {/* Toast Notifications */}

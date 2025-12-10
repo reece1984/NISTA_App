@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useParams, useSearchParams } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import ScrollToTop from './components/ScrollToTop'
@@ -21,6 +21,7 @@ import SummaryPage from './pages/project/SummaryPage'
 import DetailPage from './pages/project/DetailPage'
 import ActionsPageV3 from './components/actions/ActionsPageV3'
 import SettingsPage from './pages/project/SettingsPage'
+import GatewayReport from './reports/GatewayReport'
 
 // Create a client
 const queryClient = new QueryClient({
@@ -89,6 +90,19 @@ function RootRedirect() {
   return <Navigate to="/login" replace />
 }
 
+// Report route wrapper to extract params
+function ReportRoute() {
+  const { projectId } = useParams()
+  const [searchParams] = useSearchParams()
+  const reportType = (searchParams.get('type') as 'summary' | 'full' | 'board-pack') || 'full'
+
+  if (!projectId) {
+    return <Navigate to="/projects" replace />
+  }
+
+  return <GatewayReport projectId={projectId} reportType={reportType} />
+}
+
 function AppRoutes() {
   return (
     <>
@@ -145,6 +159,16 @@ function AppRoutes() {
             <Route path="detail" element={<Navigate to="../findings" replace />} />
           </Route>
         </Route>
+
+        {/* Report route - fullscreen without sidebar */}
+        <Route
+          path="/report/:projectId"
+          element={
+            <ProtectedRoute>
+              <ReportRoute />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Redirect old dashboard route to new projects route */}
         <Route path="/dashboard" element={<Navigate to="/projects" replace />} />
