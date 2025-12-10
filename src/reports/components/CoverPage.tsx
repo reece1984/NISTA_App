@@ -81,28 +81,85 @@ export default function CoverPage({ project, assessment }: CoverPageProps) {
           {getGateNumber()}: {getGateName(project.current_gate || project.gate_number || project.template_id)}
         </div>
 
-        {/* Overall rating - prominent */}
-        <div className={`overall-rating rating-${assessment.overall_rating.toLowerCase()}`}>
-          <p className="rating-label">Predicted Gateway Outcome</p>
-          <p className="rating-value">{assessment.overall_rating}</p>
-          <p className="rating-subtitle">
-            {getRatingSubtitle(assessment.overall_rating)}
-          </p>
-        </div>
+        {/* Readiness hero - constructive visual instead of alarming RED box */}
+        <div className="readiness-hero">
+          {/* Left: Donut chart */}
+          <div className="readiness-donut">
+            <svg viewBox="0 0 120 120" className="donut-svg">
+              {/* Background circle */}
+              <circle
+                cx="60"
+                cy="60"
+                r="50"
+                fill="none"
+                stroke="#e2e8f0"
+                strokeWidth="12"
+              />
+              {/* Progress arc */}
+              <circle
+                cx="60"
+                cy="60"
+                r="50"
+                fill="none"
+                stroke={assessment.readiness_score < 50 ? '#dc2626' :
+                        assessment.readiness_score < 85 ? '#f59e0b' : '#16a34a'}
+                strokeWidth="12"
+                strokeDasharray={`${assessment.readiness_score * 3.14} 314`}
+                strokeLinecap="round"
+                transform="rotate(-90 60 60)"
+              />
+            </svg>
+            <div className="donut-center">
+              <span className="donut-value">{assessment.readiness_score}%</span>
+              <span className="donut-label">Ready</span>
+            </div>
+          </div>
 
-        {/* Key stats row */}
-        <div className="cover-stats">
-          <div className="stat">
-            <span className="stat-value">{assessment.criteria_assessed}</span>
-            <span className="stat-label">Criteria Assessed</span>
-          </div>
-          <div className="stat">
-            <span className="stat-value text-red">{assessment.critical_count}</span>
-            <span className="stat-label">Critical Issues</span>
-          </div>
-          <div className="stat">
-            <span className="stat-value">{assessment.readiness_score}%</span>
-            <span className="stat-label">Readiness Score</span>
+          {/* Right: Status info */}
+          <div className="readiness-info">
+            <div className="readiness-header">
+              <h2 className="readiness-title">Gateway Readiness</h2>
+              <span className={`predicted-badge predicted-${assessment.overall_rating.toLowerCase()}`}>
+                Predicted: {assessment.overall_rating}
+              </span>
+            </div>
+
+            <p className="readiness-description">
+              {assessment.readiness_score < 50
+                ? 'Significant work required to achieve gateway readiness'
+                : assessment.readiness_score < 85
+                ? 'Good progress, some areas need attention'
+                : 'On track for successful gateway review'}
+            </p>
+
+            {/* Progress bar */}
+            <div className="readiness-bar-container">
+              <div className="readiness-bar">
+                <div
+                  className={`readiness-bar-fill ${assessment.readiness_score < 50 ? 'red' : assessment.readiness_score < 85 ? 'amber' : 'green'}`}
+                  style={{ width: `${assessment.readiness_score}%` }}
+                />
+                <div className="readiness-bar-threshold" style={{ left: '85%' }}>
+                  <span className="threshold-label">GREEN</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Key stats */}
+            <div className="readiness-stats">
+              <div className="stat-item">
+                <span className="stat-value">{assessment.criteria_assessed}</span>
+                <span className="stat-label">Criteria Assessed</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value stat-red">{assessment.critical_count}</span>
+                <span className="stat-label">Critical Issues</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value">{project.days_to_gate || '—'}</span>
+                <span className="stat-label">Days to Gate</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
