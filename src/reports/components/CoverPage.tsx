@@ -7,6 +7,7 @@ interface CoverPageProps {
 
 export default function CoverPage({ project, assessment }: CoverPageProps) {
   const formatDate = (date: string) => {
+    if (!date) return 'Not set'
     return new Date(date).toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'long',
@@ -14,15 +15,16 @@ export default function CoverPage({ project, assessment }: CoverPageProps) {
     })
   }
 
-  const formatValue = (value: number) => {
-    if (!value) return 'Not specified'
-    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`
+  const formatValue = (value: number | null | undefined) => {
+    if (!value || value === 0) return 'Not specified'
+    if (value >= 1000000000) return `${(value / 1000000000).toFixed(1)}B`
+    if (value >= 1000000) return `${(value / 1000000).toFixed(0)}M`
     if (value >= 1000) return `${(value / 1000).toFixed(0)}K`
     return value.toString()
   }
 
   const getRatingSubtitle = (rating: string) => {
-    switch (rating) {
+    switch (rating?.toUpperCase()) {
       case 'RED':
         return 'Critical issues require resolution'
       case 'AMBER':
@@ -34,7 +36,9 @@ export default function CoverPage({ project, assessment }: CoverPageProps) {
     }
   }
 
-  const getGateName = (gate: number) => {
+  const getGateName = (gate: number | string | null | undefined) => {
+    if (!gate && gate !== 0) return 'Not specified'
+    const gateNum = typeof gate === 'string' ? parseInt(gate) : gate
     const gates: Record<number, string> = {
       0: 'Strategic Assessment',
       1: 'Business Justification',
@@ -43,7 +47,14 @@ export default function CoverPage({ project, assessment }: CoverPageProps) {
       4: 'Readiness for Service',
       5: 'Operations Review'
     }
-    return gates[gate] || `Gate ${gate}`
+    return gates[gateNum] || 'Gateway Review'
+  }
+
+  // Safely get gate number for display
+  const getGateNumber = () => {
+    const gate = project.current_gate || project.gate_number || project.template_id
+    if (gate === null || gate === undefined) return ''
+    return `Gate ${gate}`
   }
 
   return (
@@ -63,11 +74,11 @@ export default function CoverPage({ project, assessment }: CoverPageProps) {
         <p className="document-type">GATEWAY REVIEW ASSESSMENT</p>
 
         {/* Project name - large */}
-        <h1 className="project-name">{project.name}</h1>
+        <h1 className="project-name">{project.name || project.project_name || 'Unnamed Project'}</h1>
 
         {/* Gate badge */}
         <div className="gate-badge">
-          Gate {project.current_gate}: {getGateName(project.current_gate)}
+          {getGateNumber()}: {getGateName(project.current_gate || project.gate_number || project.template_id)}
         </div>
 
         {/* Overall rating - prominent */}

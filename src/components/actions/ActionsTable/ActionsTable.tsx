@@ -51,28 +51,28 @@ export default function ActionsTable({
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
               <button className="flex items-center gap-1 hover:text-slate-700">
-                Action
+                ACTION
                 <ChevronDown className="w-3 h-3" />
               </button>
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Criterion
+              CRITERION
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Status
+              STATUS
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Priority
+              PRIORITY
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Impact
+              IMPACT
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Owner
+              OWNER
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
               <button className="flex items-center gap-1 hover:text-slate-700">
-                Due Date
+                DUE DATE
                 <ChevronDown className="w-3 h-3" />
               </button>
             </th>

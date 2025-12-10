@@ -163,6 +163,9 @@ export default function GatewayReport({ projectId, reportType }: GatewayReportPr
   // Determine overall rating
   const overallRating = readinessScore >= 85 ? 'GREEN' : readinessScore >= 50 ? 'AMBER' : 'RED'
 
+  // Define Five Case Model order
+  const CASE_ORDER = ['Strategic', 'Economic', 'Commercial', 'Financial', 'Management']
+
   // Group assessments by case
   const assessmentsByCase: Record<string, any[]> = {}
   assessments.forEach((assessment: any) => {
@@ -173,8 +176,17 @@ export default function GatewayReport({ projectId, reportType }: GatewayReportPr
     assessmentsByCase[category].push(assessment)
   })
 
+  // Sort cases in Five Case Model order
+  const sortedCaseEntries = Object.entries(assessmentsByCase).sort((a, b) => {
+    const indexA = CASE_ORDER.indexOf(a[0])
+    const indexB = CASE_ORDER.indexOf(b[0])
+    if (indexA === -1) return 1  // Unknown cases go to end
+    if (indexB === -1) return -1
+    return indexA - indexB
+  })
+
   // Create case summaries
-  const caseSummaries = Object.entries(assessmentsByCase).map(([caseName, caseAssessments]) => {
+  const caseSummaries = sortedCaseEntries.map(([caseName, caseAssessments]) => {
     const caseGreen = caseAssessments.filter(a => a.rag_rating?.toUpperCase() === 'GREEN').length
     const caseAmber = caseAssessments.filter(a => a.rag_rating?.toUpperCase() === 'AMBER').length
     const caseRed = caseAssessments.filter(a => a.rag_rating?.toUpperCase() === 'RED').length
@@ -246,9 +258,9 @@ export default function GatewayReport({ projectId, reportType }: GatewayReportPr
     status: action.status || 'Not Started'
   }))
 
-  // Build cases data for detailed assessment
+  // Build cases data for detailed assessment (use sorted order)
   const casesData: Record<string, any> = {}
-  Object.entries(assessmentsByCase).forEach(([caseName, caseAssessments]) => {
+  sortedCaseEntries.forEach(([caseName, caseAssessments]) => {
     const caseGreen = caseAssessments.filter(a => a.rag_rating?.toUpperCase() === 'GREEN').length
     const caseAmber = caseAssessments.filter(a => a.rag_rating?.toUpperCase() === 'AMBER').length
     const caseRed = caseAssessments.filter(a => a.rag_rating?.toUpperCase() === 'RED').length
@@ -326,8 +338,8 @@ export default function GatewayReport({ projectId, reportType }: GatewayReportPr
               criticalIssues={criticalIssues}
               recommendations={recommendations}
             />
-            {Object.entries(casesData).map(([caseName, caseData]) => (
-              <CaseAssessment key={caseName} caseName={caseName} caseData={caseData} />
+            {sortedCaseEntries.map(([caseName]) => (
+              <CaseAssessment key={caseName} caseName={caseName} caseData={casesData[caseName]} />
             ))}
             {formattedActions.length > 0 && <ActionPlan actions={formattedActions} />}
             {documents.length > 0 && <EvidenceRegister documents={documents} coverageStats={coverageStats} />}
