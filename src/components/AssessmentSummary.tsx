@@ -1,4 +1,4 @@
-import { CheckCircle, X, AlertCircle, RefreshCw, Download, FileText, Lightbulb } from 'lucide-react'
+import { CheckCircle, X, AlertCircle, RefreshCw, Download, FileText, Lightbulb, Plus } from 'lucide-react'
 import { generateExecutiveSummary, generateRecommendations } from '../utils/assessmentUtils'
 
 interface AssessmentSummaryProps {
@@ -9,6 +9,7 @@ interface AssessmentSummaryProps {
   onExportPDF: () => void
   onGenerateActionPlan: () => void
   runningAssessment: boolean
+  onCreateAction?: (recommendation: any) => void
 }
 
 export default function AssessmentSummary({
@@ -18,7 +19,8 @@ export default function AssessmentSummary({
   onExportExcel,
   onExportPDF,
   onGenerateActionPlan,
-  runningAssessment
+  runningAssessment,
+  onCreateAction
 }: AssessmentSummaryProps) {
   // Calculate overall rating
   const redCount = assessmentResults.filter(r => r.rag_rating?.toLowerCase() === 'red').length
@@ -538,15 +540,52 @@ export default function AssessmentSummary({
                       </span>
                     </div>
                     <div>
-                      <h4 style={{
-                        fontFamily: 'var(--font-display)',
-                        fontSize: '1rem',
-                        fontWeight: 600,
-                        color: 'var(--ink)',
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                        gap: '1rem',
                         marginBottom: '0.5rem'
                       }}>
-                        {issue.assessment_criteria?.title || issue.title || 'Assessment Finding'}
-                      </h4>
+                        <h4 style={{
+                          fontFamily: 'var(--font-display)',
+                          fontSize: '1rem',
+                          fontWeight: 600,
+                          color: 'var(--ink)',
+                          flex: 1
+                        }}>
+                          {issue.assessment_criteria?.title || issue.title || 'Assessment Finding'}
+                        </h4>
+                        {onCreateAction && (
+                          <button
+                            onClick={() => onCreateAction(issue)}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              padding: '0.35rem 0.75rem',
+                              background: '#c2703e',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '4px',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              transition: 'background 0.2s ease',
+                              flexShrink: 0
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.background = '#a85d32'
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.background = '#c2703e'
+                            }}
+                          >
+                            <Plus size={12} />
+                            Create Action
+                          </button>
+                        )}
+                      </div>
                       <p style={{
                         fontSize: '0.9rem',
                         color: 'var(--text-body)',
@@ -641,24 +680,58 @@ export default function AssessmentSummary({
                       }}
                       dangerouslySetInnerHTML={{ __html: rec.text }}
                       />
-                      <span style={{
-                        display: 'inline-flex',
+                      <div style={{
+                        display: 'flex',
                         alignItems: 'center',
-                        gap: '0.35rem',
-                        padding: '0.25rem 0.6rem',
-                        borderRadius: '4px',
-                        fontSize: '0.7rem',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        marginTop: '0.75rem',
-                        background: rec.priority === 'critical' ? 'var(--red-bg)' :
-                                   rec.priority === 'high' ? 'var(--amber-bg)' : 'var(--gray-100)',
-                        color: rec.priority === 'critical' ? 'var(--red)' :
-                               rec.priority === 'high' ? 'var(--amber)' : 'var(--text-muted)'
+                        gap: '0.75rem',
+                        marginTop: '0.75rem'
                       }}>
-                        {rec.priority === 'critical' ? 'Critical Priority' :
-                         rec.priority === 'high' ? 'High Priority' : 'Medium Priority'}
-                      </span>
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                          padding: '0.25rem 0.6rem',
+                          borderRadius: '4px',
+                          fontSize: '0.7rem',
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          background: rec.priority === 'critical' ? 'var(--red-bg)' :
+                                     rec.priority === 'high' ? 'var(--amber-bg)' : 'var(--gray-100)',
+                          color: rec.priority === 'critical' ? 'var(--red)' :
+                                 rec.priority === 'high' ? 'var(--amber)' : 'var(--text-muted)'
+                        }}>
+                          {rec.priority === 'critical' ? 'Critical Priority' :
+                           rec.priority === 'high' ? 'High Priority' : 'Medium Priority'}
+                        </span>
+                        {onCreateAction && (
+                          <button
+                            onClick={() => onCreateAction(rec)}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              padding: '0.35rem 0.75rem',
+                              background: '#c2703e',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '4px',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              transition: 'background 0.2s ease'
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.background = '#a85d32'
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.background = '#c2703e'
+                            }}
+                          >
+                            <Plus size={12} />
+                            Create Action
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}

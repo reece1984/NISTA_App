@@ -2,25 +2,25 @@ import { forwardRef, type ButtonHTMLAttributes } from 'react'
 import { cn } from '../../lib/utils'
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'accent' | 'danger'
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', ...props }, ref) => {
-    const baseStyles = 'font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+    const baseStyles = 'font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
 
     const variants = {
-      primary: 'bg-accent text-white hover:bg-accent-hover focus:ring-accent',
-      secondary: 'bg-white text-primary border-2 border-primary hover:bg-primary/5 focus:ring-primary',
-      accent: 'bg-accent text-white hover:bg-accent-hover focus:ring-accent',
-      danger: 'bg-error text-white hover:bg-error/90 focus:ring-error',
+      primary: 'bg-[#c2703e] hover:bg-[#a85d32] text-white focus:ring-[#c2703e]',
+      secondary: 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 focus:ring-slate-300',
+      danger: 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-600',
+      ghost: 'bg-transparent hover:bg-slate-100 text-slate-600 focus:ring-slate-300',
     }
 
     const sizes = {
-      sm: 'py-1.5 px-3 text-sm',
-      md: 'py-2 px-4 text-base',
-      lg: 'py-3 px-6 text-lg',
+      sm: 'px-3 py-1.5 text-sm',
+      md: 'px-4 py-2 text-sm',
+      lg: 'px-6 py-3 text-base',
     }
 
     return (

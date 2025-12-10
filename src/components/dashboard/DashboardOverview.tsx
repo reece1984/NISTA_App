@@ -154,7 +154,7 @@ export function DashboardOverview({
   return (
     <div className="p-8 max-w-[1600px] mx-auto">
 
-      {/* ROW 1: Primary Metrics */}
+      {/* ROW 1: Primary Metrics + AI Insights (PROMOTED) */}
       <div className="grid grid-cols-12 gap-6 mb-6">
         <ReadinessHero
           readinessPercent={readinessPercent}
@@ -167,39 +167,31 @@ export function DashboardOverview({
           daysRemaining={placeholderData.daysRemaining}
           targetDate={placeholderData.targetDate}
         />
-        <CriteriaStatus
-          greenCount={greenCount}
-          amberCount={amberCount}
-          redCount={redCount}
-          greenChange={placeholderData.greenChange}
-          redChange={placeholderData.redChange}
-          onViewDetails={handleViewDetails}
+        <AIInsights
+          insights={placeholderData.aiInsights}
+          onAskAdvisor={handleAskAdvisor}
         />
       </div>
 
-      {/* ROW 2: Activity & Actions */}
+      {/* ROW 2: Full-Width Readiness Trend */}
       <div className="grid grid-cols-12 gap-6 mb-6">
-        <DocumentActivity
-          activities={placeholderData.documentActivity}
-          onViewAll={handleViewDocuments}
-        />
+        <ReadinessTrend />
+      </div>
+
+      {/* ROW 3: Activity & Actions */}
+      <div className="grid grid-cols-12 gap-6">
         <CriticalGaps
           gaps={criticalGaps}
           onGapClick={handleGapClick}
           onGenerateContent={handleGenerateContent}
         />
+        <DocumentActivity
+          activities={placeholderData.documentActivity}
+          onViewAll={handleViewDocuments}
+        />
         <ActionPlanSummary
           {...placeholderData.actionPlan}
           onManage={handleManageActions}
-        />
-      </div>
-
-      {/* ROW 3: Analytics */}
-      <div className="grid grid-cols-12 gap-6">
-        <ReadinessTrend />
-        <AIInsights
-          insights={placeholderData.aiInsights}
-          onAskAdvisor={handleAskAdvisor}
         />
       </div>
     </div>

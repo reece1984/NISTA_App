@@ -8,13 +8,57 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border border-border bg-card text-card-foreground shadow-sm",
+      "rounded-lg border border-slate-200 bg-white shadow-sm",
       className
     )}
     {...props}
   />
 ))
 Card.displayName = "Card"
+
+// Card with status indicator (left border for RAG status)
+interface StatusCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  status: 'red' | 'amber' | 'green';
+}
+
+const StatusCard = React.forwardRef<HTMLDivElement, StatusCardProps>(
+  ({ className, status, ...props }, ref) => {
+    const borderColor = {
+      red: 'border-l-red-600',
+      amber: 'border-l-amber-500',
+      green: 'border-l-green-600',
+    }[status] || 'border-l-slate-300';
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "rounded-lg border border-slate-200 border-l-4 bg-white shadow-sm",
+          borderColor,
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+);
+StatusCard.displayName = "StatusCard"
+
+// Elevated card (use sparingly for primary focus areas)
+const ElevatedCard = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-lg border border-slate-200 bg-white shadow-md",
+      className
+    )}
+    {...props}
+  />
+))
+ElevatedCard.displayName = "ElevatedCard"
 
 const CardHeader = React.forwardRef<
   HTMLDivElement,
@@ -75,4 +119,4 @@ const CardFooter = React.forwardRef<
 ))
 CardFooter.displayName = "CardFooter"
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+export { Card, StatusCard, ElevatedCard, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }

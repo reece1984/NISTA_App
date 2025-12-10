@@ -1,26 +1,31 @@
 // Generate AI-like executive summary based on assessment results
 export function generateExecutiveSummary(assessmentResults: any[], overallRating: string, project: any): string {
-  const redCount = assessmentResults.filter(r => r.rating === 'Red').length
-  const amberCount = assessmentResults.filter(r => r.rating === 'Amber').length
-  const greenCount = assessmentResults.filter(r => r.rating === 'Green').length
-  const criticalRed = assessmentResults.filter(r => r.rating === 'Red' && (r.is_critical || r.assessment_criteria?.is_critical)).length
+  const redCount = assessmentResults.filter(r => r.rag_rating?.toLowerCase() === 'red').length
+  const amberCount = assessmentResults.filter(r => r.rag_rating?.toLowerCase() === 'amber').length
+  const greenCount = assessmentResults.filter(r => r.rag_rating?.toLowerCase() === 'green').length
+  const criticalRed = assessmentResults.filter(r => r.rag_rating?.toLowerCase() === 'red' && (r.is_critical || r.assessment_criteria?.is_critical)).length
+
+  // Get project name with fallback
+  const projectName = project.name || project.project_name || 'this project'
+  const templateName = project.assessment_templates?.name || project.template_name || 'the next gate'
 
   // Get categories with issues
   const categoriesWithIssues = new Set(
     assessmentResults
-      .filter(r => r.rating === 'Red' || r.rating === 'Amber')
+      .filter(r => r.rag_rating?.toLowerCase() === 'red' || r.rag_rating?.toLowerCase() === 'amber')
       .map(r => (r.assessment_criteria?.category || r.category || 'General').replace(' Case', ''))
   )
 
-  const issueCategories = Array.from(categoriesWithIssues).join(', ')
+  const issueCategories = Array.from(categoriesWithIssues).join(', ') || 'several areas'
+  const totalCriteria = assessmentResults.length
 
   // Generate summary based on rating
   if (overallRating === 'RED') {
-    return `The overall assessment rating for the ${project.name} project gate review is <strong>RED</strong> due to critical shortcomings in ${issueCategories.toLowerCase()}. While the project demonstrates structured arrangements across ${greenCount} criteria, ${criticalRed > 0 ? `${criticalRed} critical issues` : `significant risks`} must be urgently addressed before proceeding to ${project.template_name || 'the next gate'}.`
+    return `The overall assessment rating for the ${projectName} gate review is <strong>RED</strong> due to critical shortcomings in ${issueCategories.toLowerCase()}. While the project demonstrates structured arrangements across ${totalCriteria} criteria, ${criticalRed > 0 ? `${criticalRed} critical issues` : `significant risks`} must be urgently addressed before proceeding to ${templateName}.`
   } else if (overallRating === 'AMBER') {
-    return `The overall assessment rating for the ${project.name} project is <strong>AMBER</strong>, indicating the project can proceed with conditions. The assessment identified ${greenCount} criteria meeting expectations, but ${amberCount} areas require attention, particularly in ${issueCategories.toLowerCase()}. These issues should be resolved before the next gateway review to ensure project success.`
+    return `The overall assessment rating for ${projectName} is <strong>AMBER</strong>, indicating the project can proceed with conditions. The assessment identified ${greenCount} criteria meeting expectations, but ${amberCount} areas require attention, particularly in ${issueCategories.toLowerCase()}. These issues should be resolved before the next gateway review to ensure project success.`
   } else {
-    return `The overall assessment rating for the ${project.name} project is <strong>GREEN</strong>, demonstrating strong readiness to proceed. All ${greenCount} assessed criteria meet or exceed IPA standards, with robust arrangements in place across all five business case dimensions. The project shows excellent preparation for ${project.template_name || 'the next phase'} with no critical issues identified.`
+    return `The overall assessment rating for ${projectName} is <strong>GREEN</strong>, demonstrating strong readiness to proceed. All ${greenCount} assessed criteria meet or exceed IPA standards, with robust arrangements in place across all five business case dimensions. The project shows excellent preparation for ${templateName} with no critical issues identified.`
   }
 }
 
@@ -38,7 +43,7 @@ export function generateRecommendations(criticalIssues: any[]): Array<{ text: st
 
   // Generate recommendations for each category
   Object.entries(issuesByCategory).forEach(([category, issues]) => {
-    const hasRed = issues.some(i => i.rating === 'Red')
+    const hasRed = issues.some(i => i.rag_rating?.toLowerCase() === 'red')
     const priority = hasRed ? 'critical' : 'high'
 
     if (category === 'Strategic') {
@@ -64,7 +69,7 @@ export function generateRecommendations(criticalIssues: any[]): Array<{ text: st
         priority
       })
     } else if (category === 'Financial') {
-      if (issues.some(i => i.rating === 'Red')) {
+      if (issues.some(i => i.rag_rating?.toLowerCase() === 'red')) {
         recommendations.push({
           text: `<strong>Undertake a full financial review</strong> to confirm funding adequacy, contingency appropriateness, and improved cost-estimate maturity, with enhanced governance from the Shareholder Board.`,
           priority: 'critical'
@@ -95,7 +100,7 @@ export function generateRecommendations(criticalIssues: any[]): Array<{ text: st
   if (recommendations.length === 0 && criticalIssues.length > 0) {
     recommendations.push({
       text: `<strong>Address all identified issues</strong> through a comprehensive improvement plan, with clear milestones and accountabilities established before proceeding to the next gate.`,
-      priority: criticalIssues.some(i => i.rating === 'Red') ? 'critical' : 'high'
+      priority: criticalIssues.some(i => i.rag_rating?.toLowerCase() === 'red') ? 'critical' : 'high'
     })
   }
 
