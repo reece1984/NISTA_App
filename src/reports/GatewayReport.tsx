@@ -213,6 +213,16 @@ export default function GatewayReport({ projectId, reportType }: GatewayReportPr
     }
   })
 
+  // Calculate days to gate
+  const calculateDaysToGate = () => {
+    if (!project.gateway_review_date) return null
+    const today = new Date()
+    const reviewDate = new Date(project.gateway_review_date)
+    const diffTime = reviewDate.getTime() - today.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
+  }
+
   // Build assessment summary object
   const assessmentSummary = {
     overall_rating: overallRating as 'RED' | 'AMBER' | 'GREEN',
@@ -224,7 +234,8 @@ export default function GatewayReport({ projectId, reportType }: GatewayReportPr
     critical_count: criticalCount,
     created_at: assessments[0]?.created_at || new Date().toISOString(),
     executive_summary: `Assessment of ${totalCriteria} criteria shows ${greenCount} at GREEN, ${amberCount} at AMBER, and ${redCount} at RED, resulting in an overall ${overallRating} rating.`,
-    case_summaries: caseSummaries
+    case_summaries: caseSummaries,
+    days_to_gate: calculateDaysToGate()
   }
 
   // Get critical issues (RED assessments)

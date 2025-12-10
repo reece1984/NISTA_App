@@ -156,7 +156,7 @@ export default function CoverPage({ project, assessment }: CoverPageProps) {
                 <span className="stat-label">Critical Issues</span>
               </div>
               <div className="stat-item">
-                <span className="stat-value">{project.days_to_gate || '—'}</span>
+                <span className="stat-value">{assessment.days_to_gate ?? '—'}</span>
                 <span className="stat-label">Days to Gate</span>
               </div>
             </div>
