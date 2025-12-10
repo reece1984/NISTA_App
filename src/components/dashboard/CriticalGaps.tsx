@@ -20,7 +20,7 @@ export function CriticalGaps({ gaps, onGapClick, onGenerateContent }: CriticalGa
         </span>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1 scrollbar-thin">
         {gaps.slice(0, 5).map((gap) => (
           <button
             key={gap.id}

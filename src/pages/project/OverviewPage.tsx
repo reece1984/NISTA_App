@@ -139,14 +139,12 @@ export default function OverviewPage() {
 
   return (
     <>
-      <div className="bg-slate-100 min-h-screen">
-        <DashboardOverview
-          project={project}
-          assessments={assessments}
-          onRerunAssessment={() => setShowRerunDialog(true)}
-          runningAssessment={runningAssessment}
-        />
-      </div>
+      <DashboardOverview
+        project={project}
+        assessments={assessments}
+        onRerunAssessment={() => setShowRerunDialog(true)}
+        runningAssessment={runningAssessment}
+      />
 
       {/* Rerun Confirmation Dialog */}
       {showRerunDialog && (

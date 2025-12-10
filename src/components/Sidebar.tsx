@@ -94,11 +94,12 @@ export default function Sidebar() {
   })
 
   const isActive = (path: string) => {
-    if (path.startsWith('/project/')) {
-      // For project subroutes, check if location matches
-      const projectBase = `/project/${projectId}/`
-      return location.pathname.startsWith(projectBase + path.replace('/project/:id/', ''))
+    // Exact match for non-project routes
+    if (!path.includes('/project/')) {
+      return location.pathname === path
     }
+
+    // For project routes, check if current path matches
     return location.pathname === path
   }
 
@@ -117,40 +118,46 @@ export default function Sidebar() {
           display: 'flex',
           alignItems: 'center',
           gap: '0.75rem',
-          padding: '0.6rem 1rem',
-          color: active ? '#ffffff' : 'rgba(255,255,255,0.7)',
+          padding: '0.625rem 0.75rem',
+          marginLeft: '0.75rem',
+          marginRight: '0.75rem',
+          color: active ? '#ffffff' : 'rgba(148, 163, 184, 1)', // slate-400
           textDecoration: 'none',
-          fontSize: '0.9rem',
-          fontWeight: 500,
+          fontSize: '0.875rem',
+          fontWeight: active ? 500 : 400,
           transition: 'all 0.15s ease',
-          borderLeft: `3px solid ${active ? 'var(--copper)' : 'transparent'}`,
+          borderRadius: '0.5rem',
           background: active ? 'rgba(255,255,255,0.1)' : 'transparent'
         }}
         onMouseEnter={e => {
           if (!active) {
             e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
-            e.currentTarget.style.color = '#ffffff'
+            e.currentTarget.style.color = 'rgba(226, 232, 240, 1)' // slate-200
           }
         }}
         onMouseLeave={e => {
           if (!active) {
             e.currentTarget.style.background = 'transparent'
-            e.currentTarget.style.color = 'rgba(255,255,255,0.7)'
+            e.currentTarget.style.color = 'rgba(148, 163, 184, 1)' // slate-400
           }
         }}
       >
-        <Icon size={18} style={{ opacity: active ? 1 : 0.7, flexShrink: 0 }} />
+        <Icon
+          size={20}
+          style={{
+            color: active ? '#c2703e' : 'inherit', // copper when active
+            flexShrink: 0
+          }}
+        />
         <span>{label}</span>
         {count !== undefined && count > 0 && (
           <span style={{
             marginLeft: 'auto',
-            minWidth: '20px',
-            height: '20px',
-            padding: '0 6px',
-            background: active ? 'var(--copper)' : 'rgba(255,255,255,0.15)',
-            borderRadius: '10px',
-            fontSize: '0.7rem',
-            fontWeight: 600,
+            padding: '0.125rem 0.375rem',
+            background: '#c2703e', // copper
+            borderRadius: '0.25rem',
+            fontSize: '0.625rem',
+            fontWeight: 500,
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -220,7 +227,7 @@ export default function Sidebar() {
             <NavItem to={`/project/${projectId}/summary`} icon={FileText} label="Assessment Summary" count={projectData?.assessmentsCount} />
             <NavItem to={`/project/${projectId}/detail`} icon={List} label="Assessment Detail" count={projectData?.assessmentsCount} />
             <NavItem to={`/project/${projectId}/actions`} icon={CheckSquare} label="Actions" count={projectData?.actionsCount} />
-            <NavItem to={`/project/${projectId}/settings`} icon={Settings} label="Settings" />
+            <NavItem to={`/project/${projectId}/settings`} icon={Settings} label="Project Settings" />
           </div>
         )}
 

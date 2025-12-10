@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criterion Detail - GatewaySuccess</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            copper: '#c2703e',
+            navy: '#0f172a'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+    }
+    .confidence-bar {
+      width: 60px;
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .confidence-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #c2703e 0%, #c2703e var(--confidence), #e2e8f0 var(--confidence));
+    }
+  </style>
+</head>
+<body class="p-8 bg-slate-100">
+  
+  <div class="max-w-5xl mx-auto">
+    
+    <!-- Category Header -->
+    <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-slate-900">Strategic Case</h2>
+          <p class="text-sm text-slate-500">3 criteria assessed</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-sm bg-amber-500"></span>
+        <span class="text-sm font-medium text-slate-700">3</span>
+        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+        </svg>
+      </div>
+    </div>
+    
+    <!-- Criterion Card -->
+    <div class="bg-white rounded-lg border-l-4 border-l-amber-500 shadow-sm overflow-hidden">
+      
+      <!-- Header Row -->
+      <div class="px-6 py-4 flex items-center justify-between border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 text-xs font-medium text-slate-600 bg-slate-100 rounded">G3-1.1</span>
+          <h3 class="text-base font-semibold text-slate-900">Strategic Case Confirmed</h3>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="px-2.5 py-1 text-xs font-bold text-white bg-amber-500 rounded">AMBER</span>
+          <div class="flex items-center gap-2 text-sm text-slate-500">
+            <span>Confidence</span>
+            <div class="confidence-bar">
+              <div class="confidence-fill" style="--confidence: 70%"></div>
+            </div>
+          </div>
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Metrics Grid -->
+      <div class="grid grid-cols-4 divide-x divide-slate-100 border-b border-slate-100">
+        <div class="px-6 py-4 text-center">
+          <div class="text-2xl font-semibold text-slate-900">50%</div>
+          <div class="text-xs text-slate-500 uppercase tracking-wider mt-1">Satisfaction</div>
+        </div>
+        <div class="px-6 py-4 text-center">
+          <div class="text-2xl font-semibold text-copper">70</div>
+          <div class="text-xs text-slate-500 uppercase tracking-wider mt-1">Confidence</div>
+        </div>
+        <div class="px-6 py-4 text-center">
+          <div class="text-2xl font-semibold text-slate-900">1%</div>
+          <div class="text-xs text-slate-500 uppercase tracking-wider mt-1">Weight</div>
+        </div>
+        <div class="px-6 py-4 text-center">
+          <div class="text-2xl font-semibold text-green-600">No</div>
+          <div class="text-xs text-slate-500 uppercase tracking-wider mt-1">Critical</div>
+        </div>
+      </div>
+      
+      <!-- Finding Section -->
+      <div class="px-6 py-5 border-b border-slate-100">
+        <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Finding</h4>
+        <p class="text-slate-700 leading-relaxed">The evidence suggests that the Strategic Case is well-structured, clearly outlining the need for HS2 and demonstrating its potential to alleviate rail congestion and promote economic growth. However, while the case contains substantial arguments for its necessity, it falls short in fully quantifying all benefits, especially regarding the transformative impacts on economic location decisions, which is expected for a GREEN rating.</p>
+      </div>
+      
+      <!-- Evidence Section -->
+      <div class="px-6 py-5 border-b border-slate-100">
+        <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Evidence</h4>
+        <div class="space-y-4">
+          
+          <div class="flex gap-3">
+            <div class="flex-shrink-0 w-8 h-8 rounded bg-slate-50 flex items-center justify-center border-l-2 border-l-amber-400">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="text-slate-700 leading-relaxed">'The Strategic Case provides compelling evidence that HS2 offers the only viable long-term solution to overcrowding on the rail network transport and will be a major contributor to the objective of levelling up the economy.'</p>
+              <p class="text-sm text-slate-400 mt-1.5">Source: FBC Document, Page 20</p>
+            </div>
+          </div>
+          
+          <div class="flex gap-3">
+            <div class="flex-shrink-0 w-8 h-8 rounded bg-slate-50 flex items-center justify-center border-l-2 border-l-amber-400">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="text-slate-700 leading-relaxed">'The economic case does not fully quantify all the benefits set out in the strategic case such as the transformative benefits from changes in business location decisions.'</p>
+              <p class="text-sm text-slate-400 mt-1.5">Source: FBC Document, Page 21</p>
+            </div>
+          </div>
+          
+          <div class="flex gap-3">
+            <div class="flex-shrink-0 w-8 h-8 rounded bg-slate-50 flex items-center justify-center border-l-2 border-l-amber-400">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="text-slate-700 leading-relaxed">'HS2 continues to generate 42 per cent journey time improvements between London and the West Midlands and 20 per cent to the North West.'</p>
+              <p class="text-sm text-slate-400 mt-1.5">Source: FBC Document, Page 22</p>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+      <!-- NEW: Evidence Assessment Section -->
+      <div class="px-6 py-5 border-b border-slate-100 bg-slate-50/50">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Evidence Assessment</h4>
+          <div class="flex items-center gap-3 text-xs">
+            <span class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-green-500"></span>
+              <span class="text-slate-500">1 found</span>
+            </span>
+            <span class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span class="text-slate-500">1 partial</span>
+            </span>
+            <span class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-red-500"></span>
+              <span class="text-slate-500">1 missing</span>
+            </span>
+          </div>
+        </div>
+        
+        <div class="space-y-3">
+          
+          <!-- Evidence Item 1 - Found -->
+          <div class="bg-white rounded-lg border border-slate-200 p-4">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-sm font-medium text-slate-800">Strategic case confirmed at FBC stage</span>
+                  <span class="px-1.5 py-0.5 text-xs text-slate-500 bg-slate-100 rounded">Required</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Expected in: Strategic Case, FBC Chapter</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs text-green-700 bg-green-50 rounded border border-green-100">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    Case confirmed
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs text-green-700 bg-green-50 rounded border border-green-100">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    Rationale unchanged
+                  </span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 px-2 py-1 rounded bg-green-50 border border-green-100">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <span class="text-xs font-medium text-green-700">Found</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Evidence Item 2 - Partial -->
+          <div class="bg-white rounded-lg border border-slate-200 p-4">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-sm font-medium text-slate-800">Strategic benefits still valid</span>
+                  <span class="px-1.5 py-0.5 text-xs text-slate-500 bg-slate-100 rounded">Required</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Expected in: Benefits Validation, Strategic Review</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs text-green-700 bg-green-50 rounded border border-green-100">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    Benefits valid
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs text-slate-500 bg-slate-50 rounded border border-slate-200">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                    Achievability confirmed
+                  </span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 px-2 py-1 rounded bg-amber-50 border border-amber-100">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                <span class="text-xs font-medium text-amber-700">Partial</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Evidence Item 3 - Missing -->
+          <div class="bg-white rounded-lg border border-slate-200 p-4">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-sm font-medium text-slate-800">Ministerial/sponsor reconfirmation</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Expected in: Sponsor Confirmation, Ministerial Brief</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs text-slate-500 bg-slate-50 rounded border border-slate-200">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                    Reconfirmation obtained
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs text-slate-500 bg-slate-50 rounded border border-slate-200">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                    Support clear
+                  </span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 px-2 py-1 rounded bg-red-50 border border-red-100">
+                <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                <span class="text-xs font-medium text-red-700">Missing</span>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+      <!-- NEW: What's Needed for GREEN -->
+      <div class="px-6 py-5 border-b border-slate-100">
+        <div class="flex items-center gap-2 mb-4">
+          <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">What's Needed for GREEN</h4>
+          <span class="px-1.5 py-0.5 text-xs text-copper bg-orange-50 rounded border border-orange-100">3 gaps</span>
+        </div>
+        
+        <div class="grid gap-2 mb-4">
+          <div class="flex items-start gap-3 py-2 px-3 bg-slate-50 rounded">
+            <span class="flex-shrink-0 w-5 h-5 flex items-center justify-center text-xs font-medium text-white bg-copper rounded">1</span>
+            <div>
+              <span class="text-sm text-slate-800">Achievability confirmed</span>
+              <span class="ml-2 text-xs text-red-600 font-medium">Required</span>
+              <p class="text-xs text-slate-500 mt-0.5">via Strategic benefits still valid</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 py-2 px-3 bg-slate-50 rounded">
+            <span class="flex-shrink-0 w-5 h-5 flex items-center justify-center text-xs font-medium text-white bg-copper rounded">2</span>
+            <div>
+              <span class="text-sm text-slate-800">Reconfirmation obtained</span>
+              <p class="text-xs text-slate-500 mt-0.5">via Ministerial/sponsor reconfirmation</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 py-2 px-3 bg-slate-50 rounded">
+            <span class="flex-shrink-0 w-5 h-5 flex items-center justify-center text-xs font-medium text-white bg-copper rounded">3</span>
+            <div>
+              <span class="text-sm text-slate-800">Support clear</span>
+              <p class="text-xs text-slate-500 mt-0.5">via Ministerial/sponsor reconfirmation</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-3 bg-green-50 rounded border border-green-100">
+          <p class="text-xs font-medium text-green-800 uppercase tracking-wider mb-1">GREEN Standard</p>
+          <p class="text-sm text-green-700">Strategic case confirmed at FBC stage with benefits validated and sponsor reconfirmation</p>
+        </div>
+      </div>
+      
+      <!-- Recommendation Section -->
+      <div class="px-6 py-5 bg-amber-50/50 border-l-2 border-l-amber-400 m-4 rounded">
+        <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Recommendation</h4>
+        <div class="flex items-center gap-1.5 mb-2">
+          <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <span class="text-sm font-semibold text-amber-700">ACTION REQUIRED</span>
+        </div>
+        <p class="text-slate-700 leading-relaxed">To achieve a GREEN rating, HS2 Ltd should enhance its Strategic Case by strengthening the quantification of non-monetised benefits, particularly those tied to economic rebalancing and transformation. Additionally, further validation through independent review could substantiate claims made regarding the impact of HS2 on local economies.</p>
+      </div>
+      
+    </div>
+    
+    <!-- Second Criterion - Collapsed state example -->
+    <div class="bg-white rounded-lg border-l-4 border-l-amber-500 shadow-sm overflow-hidden mt-3">
+      <div class="px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 text-xs font-medium text-slate-600 bg-slate-100 rounded">G3-1.2</span>
+          <h3 class="text-base font-semibold text-slate-900">Benefits Realisation Plan</h3>
+          <span class="px-1.5 py-0.5 text-xs font-medium text-red-600 bg-red-50 rounded border border-red-100">CRITICAL</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="px-2.5 py-1 text-xs font-bold text-white bg-amber-500 rounded">AMBER</span>
+          <div class="flex items-center gap-2 text-sm text-slate-500">
+            <span>Confidence</span>
+            <div class="confidence-bar">
+              <div class="confidence-fill" style="--confidence: 65%"></div>
+            </div>
+          </div>
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Third Criterion - Collapsed state example -->
+    <div class="bg-white rounded-lg border-l-4 border-l-amber-500 shadow-sm overflow-hidden mt-3">
+      <div class="px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 text-xs font-medium text-slate-600 bg-slate-100 rounded">G3-1.3</span>
+          <h3 class="text-base font-semibold text-slate-900">Stakeholder Commitment</h3>
+          <span class="px-1.5 py-0.5 text-xs font-medium text-red-600 bg-red-50 rounded border border-red-100">CRITICAL</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="px-2.5 py-1 text-xs font-bold text-white bg-amber-500 rounded">AMBER</span>
+          <div class="flex items-center gap-2 text-sm text-slate-500">
+            <span>Confidence</span>
+            <div class="confidence-bar">
+              <div class="confidence-fill" style="--confidence: 72%"></div>
+            </div>
+          </div>
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  
+</body>
+</html>

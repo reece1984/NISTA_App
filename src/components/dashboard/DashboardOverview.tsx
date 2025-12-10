@@ -153,35 +153,6 @@ export function DashboardOverview({
 
   return (
     <div className="p-8 max-w-[1600px] mx-auto">
-      {/* Page Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-navy">
-            {project.name || project.project_name}
-          </h1>
-          <p className="text-slate-500 mt-1">
-            {project.assessment_templates?.name || 'Gate 0'} · {project.sector || 'General'} · £{project.value_m || '0'}M
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleExportReport}
-            className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-200 rounded-lg transition-colors"
-          >
-            Export Report
-          </button>
-          <button
-            onClick={onRerunAssessment}
-            disabled={runningAssessment}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-navy hover:bg-slate-800 text-white text-sm font-medium rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
-            {runningAssessment ? 'Running...' : 'Re-run Assessment'}
-          </button>
-        </div>
-      </div>
 
       {/* ROW 1: Primary Metrics */}
       <div className="grid grid-cols-12 gap-6 mb-6">

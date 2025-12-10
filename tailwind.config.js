@@ -6,6 +6,10 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Source Sans 3', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Source Sans 3', 'system-ui', '-apple-system', 'sans-serif'],
+      },
       colors: {
         // Programme Insights Brand Colors - Navy & Copper Theme
         primary: '#2c3e50', // Navy

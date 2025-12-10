@@ -197,7 +197,7 @@ export default function BaselineSuccessPage() {
                 Coming Q2 2025
               </div>
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
               Integrated Baselines.<br />Confident Delivery.
             </h1>
             <p className="text-lg md:text-xl mb-8 opacity-95 max-w-3xl mx-auto">

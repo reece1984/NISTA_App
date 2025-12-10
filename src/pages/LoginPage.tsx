@@ -96,7 +96,7 @@ export default function LoginPage() {
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
           <div>
-            <h2 className="text-center text-3xl font-bold text-white" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <h2 className="text-center text-3xl font-bold text-white">
               Sign in to your account
             </h2>
             <p className="mt-2 text-center text-sm text-white/80">
@@ -186,7 +186,7 @@ export default function LoginPage() {
         {showResetPassword && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
             <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
                 Reset Password
               </h3>
 

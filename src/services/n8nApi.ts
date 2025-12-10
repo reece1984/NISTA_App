@@ -181,6 +181,24 @@ export const n8nApi = {
       new_assessment_run_id: newAssessmentRunId,
       project_id: projectId
     })
+  },
+
+  /**
+   * Trigger assessment for a project
+   */
+  triggerAssessment: async (params: {
+    projectId: number
+    projectName: string
+    templateId: number
+    templateName: string
+  }) => {
+    return callN8N({
+      identifier: 'run_assessment',
+      project_id: params.projectId,
+      project_name: params.projectName,
+      template_id: params.templateId,
+      template_name: params.templateName
+    })
   }
 }
 

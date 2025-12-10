@@ -274,8 +274,13 @@ export function useActionPlan(assessmentRunId: number, projectId: number) {
 
       if (!dbUserId) throw new Error('User not found in database')
 
-      // Call Express API instead of N8N for database transaction
-      return apiAdapter.confirmActionPlan(draftId, dbUserId)
+      // Call Express API to confirm action plan
+      const result = await apiAdapter.confirmActionPlan(draftId, dbUserId)
+
+      return {
+        createdActionCount: result.createdActionCount,
+        actionIds: result.actionIds
+      }
     },
     onSuccess: (data) => {
       console.log(`Successfully created ${data.createdActionCount} actions`)

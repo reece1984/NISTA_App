@@ -40,7 +40,7 @@ export default function TenderSuccessPage() {
               </span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
               Turn 4 Weeks of Tender Evaluation<br />into 3 Days
             </h1>
 

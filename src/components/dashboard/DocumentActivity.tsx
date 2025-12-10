@@ -65,7 +65,7 @@ export function DocumentActivity({ activities, onViewAll }: DocumentActivityProp
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1 scrollbar-thin">
         {activities.map((activity, idx) => (
           <div
             key={idx}

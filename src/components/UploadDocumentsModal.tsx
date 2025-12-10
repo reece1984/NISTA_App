@@ -1,10 +1,8 @@
 import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { Upload, FileText, X, Loader2, AlertCircle } from 'lucide-react'
+import { Upload, FileText, X, Loader2, AlertCircle, Check } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useDocumentTypes } from '../hooks/useDocumentTypes'
-import Modal from './ui/Modal'
-import Button from './ui/Button'
 
 interface FileQueueItem {
   id: string
@@ -306,24 +304,36 @@ export default function UploadDocumentsModal({
               })
               .eq('id', fileRecord.id)
 
-            setFileQueue((prev) => {
-              const newQueue = prev.filter((f) => f.id !== queueItem.id)
-
-              // If queue is now empty, close modal after a short delay
-              if (newQueue.length === 0) {
-                setTimeout(() => {
-                  onUploadComplete()
-                  onClose()
-                }, 1500)
-              }
-
-              return newQueue
-            })
+            // Mark as complete
+            setFileQueue((prev) =>
+              prev.map((f) =>
+                f.id === queueItem.id
+                  ? { ...f, progress: 100, processingStatus: 'complete', uploading: false }
+                  : f
+              )
+            )
 
             setToast({
               message: `${file.name} uploaded and embedded successfully (${embeddingCount} chunks)`,
               type: 'success',
             })
+
+            // Remove from queue after a short delay
+            setTimeout(() => {
+              setFileQueue((prev) => {
+                const newQueue = prev.filter((f) => f.id !== queueItem.id)
+
+                // If queue is now empty, close modal after a short delay
+                if (newQueue.length === 0) {
+                  setTimeout(() => {
+                    onUploadComplete()
+                    onClose()
+                  }, 1000)
+                }
+
+                return newQueue
+              })
+            }, 2000)
           } else {
             // Still processing - update progress from 50% to 90%
             setFileQueue((prev) =>
@@ -392,6 +402,7 @@ export default function UploadDocumentsModal({
 
   const allFilesHaveTypes = fileQueue.every((f) => f.selectedType)
   const canUploadAll = fileQueue.length > 0 && allFilesHaveTypes && !fileQueue.some((f) => f.uploading)
+  const isUploading = fileQueue.some((f) => f.uploading)
 
   const handleClose = () => {
     if (fileQueue.some((f) => f.uploading)) {
@@ -405,196 +416,251 @@ export default function UploadDocumentsModal({
     }
   }
 
+  // Calculate total size
+  const totalSize = fileQueue.reduce((acc, f) => acc + f.file.size, 0)
+  const totalSizeMB = (totalSize / (1024 * 1024)).toFixed(1)
+
+  if (!isOpen) return null
+
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Upload Project Documents" size="lg">
-      <div className="space-y-6">
-        {/* Subtitle */}
-        <p className="text-sm text-text-secondary">
-          Add PDF documents for assessment (max 50 files, 50MB each)
-        </p>
+    <>
+      {/* Modal Backdrop */}
+      <div
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50"
+        onClick={handleClose}
+      />
 
-        {/* Dropzone */}
-        <div
-          {...getRootProps()}
-          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-            isDragActive
-              ? 'border-secondary bg-secondary/5'
-              : 'border-border hover:border-secondary hover:bg-gray-50'
-          }`}
-        >
-          <input {...getInputProps()} />
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center">
-              <Upload size={24} className="text-secondary" />
-            </div>
-            <div>
-              <p className="text-base font-medium text-text-primary mb-1">
-                {isDragActive ? 'Drop files here' : 'Drag and drop PDF files here'}
-              </p>
-              <p className="text-sm text-text-secondary">or click to browse</p>
-            </div>
-            <p className="text-xs text-text-secondary">
-              Maximum 50 files • 50MB per file • PDF only
-            </p>
-          </div>
-        </div>
+      {/* Modal Container */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+        <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-xl overflow-hidden pointer-events-auto">
 
-        {/* File Queue */}
-        {fileQueue.length > 0 && (
-          <div className="space-y-4">
+          {/* Header */}
+          <div className="px-6 py-5 border-b border-slate-100">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-text-primary">
-                Files ready to upload ({fileQueue.length})
-              </h3>
+              <div>
+                <h2 className="text-lg font-semibold text-navy">Upload Documents</h2>
+                <p className="text-sm text-slate-500 mt-0.5">
+                  Add project documentation for AI-powered assessment
+                </p>
+              </div>
               <button
-                onClick={clearAll}
-                disabled={fileQueue.some((f) => f.uploading)}
-                className="text-sm text-error hover:text-error/80 transition-colors disabled:opacity-50"
+                onClick={handleClose}
+                className="p-2 -mr-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
               >
-                Clear all
+                <X className="w-5 h-5" />
               </button>
             </div>
+          </div>
 
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {fileQueue.map((queueItem) => (
-                <div key={queueItem.id} className="border border-border rounded-lg p-4">
-                  <div className="flex items-start gap-3 mb-3">
-                    <FileText size={20} className="text-rag-red flex-shrink-0 mt-0.5" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-text-primary truncate">
-                        {queueItem.file.name}
-                      </p>
-                      <p className="text-xs text-text-secondary">
-                        {(queueItem.file.size / (1024 * 1024)).toFixed(2)} MB
-                      </p>
-                    </div>
-                    {!queueItem.uploading && (
-                      <button
-                        onClick={() => removeFile(queueItem.id)}
-                        className="flex-shrink-0 p-1 hover:bg-gray-100 rounded"
-                      >
-                        <X size={16} className="text-text-secondary" />
-                      </button>
-                    )}
-                  </div>
+          {/* Content */}
+          <div className="p-6">
 
-                  {/* Document Type Selector */}
-                  <div className="mb-3">
-                    <label className="block text-xs font-medium text-text-secondary mb-1">
-                      Document Type *
-                    </label>
-                    <select
-                      value={queueItem.selectedType || ''}
-                      onChange={(e) => updateFileType(queueItem.id, e.target.value)}
-                      disabled={queueItem.uploading || loadingTypes}
-                      className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:border-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <option value="">Select document type...</option>
-                      {documentTypesData?.grouped &&
-                        Object.entries(documentTypesData.grouped).map(([category, types]) => (
-                          <optgroup key={category} label={category}>
-                            {types.map((type) => (
-                              <option key={type.id} value={type.name}>
-                                {type.name}
-                              </option>
-                            ))}
-                          </optgroup>
-                        ))}
-                    </select>
-                  </div>
-
-                  {/* Status and Progress */}
-                  <div className="space-y-2">
-                    {queueItem.uploading ? (
-                      <>
-                        {/* Progress Bar */}
-                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="h-full bg-blue-600 transition-all duration-300 ease-out"
-                            style={{ width: `${queueItem.progress}%` }}
-                          />
-                        </div>
-
-                        {/* Progress Text */}
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-blue-600 flex items-center gap-1">
-                            <Loader2 size={14} className="animate-spin" />
-                            {queueItem.processingStatus === 'uploading' && queueItem.progress < 50
-                              ? `Uploading... ${queueItem.progress}%`
-                              : `Processing & embedding... ${queueItem.progress}%`
-                            }
-                          </span>
-                          {queueItem.estimatedTimeRemaining !== null && queueItem.estimatedTimeRemaining > 0 && queueItem.processingStatus === 'uploading' && (
-                            <span className="text-xs text-text-secondary">
-                              {queueItem.estimatedTimeRemaining < 60
-                                ? `${queueItem.estimatedTimeRemaining} seconds remaining`
-                                : `${Math.ceil(queueItem.estimatedTimeRemaining / 60)} minutes remaining`}
-                            </span>
-                          )}
-                          {queueItem.processingStatus === 'processing' && (
-                            <span className="text-xs text-text-secondary">
-                              This may take 1-2 minutes
-                            </span>
-                          )}
-                        </div>
-                      </>
-                    ) : queueItem.error ? (
-                      <span className="text-xs text-error flex items-center gap-1">
-                        <AlertCircle size={14} />
-                        {queueItem.error}
-                      </span>
-                    ) : queueItem.selectedType ? (
-                      <span className="text-xs text-rag-green">Ready to upload</span>
-                    ) : (
-                      <span className="text-xs text-text-secondary">
-                        Select document type to continue
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
+            {/* Dropzone */}
+            <div
+              {...getRootProps()}
+              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all group ${
+                isDragActive
+                  ? 'border-copper bg-gradient-to-b from-amber-50/50 to-orange-50/30'
+                  : 'border-slate-200 bg-gradient-to-b from-slate-50 to-slate-100/50 hover:border-copper/50 hover:bg-amber-50/30'
+              }`}
+            >
+              <input {...getInputProps()} />
+              <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <FileText className="w-7 h-7 text-copper" />
+              </div>
+              <p className="text-sm font-medium text-slate-700 mb-1">
+                {isDragActive ? (
+                  'Drop files here'
+                ) : (
+                  <>
+                    Drop PDF files here or <span className="text-copper hover:text-copper-light">browse</span>
+                  </>
+                )}
+              </p>
+              <p className="text-xs text-slate-400">
+                Up to 50 files · 50MB each · PDF format
+              </p>
             </div>
-          </div>
-        )}
 
-        {/* Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-border">
-          <Button variant="secondary" onClick={handleClose}>
-            {fileQueue.length > 0 ? 'Close' : 'Cancel'}
-          </Button>
-          <Button
-            variant="primary"
-            onClick={uploadAll}
-            disabled={!canUploadAll}
-            className="flex items-center gap-2"
-          >
-            {fileQueue.some((f) => f.uploading) ? (
-              <>
-                <Loader2 size={18} className="animate-spin" />
-                Uploading...
-              </>
-            ) : (
-              <>
-                <Upload size={18} />
-                Upload All ({fileQueue.length})
-              </>
+            {/* File List */}
+            {fileQueue.length > 0 && (
+              <div className="mt-4 space-y-2 max-h-64 overflow-y-auto">
+                {fileQueue.map((queueItem) => {
+                  const isComplete = queueItem.processingStatus === 'complete'
+                  const isPending = !queueItem.uploading && !isComplete && !queueItem.error
+
+                  return (
+                    <div
+                      key={queueItem.id}
+                      className={`flex items-center gap-3 p-3 rounded-lg border transition-all animate-in slide-in-from-top-2 duration-200 ${
+                        isComplete
+                          ? 'bg-green-50/50 border-green-100'
+                          : 'bg-slate-50 border-slate-100'
+                      }`}
+                    >
+                      {/* PDF Icon */}
+                      <div className="w-10 h-10 rounded-lg bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-5 h-5 text-red-500" />
+                      </div>
+
+                      {/* File Info & Progress */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-700 truncate">
+                          {queueItem.file.name}
+                        </p>
+
+                        {/* Pending State */}
+                        {isPending && !queueItem.selectedType && (
+                          <p className="text-xs text-slate-400">
+                            {(queueItem.file.size / (1024 * 1024)).toFixed(2)} MB · Select document type
+                          </p>
+                        )}
+
+                        {/* Ready to Upload */}
+                        {isPending && queueItem.selectedType && (
+                          <p className="text-xs text-slate-400">
+                            {(queueItem.file.size / (1024 * 1024)).toFixed(2)} MB · Ready to upload
+                          </p>
+                        )}
+
+                        {/* Uploading Progress */}
+                        {queueItem.uploading && !isComplete && (
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full bg-gradient-to-r from-copper to-copper-light transition-all duration-300"
+                                style={{ width: `${queueItem.progress}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-copper font-medium">{queueItem.progress}%</span>
+                          </div>
+                        )}
+
+                        {/* Complete State */}
+                        {isComplete && (
+                          <p className="text-xs text-green-600">Uploaded · Processing for assessment</p>
+                        )}
+
+                        {/* Error State */}
+                        {queueItem.error && (
+                          <p className="text-xs text-red-500 flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3" />
+                            {queueItem.error}
+                          </p>
+                        )}
+
+                        {/* Document Type Selector */}
+                        {!queueItem.uploading && !isComplete && !queueItem.selectedType && (
+                          <div className="mt-2">
+                            <select
+                              value={queueItem.selectedType || ''}
+                              onChange={(e) => updateFileType(queueItem.id, e.target.value)}
+                              disabled={loadingTypes}
+                              className="w-full px-2 py-1 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-copper transition-colors"
+                            >
+                              <option value="">Select document type...</option>
+                              {documentTypesData?.grouped &&
+                                Object.entries(documentTypesData.grouped).map(([category, types]) => (
+                                  <optgroup key={category} label={category}>
+                                    {types.map((type) => (
+                                      <option key={type.id} value={type.name}>
+                                        {type.name}
+                                      </option>
+                                    ))}
+                                  </optgroup>
+                                ))}
+                            </select>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Status Icon */}
+                      {!queueItem.uploading && !isComplete && (
+                        <button
+                          onClick={() => removeFile(queueItem.id)}
+                          className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+
+                      {queueItem.uploading && !isComplete && (
+                        <div className="w-8 h-8 flex items-center justify-center">
+                          <Loader2 className="w-4 h-4 text-copper animate-spin" />
+                        </div>
+                      )}
+
+                      {isComplete && (
+                        <div className="w-8 h-8 flex items-center justify-center">
+                          <Check className="w-5 h-5 text-green-500" />
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
             )}
-          </Button>
-        </div>
 
-        {/* Toast notification */}
-        {toast && (
-          <div
-            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg ${
-              toast.type === 'success'
-                ? 'bg-rag-green text-white'
-                : 'bg-error text-white'
-            }`}
-          >
-            {toast.message}
+            {/* Upload Summary */}
+            {fileQueue.length > 0 && (
+              <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
+                <span>{fileQueue.length} file{fileQueue.length !== 1 ? 's' : ''} · {totalSizeMB} MB total</span>
+                <button
+                  onClick={clearAll}
+                  disabled={isUploading}
+                  className="text-copper hover:text-copper-light font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
+
           </div>
-        )}
+
+          {/* Footer */}
+          <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+            <button
+              onClick={handleClose}
+              className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+            {fileQueue.length > 0 && (
+              <button
+                onClick={uploadAll}
+                disabled={!canUploadAll}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-navy hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    Upload All
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+
+        </div>
       </div>
-    </Modal>
+
+      {/* Toast notification */}
+      {toast && (
+        <div
+          className={`fixed bottom-4 right-4 z-[60] px-4 py-3 rounded-lg shadow-lg ${
+            toast.type === 'success'
+              ? 'bg-rag-green text-white'
+              : 'bg-error text-white'
+          }`}
+        >
+          {toast.message}
+        </div>
+      )}
+    </>
   )
 }

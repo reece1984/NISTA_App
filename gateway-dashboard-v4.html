@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gateway Intelligence Dashboard V4 - GatewaySuccess</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: '#0f172a',
+            'navy-light': '#1e293b',
+            copper: '#c2703e',
+            'copper-light': '#d4a574',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Source Sans 3', system-ui, sans-serif; }
+    
+    .readiness-ring {
+      transform: rotate(-90deg);
+    }
+    
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .pulse-slow { animation: pulse-slow 2s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+  <div class="p-8 max-w-[1600px] mx-auto">
+    
+    <!-- Page Header (V1) -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-navy">HS2 Phase One FBC 2020</h1>
+        <p class="text-slate-500 mt-1">Gate 3: Investment Decision · Transport · £50,000M</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-200 rounded-lg transition-colors">
+          Export Report
+        </button>
+        <button class="inline-flex items-center gap-2 px-4 py-2 bg-navy hover:bg-slate-800 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Re-run Assessment
+        </button>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- ROW 1: Primary Metrics (V1 with darker titles) -->
+    <!-- ============================================ -->
+    <div class="grid grid-cols-12 gap-6 mb-6">
+      
+      <!-- HERO: Readiness Score with Trajectory (V1) -->
+      <div class="col-span-5 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-start justify-between mb-2">
+          <div>
+            <h2 class="text-sm font-bold text-navy uppercase tracking-wide">Gateway Readiness</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Continuous assessment · Updated 2 hours ago</p>
+          </div>
+          <span class="px-2.5 py-1 text-xs font-semibold text-amber-700 bg-amber-100 rounded-full">
+            Predicted: AMBER
+          </span>
+        </div>
+        
+        <div class="flex items-center gap-8 mt-4">
+          <!-- Circular Progress -->
+          <div class="relative w-36 h-36 flex-shrink-0">
+            <svg class="w-full h-full readiness-ring" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="#f1f5f9" stroke-width="10"/>
+              <circle cx="60" cy="60" r="52" fill="none" stroke="url(#amberGradient)" stroke-width="10" 
+                      stroke-linecap="round" stroke-dasharray="327" stroke-dashoffset="108"/>
+              <defs>
+                <linearGradient id="amberGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#f59e0b"/>
+                  <stop offset="100%" stop-color="#fbbf24"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span class="text-4xl font-bold text-navy">67%</span>
+              <span class="text-xs text-slate-400">Ready</span>
+            </div>
+          </div>
+          
+          <!-- Trajectory Analysis -->
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-green-700">+12% this week</p>
+                <p class="text-xs text-slate-500">Trend: Improving</p>
+              </div>
+            </div>
+            
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+              <p class="text-xs text-slate-500 mb-1">Trajectory Forecast</p>
+              <p class="text-sm text-slate-700">
+                At current pace, you'll reach <strong class="text-green-700">GREEN (85%+)</strong> by <strong class="text-navy">March 15th</strong>
+              </p>
+              <p class="text-xs text-green-600 mt-1 flex items-center gap-1">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                31 days ahead of schedule
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Countdown Timer (V1) -->
+      <div class="col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <h2 class="text-sm font-bold text-navy uppercase tracking-wide mb-4">Time to Gate Review</h2>
+        
+        <div class="text-center">
+          <div class="text-5xl font-bold text-navy mb-1">127</div>
+          <div class="text-sm text-slate-500 mb-4">days remaining</div>
+          
+          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 rounded-lg text-xs text-slate-500">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span>15 April 2025</span>
+          </div>
+        </div>
+        
+        <div class="mt-4 pt-4 border-t border-slate-100 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-500">Document freeze</span>
+            <span class="font-medium text-amber-600">14 days before</span>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-500">Pre-review meeting</span>
+            <span class="font-medium text-slate-700">7 days before</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Criteria Summary (V1) -->
+      <div class="col-span-4 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-bold text-navy uppercase tracking-wide">Criteria Status</h2>
+          <a href="#" class="text-xs text-copper hover:text-copper-light font-medium">View details →</a>
+        </div>
+        
+        <!-- RAG Bar -->
+        <div class="flex h-3 rounded-full overflow-hidden mb-4">
+          <div class="bg-green-500 transition-all" style="width: 23%"></div>
+          <div class="bg-amber-400 transition-all" style="width: 52%"></div>
+          <div class="bg-red-500 transition-all" style="width: 25%"></div>
+        </div>
+        
+        <div class="grid grid-cols-3 gap-3">
+          <div class="text-center p-3 bg-green-50 rounded-xl border border-green-100">
+            <div class="text-2xl font-bold text-green-700">11</div>
+            <div class="text-xs text-green-600 font-medium">GREEN</div>
+            <div class="text-[10px] text-green-500 mt-1 flex items-center justify-center gap-0.5">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+              </svg>
+              +3 this week
+            </div>
+          </div>
+          <div class="text-center p-3 bg-amber-50 rounded-xl border border-amber-100">
+            <div class="text-2xl font-bold text-amber-700">25</div>
+            <div class="text-xs text-amber-600 font-medium">AMBER</div>
+            <div class="text-[10px] text-slate-400 mt-1">no change</div>
+          </div>
+          <div class="text-center p-3 bg-red-50 rounded-xl border border-red-100">
+            <div class="text-2xl font-bold text-red-700">12</div>
+            <div class="text-xs text-red-600 font-medium">RED</div>
+            <div class="text-[10px] text-green-500 mt-1 flex items-center justify-center gap-0.5">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+              </svg>
+              -3 this week
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- ============================================ -->
+    <!-- ROW 2: Activity & Actions (V3 with navy button) -->
+    <!-- ============================================ -->
+    <div class="grid grid-cols-12 gap-6 mb-6">
+      
+      <!-- Document Activity (V3) -->
+      <div class="col-span-4 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-sm font-bold text-navy uppercase tracking-wide">Document Activity</h2>
+            <p class="text-xs text-slate-400 mt-0.5">This week's changes</p>
+          </div>
+          <div class="flex items-center gap-1 px-2 py-1 bg-green-50 rounded-full border border-green-200">
+            <span class="w-1.5 h-1.5 bg-green-500 rounded-full pulse-slow"></span>
+            <span class="text-[10px] font-semibold text-green-700">Live sync</span>
+          </div>
+        </div>
+        
+        <div class="space-y-3">
+          <!-- Document with impact highlight -->
+          <div class="flex gap-3 p-3 bg-green-50 rounded-lg border-l-4 border-green-500">
+            <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-slate-700">Benefits Register updated</p>
+              <p class="text-xs text-slate-500">Added tracking mechanisms · 2 hours ago</p>
+              <p class="text-xs font-semibold text-green-600 mt-1">+8% impact on readiness</p>
+            </div>
+          </div>
+          
+          <div class="flex gap-3 p-3 bg-slate-50 rounded-lg border-l-4 border-amber-400">
+            <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-slate-700">Risk Register v3.2</p>
+              <p class="text-xs text-slate-500">New version detected · Yesterday</p>
+              <p class="text-xs font-semibold text-amber-600 mt-1">Pending re-assessment</p>
+            </div>
+          </div>
+          
+          <div class="flex gap-3 p-3 bg-slate-50 rounded-lg border-l-4 border-slate-300">
+            <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-slate-700">Commercial Case Annex</p>
+              <p class="text-xs text-slate-500">New document added · 3 days ago</p>
+              <p class="text-xs font-semibold text-green-600 mt-1">+4% impact on readiness</p>
+            </div>
+          </div>
+        </div>
+        
+        <a href="#" class="mt-4 flex items-center justify-center gap-1 text-xs text-copper hover:text-copper-light font-medium py-2">
+          View all documents
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+      
+      <!-- Critical Gaps (V3 with navy button) -->
+      <div class="col-span-4 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-bold text-navy uppercase tracking-wide">Critical Gaps</h2>
+          <span class="px-2 py-0.5 text-xs font-semibold text-red-700 bg-red-100 rounded-full">5 blockers</span>
+        </div>
+        
+        <div class="space-y-2">
+          <a href="#" class="block p-3 bg-red-50 hover:bg-red-100 rounded-lg border-l-4 border-red-500 transition-colors group">
+            <div class="flex items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-slate-700 group-hover:text-navy">Benefits Realisation Plan</p>
+                <p class="text-xs text-slate-500">Missing: tracking mechanisms, baselines</p>
+              </div>
+              <svg class="w-4 h-4 text-slate-400 group-hover:text-copper flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </a>
+          
+          <a href="#" class="block p-3 bg-red-50 hover:bg-red-100 rounded-lg border-l-4 border-red-500 transition-colors group">
+            <div class="flex items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-slate-700 group-hover:text-navy">Quantified Risk Assessment</p>
+                <p class="text-xs text-slate-500">QRA not updated since OBC stage</p>
+              </div>
+              <svg class="w-4 h-4 text-slate-400 group-hover:text-copper flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </a>
+          
+          <a href="#" class="block p-3 bg-red-50 hover:bg-red-100 rounded-lg border-l-4 border-red-500 transition-colors group">
+            <div class="flex items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-slate-700 group-hover:text-navy">Resource Plan</p>
+                <p class="text-xs text-slate-500">No evidence of skills gap analysis</p>
+              </div>
+              <svg class="w-4 h-4 text-slate-400 group-hover:text-copper flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </a>
+        </div>
+        
+        <div class="mt-4 pt-4 border-t border-slate-100">
+          <!-- Navy button as per V1 -->
+          <button class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-navy hover:bg-slate-800 text-white text-sm font-medium rounded-lg transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            Generate Missing Content
+          </button>
+          <p class="text-[10px] text-slate-400 text-center mt-2">AI can draft content based on your documents</p>
+        </div>
+      </div>
+      
+      <!-- Action Plan (V3) -->
+      <div class="col-span-4 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-bold text-navy uppercase tracking-wide">Action Plan</h2>
+          <a href="#" class="text-xs text-copper hover:text-copper-light font-medium">Manage →</a>
+        </div>
+        
+        <!-- Copper progress bar -->
+        <div class="mb-4">
+          <div class="flex items-center justify-between text-sm mb-2">
+            <span class="text-slate-600">Completion</span>
+            <span class="font-bold text-navy">18 of 34</span>
+          </div>
+          <div class="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-full bg-copper rounded-full transition-all" style="width: 53%"></div>
+          </div>
+        </div>
+        
+        <!-- Stats -->
+        <div class="grid grid-cols-3 gap-2 mb-4">
+          <div class="text-center p-2 bg-green-50 rounded-lg border border-green-100">
+            <div class="text-lg font-bold text-green-600">18</div>
+            <div class="text-[10px] font-semibold text-green-700">Complete</div>
+          </div>
+          <div class="text-center p-2 bg-amber-50 rounded-lg border border-amber-100">
+            <div class="text-lg font-bold text-amber-600">12</div>
+            <div class="text-[10px] font-semibold text-amber-700">In Progress</div>
+          </div>
+          <div class="text-center p-2 bg-slate-50 rounded-lg border border-slate-200">
+            <div class="text-lg font-bold text-slate-500">4</div>
+            <div class="text-[10px] font-semibold text-slate-600">Not Started</div>
+          </div>
+        </div>
+        
+        <!-- Overdue alert -->
+        <div class="p-3 bg-red-50 rounded-lg border border-red-100 flex items-start gap-2 mb-4">
+          <svg class="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div>
+            <p class="text-xs font-semibold text-red-700">3 actions overdue</p>
+            <p class="text-[10px] text-red-600">Oldest: 5 days overdue</p>
+          </div>
+        </div>
+        
+        <!-- Due this week -->
+        <div class="space-y-2">
+          <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Due this week</p>
+          <div class="flex items-center gap-2 text-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            <span class="flex-1 truncate text-slate-700">Update QRA with latest estimates</span>
+            <span class="text-xs text-slate-400">Fri</span>
+          </div>
+          <div class="flex items-center gap-2 text-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            <span class="flex-1 truncate text-slate-700">Complete stakeholder mapping</span>
+            <span class="text-xs text-slate-400">Fri</span>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- ============================================ -->
+    <!-- ROW 3: Trend Chart + AI Insights (V1) -->
+    <!-- ============================================ -->
+    <div class="grid grid-cols-12 gap-6">
+      
+      <!-- Readiness Trend Chart (V1) -->
+      <div class="col-span-8 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-sm font-bold text-navy uppercase tracking-wide">Readiness Trend</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Weekly progress toward GREEN threshold</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">4W</button>
+            <button class="px-3 py-1.5 text-xs font-medium text-white bg-navy rounded-lg">8W</button>
+            <button class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">12W</button>
+          </div>
+        </div>
+        
+        <!-- Chart Area -->
+        <div class="relative h-48">
+          <!-- Y-axis labels -->
+          <div class="absolute left-0 top-0 bottom-8 w-12 flex flex-col justify-between text-xs text-slate-400">
+            <span>100%</span>
+            <span>75%</span>
+            <span>50%</span>
+            <span>25%</span>
+            <span>0%</span>
+          </div>
+          
+          <!-- Chart -->
+          <div class="ml-12 h-40 relative">
+            <!-- GREEN threshold line -->
+            <div class="absolute left-0 right-0 top-[15%] border-t-2 border-dashed border-green-300 z-10">
+              <span class="absolute -top-2.5 right-0 text-[10px] font-medium text-green-600 bg-white px-1">GREEN (85%)</span>
+            </div>
+            
+            <!-- Projected area -->
+            <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+              <!-- Projected trend area -->
+              <polygon 
+                points="400,80 480,65 560,48 560,160 400,160" 
+                fill="url(#projectedGradient)" 
+                opacity="0.3"
+              />
+              <!-- Actual trend line -->
+              <polyline 
+                points="0,140 80,130 160,120 240,105 320,90 400,80" 
+                fill="none" 
+                stroke="#c2703e" 
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <!-- Projected trend line -->
+              <polyline 
+                points="400,80 480,65 560,48" 
+                fill="none" 
+                stroke="#c2703e" 
+                stroke-width="3"
+                stroke-dasharray="8,4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                opacity="0.5"
+              />
+              <!-- Data points -->
+              <circle cx="0" cy="140" r="4" fill="#c2703e"/>
+              <circle cx="80" cy="130" r="4" fill="#c2703e"/>
+              <circle cx="160" cy="120" r="4" fill="#c2703e"/>
+              <circle cx="240" cy="105" r="4" fill="#c2703e"/>
+              <circle cx="320" cy="90" r="4" fill="#c2703e"/>
+              <circle cx="400" cy="80" r="6" fill="#c2703e" stroke="white" stroke-width="2"/>
+              
+              <defs>
+                <linearGradient id="projectedGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#c2703e" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#c2703e" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            
+            <!-- X-axis labels -->
+            <div class="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-slate-400 -mb-6">
+              <span>Nov 4</span>
+              <span>Nov 11</span>
+              <span>Nov 18</span>
+              <span>Nov 25</span>
+              <span>Dec 2</span>
+              <span>Dec 9</span>
+              <span class="text-slate-300">Dec 16</span>
+              <span class="text-slate-300">Dec 23</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="flex items-center justify-center gap-6 mt-10 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-4 h-0.5 bg-copper rounded"></span>
+            <span class="text-slate-600">Actual</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-4 h-0.5 bg-copper/50 rounded" style="background: repeating-linear-gradient(90deg, #c2703e 0, #c2703e 4px, transparent 4px, transparent 8px)"></span>
+            <span class="text-slate-600">Projected</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-4 h-0.5 border-t-2 border-dashed border-green-400"></span>
+            <span class="text-slate-600">GREEN threshold</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- AI Insights Panel (V1) -->
+      <div class="col-span-4 bg-gradient-to-br from-navy to-slate-800 rounded-2xl p-6 shadow-sm text-white">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-8 rounded-lg bg-copper/20 flex items-center justify-center">
+            <svg class="w-5 h-5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+          </div>
+          <h2 class="text-sm font-bold uppercase tracking-wide text-white/80">AI Insights</h2>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="p-3 bg-white/10 rounded-lg backdrop-blur">
+            <p class="text-xs text-copper font-medium mb-1">Trajectory Analysis</p>
+            <p class="text-sm text-white/90">Current improvement rate of +3% per week will achieve GREEN before the review date. Maintain momentum on Benefits documentation.</p>
+          </div>
+          
+          <div class="p-3 bg-white/10 rounded-lg backdrop-blur">
+            <p class="text-xs text-amber-400 font-medium mb-1">Risk Alert</p>
+            <p class="text-sm text-white/90">QRA gap is a gateway blocker. Similar projects that failed to address this by T-60 days saw 78% RED rating probability.</p>
+          </div>
+          
+          <div class="p-3 bg-white/10 rounded-lg backdrop-blur">
+            <p class="text-xs text-green-400 font-medium mb-1">Opportunity</p>
+            <p class="text-sm text-white/90">Your Commercial Case is stronger than 85% of projects at this stage. Consider highlighting in pre-review briefing.</p>
+          </div>
+        </div>
+        
+        <button class="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2.5 bg-copper hover:bg-copper-light text-white text-sm font-medium rounded-lg transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+          </svg>
+          Ask Gateway Advisor
+        </button>
+      </div>
+      
+    </div>
+    
+  </div>
+
+</body>
+</html>

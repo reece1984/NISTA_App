@@ -37,7 +37,7 @@
     --red-bg: rgba(220, 38, 38, 0.06);
     --red-border: rgba(220, 38, 38, 0.15);
 
-    --font-display: 'Fraunces', Georgia, serif;
+    --font-display: 'Source Sans 3', -apple-system, sans-serif;
     --font-body: 'Source Sans 3', -apple-system, sans-serif;
 
     --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
@@ -115,4 +115,29 @@
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
+}
+
+/* Chat scrollbar styling */
+.chat-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Firefox support */
+.chat-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
 }

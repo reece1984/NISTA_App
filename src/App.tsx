@@ -18,7 +18,7 @@ import OverviewPage from './pages/project/OverviewPage'
 import DocumentsPage from './pages/project/DocumentsPage'
 import SummaryPage from './pages/project/SummaryPage'
 import DetailPage from './pages/project/DetailPage'
-import ActionsPage from './pages/project/ActionsPage'
+import ActionsPageV3 from './components/actions/ActionsPageV3'
 import SettingsPage from './pages/project/SettingsPage'
 
 // Create a client
@@ -135,7 +135,7 @@ function AppRoutes() {
             <Route path="documents" element={<DocumentsPage />} />
             <Route path="summary" element={<SummaryPage />} />
             <Route path="detail" element={<DetailPage />} />
-            <Route path="actions" element={<ActionsPage />} />
+            <Route path="actions" element={<ActionsPageV3 />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Route>

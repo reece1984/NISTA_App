@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actions - AI Generating (Sidebar)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: '#0f172a',
+            'navy-light': '#1e293b',
+            copper: '#c2703e',
+            'copper-light': '#d4a574',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Source Sans 3', system-ui, sans-serif; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { animation: spin 1s linear infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .pulse { animation: pulse 2s ease-in-out infinite; }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .shimmer {
+      background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+  <div class="flex">
+    
+    <!-- Main Content Area (dimmed during generation) -->
+    <div class="flex-1 p-8 max-w-[1200px] opacity-50 pointer-events-none">
+      
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-navy">Actions Register</h1>
+          <p class="text-slate-500 mt-1">Track and manage gateway readiness actions</p>
+        </div>
+      </div>
+
+      <!-- Empty/Placeholder Content -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm py-32">
+        <div class="text-center text-slate-400">
+          <svg class="w-12 h-12 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+          <p class="text-sm">Generating actions...</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- AI Generation Sidebar - Loading State -->
+    <div class="fixed top-0 right-0 h-full w-[420px] bg-navy shadow-2xl z-50 flex flex-col">
+      
+      <!-- Sidebar Header -->
+      <div class="p-6 border-b border-white/10">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-copper/20 flex items-center justify-center">
+              <svg class="w-5 h-5 text-copper spinner" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-semibold text-white">Generating Actions</h2>
+              <p class="text-xs text-white/50">Analyzing assessment gaps...</p>
+            </div>
+          </div>
+          <button class="p-2 text-white/30 cursor-not-allowed rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Progress Section -->
+      <div class="p-6 border-b border-white/10">
+        <!-- Progress Bar -->
+        <div class="mb-4">
+          <div class="flex items-center justify-between text-sm mb-2">
+            <span class="text-white/70">Progress</span>
+            <span class="text-white font-medium">65%</span>
+          </div>
+          <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-copper to-copper-light rounded-full transition-all duration-500" style="width: 65%"></div>
+          </div>
+        </div>
+        
+        <!-- Status Steps -->
+        <div class="space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+              <svg class="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="text-sm text-white/70">Loaded assessment results</span>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <div class="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+              <svg class="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="text-sm text-white/70">Identified 21 RED/AMBER gaps</span>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <div class="w-5 h-5 rounded-full bg-copper/30 flex items-center justify-center">
+              <svg class="w-3 h-3 text-copper spinner" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+            </div>
+            <span class="text-sm text-white">Generating remediation actions...</span>
+          </div>
+          
+          <div class="flex items-center gap-3 opacity-40">
+            <div class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center">
+              <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span>
+            </div>
+            <span class="text-sm text-white/50">Calculating impact scores</span>
+          </div>
+          
+          <div class="flex items-center gap-3 opacity-40">
+            <div class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center">
+              <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span>
+            </div>
+            <span class="text-sm text-white/50">Prioritizing actions</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Placeholder Action Cards (Loading Skeletons) -->
+      <div class="flex-1 overflow-hidden p-6 space-y-3">
+        <p class="text-xs font-medium text-white/30 uppercase tracking-wider mb-4">Suggested Actions</p>
+        
+        <!-- Skeleton Card 1 -->
+        <div class="bg-white/5 rounded-xl p-4 border border-white/5">
+          <div class="flex items-start justify-between mb-3">
+            <div class="h-5 w-16 rounded shimmer"></div>
+            <div class="h-5 w-10 rounded shimmer"></div>
+          </div>
+          <div class="h-4 w-3/4 rounded shimmer mb-2"></div>
+          <div class="h-3 w-full rounded shimmer mb-1"></div>
+          <div class="h-3 w-2/3 rounded shimmer"></div>
+        </div>
+        
+        <!-- Skeleton Card 2 -->
+        <div class="bg-white/5 rounded-xl p-4 border border-white/5">
+          <div class="flex items-start justify-between mb-3">
+            <div class="h-5 w-14 rounded shimmer"></div>
+            <div class="h-5 w-10 rounded shimmer"></div>
+          </div>
+          <div class="h-4 w-2/3 rounded shimmer mb-2"></div>
+          <div class="h-3 w-full rounded shimmer mb-1"></div>
+          <div class="h-3 w-1/2 rounded shimmer"></div>
+        </div>
+        
+        <!-- Skeleton Card 3 -->
+        <div class="bg-white/5 rounded-xl p-4 border border-white/5">
+          <div class="flex items-start justify-between mb-3">
+            <div class="h-5 w-20 rounded shimmer"></div>
+            <div class="h-5 w-10 rounded shimmer"></div>
+          </div>
+          <div class="h-4 w-4/5 rounded shimmer mb-2"></div>
+          <div class="h-3 w-full rounded shimmer mb-1"></div>
+          <div class="h-3 w-3/4 rounded shimmer"></div>
+        </div>
+        
+        <!-- Fade overlay -->
+        <div class="absolute bottom-24 left-0 right-0 h-20 bg-gradient-to-t from-navy to-transparent pointer-events-none"></div>
+      </div>
+      
+      <!-- Sidebar Footer (disabled during loading) -->
+      <div class="p-6 border-t border-white/10 bg-navy-light">
+        <div class="flex items-center gap-3">
+          <button disabled class="flex-1 px-4 py-2.5 text-sm font-medium text-white/30 border border-white/10 rounded-lg cursor-not-allowed">
+            Cancel
+          </button>
+          <button disabled class="flex-1 px-4 py-2.5 bg-white/10 text-white/30 text-sm font-medium rounded-lg cursor-not-allowed">
+            Generating...
+          </button>
+        </div>
+        <p class="text-xs text-white/30 text-center mt-3">This may take 1-2 minutes</p>
+      </div>
+      
+    </div>
+    
+    <!-- Overlay -->
+    <div class="fixed inset-0 bg-black/30 z-40"></div>
+    
+  </div>
+
+</body>
+</html>

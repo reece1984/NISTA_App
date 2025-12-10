@@ -21,7 +21,7 @@ export function CriteriaStatus({
   const redPercent = (redCount / total) * 100
 
   return (
-    <div className="col-span-4 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+    <div className="col-span-4 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-bold text-navy uppercase tracking-wide">Criteria Status</h2>
         <button
@@ -32,8 +32,8 @@ export function CriteriaStatus({
         </button>
       </div>
 
-      {/* RAG Bar */}
-      <div className="flex h-3 rounded-full overflow-hidden mb-4">
+      {/* RAG Bar - thicker with more space below */}
+      <div className="flex h-3 rounded-full overflow-hidden mb-6">
         <div
           className="bg-green-500 transition-all"
           style={{ width: `${greenPercent}%` }}
@@ -48,7 +48,9 @@ export function CriteriaStatus({
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      {/* Stat cards - centered in remaining space */}
+      <div className="flex-1 flex items-center">
+        <div className="grid grid-cols-3 gap-3 w-full">
         <div className="text-center p-3 bg-green-50 rounded-xl border border-green-100">
           <div className="text-2xl font-bold text-green-700">{greenCount}</div>
           <div className="text-xs text-green-600 font-medium">GREEN</div>
@@ -78,6 +80,7 @@ export function CriteriaStatus({
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   )

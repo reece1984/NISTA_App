@@ -3,20 +3,64 @@ import type { EvidenceRequirement, EvidenceAssessmentItem } from '../../types/as
 
 interface Props {
   evidenceRequirements: EvidenceRequirement[]
-  evidenceAssessment: EvidenceAssessmentItem[]
+  evidenceAssessment: EvidenceAssessmentItem[] | string | null | undefined
+}
+
+/**
+ * Safely parse evidence_assessment data which may be:
+ * - JSON string (from database)
+ * - Already parsed array
+ * - null/undefined
+ */
+const parseEvidenceAssessment = (data: string | any[] | null | undefined): EvidenceAssessmentItem[] => {
+  if (!data) return []
+  if (Array.isArray(data)) return data
+  if (typeof data === 'string') {
+    try {
+      const parsed = JSON.parse(data)
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
+  }
+  return []
+}
+
+/**
+ * Normalize indicators array which may contain:
+ * - Strings: ["indicator1", "indicator2"]
+ * - Objects: [{definition: "...", indicators: [...]}, ...]
+ */
+const normalizeIndicators = (indicators: any[] | undefined | null): string[] => {
+  if (!indicators || !Array.isArray(indicators)) return []
+
+  return indicators.map(indicator => {
+    if (typeof indicator === 'string') {
+      return indicator
+    }
+    if (indicator && typeof indicator === 'object') {
+      return indicator.definition || indicator.text || JSON.stringify(indicator)
+    }
+    return String(indicator || '')
+  })
 }
 
 export function EvidenceAssessmentSection({ evidenceRequirements, evidenceAssessment }: Props) {
+  // Safely parse evidence assessment data
+  const safeEvidenceAssessment = parseEvidenceAssessment(evidenceAssessment)
+
   // Merge requirements with assessment results
   const items = evidenceRequirements.map(req => {
-    const assessment = evidenceAssessment.find(
+    const assessment = safeEvidenceAssessment.find(
       ea => ea.evidence_requirement_id === req.id
     )
     return {
       ...req,
       status: assessment?.status ?? 'missing',
-      found_indicators: assessment?.found_indicators ?? [],
-      missing_indicators: assessment?.missing_indicators ?? req.quality_indicators,
+      found_indicators: normalizeIndicators(assessment?.found_indicators),
+      missing_indicators: assessment?.missing_indicators
+        ? normalizeIndicators(assessment.missing_indicators)
+        : normalizeIndicators(req.quality_indicators),
       source_refs: assessment?.source_refs ?? []
     }
   })
