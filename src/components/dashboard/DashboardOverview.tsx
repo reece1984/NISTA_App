@@ -152,7 +152,7 @@ export function DashboardOverview({
   return (
     <div className="p-6">
       {/* Top section: Gateway Readiness + Readiness Trend (left) | AI Insights spanning both rows (right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] lg:grid-rows-[auto_1fr] gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] lg:grid-rows-[auto_1fr] gap-4 mb-6">
         {/* Top-left: Gateway Readiness Hero */}
         <div className="col-start-1 row-start-1">
           <GatewayReadinessHero
@@ -181,7 +181,7 @@ export function DashboardOverview({
       </div>
 
       {/* Bottom row: Three supporting panels */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <CriticalGaps
           gaps={criticalGaps}
           onGapClick={handleGapClick}

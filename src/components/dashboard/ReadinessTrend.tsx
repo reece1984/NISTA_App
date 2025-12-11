@@ -25,8 +25,8 @@ export function ReadinessTrend({}: ReadinessTrendProps) {
   ]
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-6 shadow-sm">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-sm font-bold text-navy uppercase tracking-wide">Readiness Trend</h2>
           <p className="text-xs text-slate-400 mt-0.5">Weekly progress toward GREEN threshold</p>
@@ -49,7 +49,7 @@ export function ReadinessTrend({}: ReadinessTrendProps) {
       </div>
 
       {/* Chart Area */}
-      <div className="relative h-48">
+      <div className="relative h-40">
         {/* Y-axis labels */}
         <div className="absolute left-0 top-0 bottom-8 w-12 flex flex-col justify-between text-xs text-slate-400">
           <span>100%</span>
@@ -60,7 +60,7 @@ export function ReadinessTrend({}: ReadinessTrendProps) {
         </div>
 
         {/* Chart */}
-        <div className="ml-12 h-40 relative">
+        <div className="ml-12 h-32 relative">
           {/* GREEN threshold line */}
           <div className="absolute left-0 right-0 top-[15%] border-t-2 border-dashed border-green-300 z-10">
             <span className="absolute -top-2.5 right-0 text-[10px] font-medium text-green-600 bg-white px-1">

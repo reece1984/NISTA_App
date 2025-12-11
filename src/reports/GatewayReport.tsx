@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import CoverPage from './components/CoverPage'
 import ExecutiveSummary from './components/ExecutiveSummary'
+import CaseBreakdown from './components/CaseBreakdown'
 import CaseAssessment from './components/CaseAssessment'
 import ActionPlan from './components/ActionPlan'
 import EvidenceRegister from './components/EvidenceRegister'
@@ -250,12 +251,19 @@ export default function GatewayReport({ projectId, reportType }: GatewayReportPr
     }))
 
   // Get recommendations (from actions or generate from RED criteria)
-  const recommendations = actions.slice(0, 10).map((action: any) => ({
-    id: action.id,
-    recommendation: action.action_required || action.title || 'Action required',
-    priority: action.priority || 'Medium',
-    impact: 5 // Default impact percentage
-  }))
+  const recommendations = actions.length > 0
+    ? actions.slice(0, 10).map((action: any) => ({
+        id: action.id,
+        recommendation: action.action_required || action.title || 'Action required',
+        priority: action.priority || 'Medium',
+        impact: action.impact || 5
+      }))
+    : criticalIssues.slice(0, 8).map((issue: any, index: number) => ({
+        id: `rec-${index}`,
+        recommendation: `Address gaps in ${issue.criterion_name}: ${issue.finding}`,
+        priority: index < 3 ? 'Critical' : 'High',
+        impact: index < 3 ? 10 : 7
+      }))
 
   // Format actions for ActionPlan component
   const formattedActions = actions.map((action: any) => ({
@@ -311,6 +319,13 @@ export default function GatewayReport({ projectId, reportType }: GatewayReportPr
     missing_documents: []
   }
 
+  // Debug logging for recommendations
+  console.log('=== REPORT DEBUG ===')
+  console.log('Actions count:', actions.length)
+  console.log('Critical issues count:', criticalIssues.length)
+  console.log('Recommendations:', recommendations)
+  console.log('Recommendations length:', recommendations?.length)
+
   // Render different report types
   const renderReport = () => {
     switch (reportType) {
@@ -348,6 +363,10 @@ export default function GatewayReport({ projectId, reportType }: GatewayReportPr
               assessment={assessmentSummary}
               criticalIssues={criticalIssues}
               recommendations={recommendations}
+            />
+            <CaseBreakdown
+              caseSummaries={caseSummaries}
+              assessmentsByCase={assessmentsByCase}
             />
             {sortedCaseEntries.map(([caseName]) => (
               <CaseAssessment key={caseName} caseName={caseName} caseData={casesData[caseName]} />

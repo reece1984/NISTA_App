@@ -358,25 +358,20 @@ export default function SettingsPage() {
   const countdown = countdownDays !== null ? getCountdownColor(countdownDays) : null
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Scrollable Content */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          {/* Page Header */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <h1 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '1.5rem',
-              fontWeight: 600,
-              color: 'var(--ink)',
-              marginBottom: '0.25rem',
-            }}>
-              Project Settings
-            </h1>
-            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-              Manage your project configuration and preferences
-            </p>
-          </div>
+    <div className="p-6">
+      {/* Page Header - full width */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Project Settings</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Manage your project configuration and preferences
+          </p>
+        </div>
+      </div>
+
+      {/* Form content - centered with max-width */}
+      <div className="max-w-4xl">
+        <div>
 
           {/* Project Basics */}
           <SettingsCard icon={Folder} title="Project Basics">

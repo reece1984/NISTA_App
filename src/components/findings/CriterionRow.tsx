@@ -2,7 +2,7 @@ import { ChevronDown, ChevronUp, Plus, AlertCircle } from 'lucide-react'
 
 interface EvidenceRequirement {
   id: number
-  description: string
+  evidence_text: string
   is_met: boolean
 }
 
@@ -144,7 +144,7 @@ export function CriterionRow({ criterion, isExpanded, onToggle, onCreateAction }
               <div className="space-y-2">
                 {criterion.evidence_requirements.map((req) => (
                   <div key={req.id} className="flex items-start justify-between gap-3 p-2 bg-white rounded border border-slate-200">
-                    <span className="text-sm text-slate-700 flex-1">{req.description}</span>
+                    <span className="text-sm text-slate-700 flex-1">{req.evidence_text}</span>
                     <span className={`text-xs font-medium flex-shrink-0 ${req.is_met ? 'text-green-600' : 'text-red-600'}`}>
                       {req.is_met ? 'Met' : 'Missing'}
                     </span>

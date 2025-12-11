@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { ChevronDown, ChevronRight } from 'lucide-react'
 import { CaseSection } from './CaseSection'
 
 interface Criterion {
@@ -42,6 +43,7 @@ export function DetailedFindings({
   onCreateAction
 }: DetailedFindingsProps) {
   const [filter, setFilter] = useState<FilterType>('all')
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   const filteredCriteria = useMemo(() => {
     return assessments.filter(c => {
@@ -70,55 +72,75 @@ export function DetailedFindings({
   }, [filteredCriteria])
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
-      {/* Header */}
-      <div className="p-4 border-b border-slate-100">
-        <h2 className="text-base font-semibold text-slate-900 mb-3">Detailed Findings</h2>
-
-        {/* Filter bar */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {(['all', 'green', 'amber', 'red', 'critical'] as FilterType[]).map(f => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  filter === f
-                    ? 'bg-slate-900 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                {f === 'all' ? 'All' :
-                 f === 'critical' ? 'Critical Only' :
-                 f.charAt(0).toUpperCase() + f.slice(1)}
-              </button>
-            ))}
-          </div>
-          <span className="text-sm text-slate-500">
-            Showing {filteredCriteria.length} of {assessments.length} criteria
-          </span>
+    <div className="bg-white rounded-lg border border-slate-200 shadow-sm mb-6">
+      {/* Header - always visible */}
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          {isCollapsed ? (
+            <ChevronRight className="w-5 h-5 text-slate-400" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-slate-400" />
+          )}
+          <h2 className="text-base font-semibold text-slate-900">Detailed Findings</h2>
         </div>
-      </div>
+        <span className="text-sm text-slate-500">
+          {isCollapsed ? 'Expand' : 'Collapse'}
+        </span>
+      </button>
 
-      {/* Case sections */}
-      <div className="divide-y divide-slate-100">
-        {Object.entries(groupedByCases).length === 0 ? (
-          <div className="p-8 text-center text-slate-500">
-            No criteria match the selected filter
+      {/* Collapsible content */}
+      {!isCollapsed && (
+        <>
+          {/* Filter bar */}
+          <div className="px-4 pb-4 border-b border-slate-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {(['all', 'green', 'amber', 'red', 'critical'] as FilterType[]).map(f => (
+                  <button
+                    key={f}
+                    onClick={() => setFilter(f)}
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                      filter === f
+                        ? 'bg-slate-900 text-white'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {f === 'all' ? 'All' :
+                     f === 'critical' ? 'Critical Only' :
+                     f.charAt(0).toUpperCase() + f.slice(1)}
+                  </button>
+                ))}
+              </div>
+              <span className="text-sm text-slate-500">
+                Showing {filteredCriteria.length} of {assessments.length} criteria
+              </span>
+            </div>
           </div>
-        ) : (
-          Object.entries(groupedByCases).map(([caseCategory, criteria]) => (
-            <CaseSection
-              key={caseCategory}
-              caseCategory={caseCategory}
-              criteria={criteria}
-              expandedCriteria={expandedCriteria}
-              setExpandedCriteria={setExpandedCriteria}
-              onCreateAction={onCreateAction}
-            />
-          ))
-        )}
-      </div>
+
+          {/* Case sections */}
+          <div className="divide-y divide-slate-100">
+            {Object.entries(groupedByCases).length === 0 ? (
+              <div className="p-8 text-center text-slate-500">
+                No criteria match the selected filter
+              </div>
+            ) : (
+              Object.entries(groupedByCases).map(([caseCategory, criteria]) => (
+                <CaseSection
+                  key={caseCategory}
+                  caseCategory={caseCategory}
+                  criteria={criteria}
+                  expandedCriteria={expandedCriteria}
+                  setExpandedCriteria={setExpandedCriteria}
+                  onCreateAction={onCreateAction}
+                />
+              ))
+            )}
+          </div>
+        </>
+      )}
     </div>
   )
 }

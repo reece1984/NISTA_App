@@ -18,7 +18,7 @@ export default function FindingsPage() {
   const [showExportModal, setShowExportModal] = useState(false)
   const [runningAssessment, setRunningAssessment] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null)
-  const [summaryCollapsed, setSummaryCollapsed] = useState(false)
+  const [summaryCollapsed, setSummaryCollapsed] = useState(true)
   const [expandedCriteria, setExpandedCriteria] = useState<number[]>([])
 
   // Fetch project data with assessments
@@ -248,6 +248,7 @@ export default function FindingsPage() {
         onToggle={() => setSummaryCollapsed(!summaryCollapsed)}
         onCriterionClick={handleCriterionClick}
         onCreateAction={handleCreateAction}
+        project={projectData}
       />
 
       {/* Detailed Findings */}

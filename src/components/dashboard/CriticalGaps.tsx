@@ -12,7 +12,7 @@ interface CriticalGapsProps {
 
 export function CriticalGaps({ gaps, onGapClick, onGenerateContent }: CriticalGapsProps) {
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-6 shadow-sm flex flex-col h-full">
+    <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-bold text-navy uppercase tracking-wide">Critical Gaps</h2>
         <span className="px-2 py-0.5 text-xs font-semibold text-red-700 bg-red-100 rounded-full">

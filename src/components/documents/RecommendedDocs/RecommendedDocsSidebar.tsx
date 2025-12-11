@@ -21,35 +21,38 @@ export default function RecommendedDocsSidebar({
   if (!recommendations) return null
 
   return (
-    <div className="w-[260px] border-r border-slate-200 bg-white flex flex-col">
+    <div className="bg-white rounded-lg border border-slate-200 flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-slate-100">
-        <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-          <ClipboardCheck className="w-3.5 h-3.5" />
-          Recommended for
-        </div>
-        <p className="text-base font-bold text-navy mt-1">
+      <div className="p-2 border-b border-slate-100 flex-shrink-0">
+        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+          Recommended For
+        </h3>
+        <p className="text-sm font-semibold text-navy">
           {recommendations.gateName}
         </p>
       </div>
 
-      {/* Checklist */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-1">
-        {recommendations.documents.map(doc => (
-          <RecommendedDocItem
-            key={doc.id}
-            document={doc}
-            onUploadClick={() => onUploadClick(doc)}
-          />
-        ))}
+      {/* Checklist - scrollable */}
+      <div className="flex-1 overflow-y-auto px-2 py-1.5 min-h-0">
+        <div className="space-y-1">
+          {recommendations.documents.map(doc => (
+            <RecommendedDocItem
+              key={doc.id}
+              document={doc}
+              onUploadClick={() => onUploadClick(doc)}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Progress Footer */}
-      <UploadProgress
-        uploaded={recommendations.uploadedCount}
-        total={recommendations.totalCount}
-        percent={recommendations.progressPercent}
-      />
+      <div className="flex-shrink-0">
+        <UploadProgress
+          uploaded={recommendations.uploadedCount}
+          total={recommendations.totalCount}
+          percent={recommendations.progressPercent}
+        />
+      </div>
     </div>
   )
 }

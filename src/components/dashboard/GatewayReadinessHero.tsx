@@ -37,11 +37,11 @@ export function GatewayReadinessHero({
   const isImproving = weeklyChange > 0
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+    <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">Gateway Readiness</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-900">GATEWAY READINESS</h2>
           <p className="text-sm text-slate-500">Continuous assessment · Updated 2 hours ago</p>
         </div>
         <span className={`px-3 py-1 text-sm font-semibold rounded-full ${badgeColors[predictedRAG]}`}>
@@ -50,11 +50,11 @@ export function GatewayReadinessHero({
       </div>
 
       {/* Main content - two columns */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-4">
         {/* Left: Donut and trend */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
           {/* Circular Progress */}
-          <div className="relative w-32 h-32 flex-shrink-0">
+          <div className="relative w-28 h-28 flex-shrink-0">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
               <circle cx="60" cy="60" r="52" fill="none" stroke="#f1f5f9" strokeWidth="10"/>
               <circle
@@ -130,7 +130,7 @@ export function GatewayReadinessHero({
         </div>
 
         {/* Right: Time to Gate Review */}
-        <div className="border-l border-slate-200 pl-6">
+        <div className="border-l border-slate-200 pl-6 self-start">
           <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
             Time to Gate Review
           </h3>

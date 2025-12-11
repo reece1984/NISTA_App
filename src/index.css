@@ -141,3 +141,162 @@
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 #f1f5f9;
 }
+
+/* ========================================
+   Findings Page Components
+   ======================================== */
+
+/* Assessment by Case - Collapsible section */
+.assessment-by-case {
+  margin-bottom: 1rem;
+}
+
+.section-header-collapsible {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.section-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-chevron {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+.section-description {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0.25rem 0 0 0;
+}
+
+.case-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.case-summary-table thead th {
+  text-align: left;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.case-summary-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background-color 0.15s ease;
+}
+
+.case-summary-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.case-summary-table tbody td {
+  padding: 0.75rem 0.5rem;
+}
+
+.case-name-cell {
+  font-weight: 600;
+  color: #0f172a;
+  padding-left: 1rem !important;
+}
+
+.case-finding-cell {
+  color: #64748b;
+  font-size: 0.813rem;
+  max-width: 400px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Mobile: Card layout */
+.case-summary-cards {
+  display: none;
+  gap: 0.75rem;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .case-summary-table {
+    display: none;
+  }
+
+  .case-summary-cards {
+    display: flex;
+  }
+}
+
+.case-summary-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.case-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.case-card-name {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 0.875rem;
+}
+
+.case-card-stats {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.case-card-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.case-card-stat .stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.case-card-stat .stat-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+}
+
+.case-card-finding {
+  font-size: 0.813rem;
+  color: #64748b;
+  line-height: 1.5;
+}

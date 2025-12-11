@@ -45,7 +45,7 @@ export default function ExecutiveSummary({ assessment, criticalIssues, recommend
 
       {/* Key metrics row */}
       <div className="metrics-row">
-        <div className="metric-card">
+        <div className="metric-card primary">
           <span className="metric-value">{assessment.readiness_score}%</span>
           <span className="metric-label">Overall Readiness</span>
           <div className="metric-bar">
@@ -84,8 +84,7 @@ export default function ExecutiveSummary({ assessment, criticalIssues, recommend
         <tbody>
           {assessment.case_summaries?.map((caseSummary: any) => (
             <tr key={caseSummary.case}>
-              <td className="case-name">
-                <span className={`case-indicator ${caseSummary.case.toLowerCase()}`} />
+              <td className={`case-name case-${caseSummary.case.toLowerCase()}`}>
                 {caseSummary.case}
               </td>
               <td><RatingBadge rating={caseSummary.rating} size="small" /></td>
@@ -106,14 +105,19 @@ export default function ExecutiveSummary({ assessment, criticalIssues, recommend
       </p>
       <div className="critical-issues-list">
         {criticalIssues.slice(0, 8).map((issue, index) => (
-          <div key={issue.id} className="critical-issue">
+          <div key={issue.id} className={`critical-issue ${index < 3 ? 'top-priority' : ''}`}>
             <span className="issue-number">{index + 1}</span>
+
             <div className="issue-content">
               <p className="issue-title">{issue.criterion_name}</p>
               <p className="issue-description">{issue.finding}</p>
               <p className="issue-case">{issue.case} Case · {issue.criterion_code}</p>
             </div>
-            <RatingBadge rating="RED" size="small" />
+
+            <div className="issue-badges">
+              {index < 3 && <span className="urgent-badge">URGENT</span>}
+              <RatingBadge rating="RED" size="small" />
+            </div>
           </div>
         ))}
       </div>

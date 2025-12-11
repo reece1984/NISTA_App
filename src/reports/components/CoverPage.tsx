@@ -16,11 +16,11 @@ export default function CoverPage({ project, assessment }: CoverPageProps) {
   }
 
   const formatValue = (value: number | null | undefined) => {
-    if (!value || value === 0) return 'Not specified'
-    if (value >= 1000000000) return `${(value / 1000000000).toFixed(1)}B`
-    if (value >= 1000000) return `${(value / 1000000).toFixed(0)}M`
-    if (value >= 1000) return `${(value / 1000).toFixed(0)}K`
-    return value.toString()
+    if (!value || value === 0) return '[TBC]'
+    if (value >= 1000000000) return `£${(value / 1000000000).toFixed(1)}B`
+    if (value >= 1000000) return `£${(value / 1000000).toFixed(0)}M`
+    if (value >= 1000) return `£${(value / 1000).toFixed(0)}K`
+    return `£${value.toLocaleString()}`
   }
 
   const getRatingSubtitle = (rating: string) => {
@@ -57,6 +57,9 @@ export default function CoverPage({ project, assessment }: CoverPageProps) {
     return `Gate ${gate}`
   }
 
+  // Get consistent gate value for both number and name
+  const gateValue = project.current_gate || project.gate_number || project.template_id
+
   return (
     <div className="cover-page">
       {/* Top section - subtle branding */}
@@ -65,7 +68,7 @@ export default function CoverPage({ project, assessment }: CoverPageProps) {
           <span className="brand-gateway">Gateway</span>
           <span className="brand-success">Success</span>
         </div>
-        <p className="brand-tagline">Gateway Intelligence Platform</p>
+        <p className="brand-tagline">Continuous Readiness Monitoring</p>
       </div>
 
       {/* Main content - centered */}
@@ -78,7 +81,7 @@ export default function CoverPage({ project, assessment }: CoverPageProps) {
 
         {/* Gate badge */}
         <div className="gate-badge">
-          {getGateNumber()}: {getGateName(project.current_gate || project.gate_number || project.template_id)}
+          {gateValue !== null && gateValue !== undefined ? `Gate ${gateValue}` : ''}: {getGateName(gateValue)}
         </div>
 
         {/* Readiness hero - constructive visual instead of alarming RED box */}
@@ -169,19 +172,19 @@ export default function CoverPage({ project, assessment }: CoverPageProps) {
         <div className="metadata-grid">
           <div className="metadata-item">
             <span className="metadata-label">Sponsoring Department</span>
-            <span className="metadata-value">{project.sponsoring_organisation || 'Not specified'}</span>
+            <span className="metadata-value">{project.sponsoring_organisation || project.sponsoring_organization || '[TBC]'}</span>
           </div>
           <div className="metadata-item">
             <span className="metadata-label">Delivery Organisation</span>
-            <span className="metadata-value">{project.delivery_organisation || 'Not specified'}</span>
+            <span className="metadata-value">{project.delivery_organisation || project.delivery_organization || '[TBC]'}</span>
           </div>
           <div className="metadata-item">
             <span className="metadata-label">Project Value</span>
-            <span className="metadata-value">£{formatValue(project.value)}</span>
+            <span className="metadata-value">{formatValue(project.value)}</span>
           </div>
           <div className="metadata-item">
             <span className="metadata-label">Sector</span>
-            <span className="metadata-value">{project.sector || 'Not specified'}</span>
+            <span className="metadata-value">{project.sector || '[TBC]'}</span>
           </div>
           <div className="metadata-item">
             <span className="metadata-label">Assessment Date</span>

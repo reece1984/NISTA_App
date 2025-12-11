@@ -75,12 +75,12 @@ export default function ActionsPageV3() {
   }
 
   return (
-    <div className="p-8 max-w-[1500px] mx-auto">
+    <div className="p-6">
       {/* Page Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-navy">Actions Register</h1>
-          <p className="text-slate-500 mt-1">
+          <h1 className="text-2xl font-bold text-slate-900">Actions Register</h1>
+          <p className="text-sm text-slate-500 mt-1">
             {actions.length} action{actions.length !== 1 ? 's' : ''} · Last updated recently
           </p>
         </div>

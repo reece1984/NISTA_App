@@ -36,6 +36,13 @@ export default {
       },
       animation: {
         'bounce-slow': 'bounce 2s infinite',
+        'slide-in': 'slideIn 300ms ease-out',
+      },
+      keyframes: {
+        slideIn: {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
       },
     },
   },

@@ -12,14 +12,43 @@ export default function ActionPlan({ actions }: ActionPlanProps) {
     })
   }
 
+  const criticalCount = actions.filter(a => a.priority === 'Critical').length
+  const highCount = actions.filter(a => a.priority === 'High').length
+  const mediumCount = actions.filter(a => a.priority === 'Medium').length
+  const lowCount = actions.filter(a => a.priority === 'Low').length
+
   return (
-    <div className="report-section">
+    <div className="report-section page-break">
       <h2 className="section-title">Action Plan</h2>
 
       <p className="section-intro">
         {actions.length} action{actions.length !== 1 ? 's' : ''} have been identified to improve gateway readiness.
         Actions are prioritised by potential impact on the overall assessment.
       </p>
+
+      {/* Priority Summary Cards */}
+      <div className="action-priority-summary">
+        <div className="priority-card critical">
+          <span className="priority-count">{criticalCount}</span>
+          <span className="priority-label">Critical</span>
+          <span className="priority-desc">Must resolve before gate</span>
+        </div>
+        <div className="priority-card high">
+          <span className="priority-count">{highCount}</span>
+          <span className="priority-label">High</span>
+          <span className="priority-desc">Significant impact</span>
+        </div>
+        <div className="priority-card medium">
+          <span className="priority-count">{mediumCount}</span>
+          <span className="priority-label">Medium</span>
+          <span className="priority-desc">Should address</span>
+        </div>
+        <div className="priority-card low">
+          <span className="priority-count">{lowCount}</span>
+          <span className="priority-label">Low</span>
+          <span className="priority-desc">If time permits</span>
+        </div>
+      </div>
 
       {/* Summary stats */}
       <div className="action-stats">
@@ -37,7 +66,7 @@ export default function ActionPlan({ actions }: ActionPlanProps) {
         </div>
         <div className="action-stat">
           <span className="action-stat-value">{actions.filter(a => a.status === 'Completed').length}</span>
-          <span className="action-stat-label">Completed</span>
+          <span class="action-stat-label">Completed</span>
         </div>
       </div>
 

@@ -199,7 +199,7 @@ export default function Sidebar() {
           letterSpacing: '0.05em',
           marginTop: '2px'
         }}>
-          NISTA/PAR Assessment
+          Continuous Readiness Monitoring
         </div>
       </div>
 

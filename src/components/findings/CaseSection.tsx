@@ -35,7 +35,7 @@ export function CaseSection({
   setExpandedCriteria,
   onCreateAction
 }: CaseSectionProps) {
-  const [isExpanded, setIsExpanded] = useState(true)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   const ratingCounts = {
     green: criteria.filter(c => c.rag_rating?.toUpperCase() === 'GREEN').length,

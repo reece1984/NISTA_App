@@ -12,6 +12,12 @@ export default function CaseAssessment({ caseName, caseData }: CaseAssessmentPro
     return text.substring(0, maxLength) + '...'
   }
 
+  // Calculate percentages for RAG bar
+  const total = caseData.criteria_count || 1
+  const greenPercent = ((caseData.green_count || 0) / total) * 100
+  const amberPercent = ((caseData.amber_count || 0) / total) * 100
+  const redPercent = ((caseData.red_count || 0) / total) * 100
+
   return (
     <div className="case-section">
       {/* Case header */}
@@ -21,11 +27,11 @@ export default function CaseAssessment({ caseName, caseData }: CaseAssessmentPro
           <h2 className="case-title">{caseName} Case</h2>
           <RatingBadge rating={caseData.rating} size="medium" />
         </div>
-        <p className="case-summary">{caseData.summary}</p>
+        <p className="case-summary-text">{caseData.summary}</p>
       </div>
 
       {/* Case stats */}
-      <div className="case-stats">
+      <div className="case-stats-row">
         <div className="case-stat">
           <span className="case-stat-value">{caseData.criteria_count}</span>
           <span className="case-stat-label">Criteria</span>
@@ -41,6 +47,15 @@ export default function CaseAssessment({ caseName, caseData }: CaseAssessmentPro
         <div className="case-stat">
           <span className="case-stat-value red">{caseData.red_count}</span>
           <span className="case-stat-label">RED</span>
+        </div>
+      </div>
+
+      {/* RAG distribution bar */}
+      <div className="case-rag-distribution">
+        <div className="rag-bar">
+          {greenPercent > 0 && <div className="rag-fill rag-green" style={{ width: `${greenPercent}%` }} />}
+          {amberPercent > 0 && <div className="rag-fill rag-amber" style={{ width: `${amberPercent}%` }} />}
+          {redPercent > 0 && <div className="rag-fill rag-red" style={{ width: `${redPercent}%` }} />}
         </div>
       </div>
 

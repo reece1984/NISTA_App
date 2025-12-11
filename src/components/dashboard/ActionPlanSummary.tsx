@@ -26,7 +26,7 @@ export function ActionPlanSummary({
   const completionPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-6 shadow-sm flex flex-col h-full">
+    <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-bold text-navy uppercase tracking-wide">Action Plan</h2>
         <button

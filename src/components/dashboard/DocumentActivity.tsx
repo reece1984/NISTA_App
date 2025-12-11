@@ -53,7 +53,7 @@ export function DocumentActivity({ activities, onViewAll }: DocumentActivityProp
   }
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-6 shadow-sm flex flex-col h-full">
+    <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-sm font-bold text-navy uppercase tracking-wide">Document Activity</h2>

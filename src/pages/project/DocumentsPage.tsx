@@ -306,49 +306,54 @@ export default function DocumentsPage() {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      {/* Page Header */}
-      <DocumentsHeader
-        documentCount={documents.length}
-        pageCount={pageCount}
-        uploadedCount={recommendations?.uploadedCount || 0}
-        totalRecommended={recommendations?.totalCount || 6}
-        isChatOpen={isChatOpen}
-        onChatToggle={() => setIsChatOpen(!isChatOpen)}
-        onUploadClick={() => setShowUploadModal(true)}
-      />
-
-      {/* Content Area with 3 columns */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar: Recommended Documents */}
-        <RecommendedDocsSidebar
-          projectGate={projectGate}
-          documents={documents}
-          onUploadClick={handleRecommendedUploadClick}
-        />
-
-        {/* Center: Documents Table */}
-        <div className="flex-1 p-6 overflow-auto bg-slate-50">
-          <DocumentsTable
-            documents={documents.map(doc => ({
-              ...doc,
-              status: 'indexed' as const
-            }))}
-            onDeleteDocument={handleDeleteDocument}
-            deletingDocumentId={deletingDocumentId}
+    <div className="flex flex-col -m-5 h-[calc(100vh-48px)]">
+      {/* Main Content Area */}
+      <div className="flex flex-col p-6 h-full bg-slate-100">
+        {/* Page Header - aligned with content below */}
+        <div className="flex-shrink-0 mb-6">
+          <DocumentsHeader
+            documentCount={documents.length}
+            pageCount={pageCount}
+            uploadedCount={recommendations?.uploadedCount || 0}
+            totalRecommended={recommendations?.totalCount || 6}
+            isChatOpen={isChatOpen}
+            onChatToggle={() => setIsChatOpen(!isChatOpen)}
+            onUploadClick={() => setShowUploadModal(true)}
           />
         </div>
 
-        {/* Right: Chat Panel (conditional) */}
-        {isChatOpen && (
-          <DocumentChatPanel
-            projectId={projectId}
-            documentCount={documents.length}
-            pageCount={pageCount}
-            onClose={() => setIsChatOpen(false)}
+        {/* Two-column layout - flexible height */}
+        <div className="grid grid-cols-[280px_1fr] gap-4 flex-1 min-h-0">
+          {/* Left: Recommended docs */}
+          <RecommendedDocsSidebar
+            projectGate={projectGate}
+            documents={documents}
+            onUploadClick={handleRecommendedUploadClick}
           />
-        )}
+
+          {/* Center: Documents table */}
+          <div className="bg-white rounded-lg border border-slate-200 flex flex-col h-full">
+            <DocumentsTable
+              documents={documents.map(doc => ({
+                ...doc,
+                status: 'indexed' as const
+              }))}
+              onDeleteDocument={handleDeleteDocument}
+              deletingDocumentId={deletingDocumentId}
+            />
+          </div>
+        </div>
       </div>
+
+      {/* Right: Chat Panel (overlay when open) */}
+      {isChatOpen && (
+        <DocumentChatPanel
+          projectId={projectId}
+          documentCount={documents.length}
+          pageCount={pageCount}
+          onClose={() => setIsChatOpen(false)}
+        />
+      )}
 
       {/* Upload Modal */}
       <UploadDocumentsModal
