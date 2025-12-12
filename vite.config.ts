@@ -10,6 +10,11 @@ export default defineConfig({
         target: 'https://n8n-reeceai-u56804.vm.elestio.app',
         changeOrigin: true,
         secure: false,
+      },
+      '/webhook-test': {
+        target: 'https://n8n-reeceai-u56804.vm.elestio.app',
+        changeOrigin: true,
+        secure: false,
       }
     }
   }

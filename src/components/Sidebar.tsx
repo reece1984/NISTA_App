@@ -4,8 +4,6 @@ import {
   Home, Table, LogOut, Settings
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import { useQuery } from '@tanstack/react-query'
-import { supabase } from '../lib/supabase'
 
 export default function Sidebar() {
   const location = useLocation()
@@ -30,68 +28,6 @@ export default function Sidebar() {
     return formatted.replace('.', ' ')
   }
 
-  // Fetch project data to get counts for badges
-  const { data: projectData } = useQuery({
-    queryKey: ['project-sidebar', projectId],
-    queryFn: async () => {
-      if (!projectId) return null
-
-      try {
-        const { data: project, error: projectError } = await supabase
-          .from('projects')
-          .select('*')
-          .eq('id', projectId)
-          .single()
-
-        if (projectError) {
-          console.error('Error fetching project:', projectError)
-        }
-
-        const { data: files, error: filesError } = await supabase
-          .from('files')
-          .select('id')
-          .eq('project_id', projectId)
-
-        if (filesError) {
-          console.error('Error fetching documents:', filesError)
-        }
-
-        const { data: assessments, error: assessmentsError } = await supabase
-          .from('assessment_runs')
-          .select('id')
-          .eq('project_id', projectId)
-
-        if (assessmentsError) {
-          console.error('Error fetching assessments:', assessmentsError)
-        }
-
-        const { data: actions, error: actionsError } = await supabase
-          .from('actions')
-          .select('id')
-          .eq('project_id', projectId)
-
-        if (actionsError) {
-          console.error('Error fetching actions:', actionsError)
-        }
-
-        return {
-          project,
-          documentsCount: files?.length || 0,
-          assessmentsCount: assessments?.length || 0,
-          actionsCount: actions?.length || 0
-        }
-      } catch (error) {
-        console.error('Error in sidebar query:', error)
-        return {
-          project: null,
-          documentsCount: 0,
-          assessmentsCount: 0,
-          actionsCount: 0
-        }
-      }
-    },
-    enabled: !!projectId
-  })
 
   const isActive = (path: string) => {
     // Exact match for non-project routes
@@ -103,11 +39,10 @@ export default function Sidebar() {
     return location.pathname === path
   }
 
-  const NavItem = ({ to, icon: Icon, label, count }: {
+  const NavItem = ({ to, icon: Icon, label }: {
     to: string,
     icon: any,
-    label: string,
-    count?: number
+    label: string
   }) => {
     const active = isActive(to)
 
@@ -150,22 +85,6 @@ export default function Sidebar() {
           }}
         />
         <span>{label}</span>
-        {count !== undefined && count > 0 && (
-          <span style={{
-            marginLeft: 'auto',
-            padding: '0.125rem 0.375rem',
-            background: '#c2703e', // copper
-            borderRadius: '0.25rem',
-            fontSize: '0.625rem',
-            fontWeight: 500,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#ffffff'
-          }}>
-            {count}
-          </span>
-        )}
       </Link>
     )
   }
@@ -222,10 +141,10 @@ export default function Sidebar() {
             }}>
               Project
             </div>
+            <NavItem to={`/project/${projectId}/evidence`} icon={FileText} label="Evidence" />
             <NavItem to={`/project/${projectId}/readiness`} icon={LayoutGrid} label="Readiness" />
-            <NavItem to={`/project/${projectId}/evidence`} icon={FileText} label="Evidence" count={projectData?.documentsCount} />
-            <NavItem to={`/project/${projectId}/findings`} icon={BarChart3} label="Findings" count={projectData?.assessmentsCount} />
-            <NavItem to={`/project/${projectId}/actions`} icon={CheckSquare} label="Actions" count={projectData?.actionsCount} />
+            <NavItem to={`/project/${projectId}/findings`} icon={BarChart3} label="Findings" />
+            <NavItem to={`/project/${projectId}/actions`} icon={CheckSquare} label="Actions" />
             <NavItem to={`/project/${projectId}/settings`} icon={Settings} label="Settings" />
           </div>
         )}

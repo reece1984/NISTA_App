@@ -3,7 +3,8 @@ import { cn } from '../../lib/utils'
 
 interface DocumentsHeaderProps {
   documentCount: number
-  pageCount: number
+  indexedChunks: number
+  isLoadingStats?: boolean
   uploadedCount: number
   totalRecommended: number
   isChatOpen: boolean
@@ -13,19 +14,33 @@ interface DocumentsHeaderProps {
 
 export default function DocumentsHeader({
   documentCount,
-  pageCount,
+  indexedChunks,
+  isLoadingStats,
   uploadedCount,
   totalRecommended,
   isChatOpen,
   onChatToggle,
   onUploadClick,
 }: DocumentsHeaderProps) {
+  const getIndexingStatus = () => {
+    if (isLoadingStats) {
+      return 'Loading...'
+    }
+    if (documentCount === 0) {
+      return 'No documents uploaded'
+    }
+    if (indexedChunks === 0) {
+      return '0 pages indexed - processing...'
+    }
+    return `${indexedChunks.toLocaleString()} pages indexed`
+  }
+
   return (
     <div className="flex items-center justify-between">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Evidence</h1>
         <p className="text-sm text-slate-500 mt-1">
-          {uploadedCount} of {totalRecommended} recommended documents uploaded · {pageCount.toLocaleString()} pages indexed
+          {uploadedCount} of {totalRecommended} recommended documents uploaded · {getIndexingStatus()}
         </p>
       </div>
       <div className="flex items-center gap-3">

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import type { ChatMessage } from '../types/documentChat'
 
-// const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_BASE_URL
+const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_BASE_URL
 
 export function useDocumentChat(projectId: number) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -28,38 +28,33 @@ export function useDocumentChat(projectId: number) {
     }])
 
     try {
-      // TODO: Replace with real API call when N8N workflow is ready
-      // const response = await fetch(`${N8N_WEBHOOK_URL}/chat_with_documents`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     project_id: projectId,
-      //     user_query: query,
-      //     conversation_history: messages.slice(-10).map(m => ({
-      //       role: m.role,
-      //       content: m.content,
-      //     })),
-      //   }),
-      // })
-      // const data = await response.json()
+      console.log('🔵 Document Chat: Sending request to N8N webhook')
+      console.log('🔵 Project ID:', projectId)
+      console.log('🔵 Query:', query)
+      console.log('🔵 Webhook URL:', N8N_WEBHOOK_URL)
 
-      // Mock response for testing
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      const data = {
-        success: true,
-        answer: `Based on your documents, here's what I found about "${query}":\n\nThe Full Business Case v2.3 contains relevant information. The document indicates comprehensive coverage of this topic with supporting evidence.\n\nKey points:\n• Primary analysis documented in Section 4\n• Supporting data in the appendices\n• Cross-referenced with Risk Register`,
-        citations: [
-          {
-            document_id: 1,
-            document_name: "Full Business Case v2.3",
-            file_name: "FBC_Gate3_v2.3.pdf",
-            section: "Section 4.3",
-            page_numbers: "45-52",
-            relevance_score: 0.92,
-            excerpt: "The analysis demonstrates..."
-          }
-        ],
+      const response = await fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          identifier: 'chat_with_documents',
+          project_id: projectId,
+          user_query: query,
+          conversation_history: messages.slice(-10).map(m => ({
+            role: m.role,
+            content: m.content,
+          })),
+        }),
+      })
+
+      console.log('🔵 Response status:', response.status)
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
+
+      const data = await response.json()
+      console.log('🔵 Response data:', data)
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to get response')

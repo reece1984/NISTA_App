@@ -7,6 +7,11 @@ interface ChatCitationProps {
 }
 
 export default function ChatCitation({ citation, onClick }: ChatCitationProps) {
+  const handleClick = () => {
+    console.log('🔵 Citation clicked:', citation)
+    onClick?.()
+  }
+
   const fileExt = citation.file_name.split('.').pop()?.toLowerCase()
 
   const iconBgColor = fileExt === 'pdf' ? 'bg-red-100' :
@@ -21,8 +26,9 @@ export default function ChatCitation({ citation, onClick }: ChatCitationProps) {
 
   return (
     <button
-      onClick={onClick}
-      className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg hover:border-copper hover:bg-copper/5 transition-colors group w-full text-left"
+      onClick={handleClick}
+      type="button"
+      className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg hover:border-copper hover:bg-copper/5 transition-colors group w-full text-left cursor-pointer"
     >
       <div className={`w-6 h-6 ${iconBgColor} rounded flex items-center justify-center flex-shrink-0`}>
         <FileText className={`w-3 h-3 ${iconColor}`} />

@@ -5,10 +5,11 @@ interface ChatInputProps {
   onSend: (message: string) => void
   disabled?: boolean
   documentCount: number
-  pageCount: number
+  indexedChunks: number
+  isLoadingStats?: boolean
 }
 
-export default function ChatInput({ onSend, disabled, documentCount, pageCount }: ChatInputProps) {
+export default function ChatInput({ onSend, disabled, documentCount, indexedChunks, isLoadingStats }: ChatInputProps) {
   const [input, setInput] = useState('')
 
   const handleSend = () => {
@@ -23,6 +24,12 @@ export default function ChatInput({ onSend, disabled, documentCount, pageCount }
       e.preventDefault()
       handleSend()
     }
+  }
+
+  const getIndexingText = () => {
+    if (isLoadingStats) return 'Loading...'
+    if (indexedChunks === 0) return '0 pages (processing...)'
+    return `${indexedChunks.toLocaleString()} pages`
   }
 
   return (
@@ -48,7 +55,7 @@ export default function ChatInput({ onSend, disabled, documentCount, pageCount }
         </button>
       </div>
       <p className="text-xs text-slate-400 mt-2 text-center">
-        Searching across {documentCount} documents · {pageCount.toLocaleString()} pages
+        Searching across {documentCount} documents · {getIndexingText()}
       </p>
     </div>
   )

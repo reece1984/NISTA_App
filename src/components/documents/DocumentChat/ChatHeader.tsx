@@ -2,11 +2,18 @@ import { MessageSquare, X } from 'lucide-react'
 
 interface ChatHeaderProps {
   documentCount: number
-  pageCount: number
+  indexedChunks: number
+  isLoadingStats?: boolean
   onClose: () => void
 }
 
-export default function ChatHeader({ documentCount, pageCount, onClose }: ChatHeaderProps) {
+export default function ChatHeader({ documentCount, indexedChunks, isLoadingStats, onClose }: ChatHeaderProps) {
+  const getIndexingText = () => {
+    if (isLoadingStats) return 'Loading...'
+    if (indexedChunks === 0) return 'processing...'
+    return `${indexedChunks} pages`
+  }
+
   return (
     <div className="px-4 py-3 border-b border-slate-200">
       <div className="flex items-center justify-between">
@@ -16,7 +23,7 @@ export default function ChatHeader({ documentCount, pageCount, onClose }: ChatHe
           </div>
           <div>
             <h3 className="text-sm font-semibold text-navy">Ask Your Documents</h3>
-            <p className="text-xs text-slate-500">{documentCount} documents · {pageCount} pages</p>
+            <p className="text-xs text-slate-500">{documentCount} documents · {getIndexingText()}</p>
           </div>
         </div>
         <button

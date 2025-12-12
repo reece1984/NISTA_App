@@ -53,7 +53,17 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         {message.citations && message.citations.length > 0 && (
           <div className="mt-2 space-y-1.5">
             {message.citations.map((citation, idx) => (
-              <ChatCitation key={idx} citation={citation} />
+              <ChatCitation
+                key={idx}
+                citation={citation}
+                onClick={() => {
+                  if (citation.file_url) {
+                    window.open(citation.file_url, '_blank')
+                  } else {
+                    console.warn('No file_url available for citation:', citation)
+                  }
+                }}
+              />
             ))}
           </div>
         )}

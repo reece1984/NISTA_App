@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import { useDocuments } from '../../hooks/useDocuments'
+import { useDocumentStats } from '../../hooks/useDocumentStats'
 import DocumentsTable from '../../components/documents/DocumentsTable'
 import UploadDocumentsModal from '../../components/UploadDocumentsModal'
 import Toast, { type ToastType } from '../../components/ui/Toast'
@@ -44,6 +45,9 @@ export default function DocumentsPage() {
 
   // Fetch documents using the hook
   const { documents, refetch, deleteDocument } = useDocuments(projectId)
+
+  // Fetch document indexing stats
+  const { totalChunks, isLoading: statsLoading } = useDocumentStats(projectId)
 
   // Check if project has assessments
   const { data: assessments = [] } = useQuery({
@@ -282,8 +286,7 @@ export default function DocumentsPage() {
     setShowUploadModal(true)
   }
 
-  // Calculate page count and project gate
-  const pageCount = documents.reduce((sum, doc) => sum + (doc.page_count || 0), 0)
+  // Calculate project gate
   const projectGate = projectData?.current_gate || 'gate-3'
 
   // Get recommendations with upload status
@@ -313,7 +316,8 @@ export default function DocumentsPage() {
         <div className="flex-shrink-0 mb-6">
           <DocumentsHeader
             documentCount={documents.length}
-            pageCount={pageCount}
+            indexedChunks={totalChunks}
+            isLoadingStats={statsLoading}
             uploadedCount={recommendations?.uploadedCount || 0}
             totalRecommended={recommendations?.totalCount || 6}
             isChatOpen={isChatOpen}
@@ -350,7 +354,8 @@ export default function DocumentsPage() {
         <DocumentChatPanel
           projectId={projectId}
           documentCount={documents.length}
-          pageCount={pageCount}
+          indexedChunks={totalChunks}
+          isLoadingStats={statsLoading}
           onClose={() => setIsChatOpen(false)}
         />
       )}

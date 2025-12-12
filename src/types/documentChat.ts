@@ -13,6 +13,7 @@ export interface Citation {
   document_id: number;
   document_name: string;
   file_name: string;
+  file_url: string | null;
   section: string | null;
   page_numbers: string | null;
   relevance_score: number;
