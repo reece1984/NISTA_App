@@ -56,7 +56,10 @@ export const apiAdapter = {
   ) => {
     const snakeFilters = toSnakeCase(filters)
     const result = await api.getActions(projectId, snakeFilters)
-    return toCamelCase(result)
+    console.log('API result before toCamelCase:', result)
+    const camelResult = toCamelCase(result)
+    console.log('API result after toCamelCase:', camelResult)
+    return camelResult
   },
 
   /**

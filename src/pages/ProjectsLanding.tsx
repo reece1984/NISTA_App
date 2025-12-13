@@ -408,27 +408,12 @@ export default function ProjectsLanding() {
                   const nextAction = getNextAction(project)
                   const isMenuOpen = openMenuId === project.id
 
-                  // Get sector color
-                  const getSectorColor = (category: string | null): string => {
-                    if (!category) return 'bg-slate-400'
-                    const categoryLower = category.toLowerCase()
-                    if (categoryLower.includes('transport') || categoryLower.includes('rail')) return 'bg-blue-500'
-                    if (categoryLower.includes('energy') || categoryLower.includes('nuclear')) return 'bg-green-500'
-                    if (categoryLower.includes('health')) return 'bg-red-500'
-                    if (categoryLower.includes('infrastructure')) return 'bg-copper'
-                    if (categoryLower.includes('digital') || categoryLower.includes('tech')) return 'bg-purple-500'
-                    return 'bg-slate-400'
-                  }
-
                   return (
                     <button
                       key={project.id}
                       onClick={() => navigate(`/project/${project.id}/readiness`)}
-                      className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-all hover:-translate-y-0.5 text-left relative group"
+                      className="bg-white border border-slate-200 rounded-lg shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 text-left relative group"
                     >
-                      {/* Sector Color Bar */}
-                      <div className={`h-1 ${getSectorColor(project.category)}`} />
-
                       <div className="p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1 min-w-0">

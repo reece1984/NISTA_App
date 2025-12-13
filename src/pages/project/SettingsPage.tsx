@@ -6,6 +6,8 @@ import {
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import type { Project } from '../../lib/supabase'
+import { ConfirmModal } from '../../components/ui/ConfirmModal'
+import Toast from '../../components/ui/Toast'
 
 // Types
 interface ProjectFormData {
@@ -101,6 +103,11 @@ export default function SettingsPage() {
   const [metadata, setMetadata] = useState<ProjectMetadata | null>(null)
   const [templateFile, setTemplateFile] = useState<File | null>(null)
   const [templates, setTemplates] = useState<Array<{ id: number; name: string; code: string }>>([])
+  const [actionCounts, setActionCounts] = useState({ total: 0, ai: 0, manual: 0 })
+  const [showDeleteAIModal, setShowDeleteAIModal] = useState(false)
+  const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   // Calculate unsaved changes
   const hasUnsavedChanges = useMemo(() => {
@@ -190,6 +197,28 @@ export default function SettingsPage() {
     }
 
     fetchData()
+  }, [id])
+
+  // Fetch action counts
+  useEffect(() => {
+    const fetchActionCounts = async () => {
+      if (!id) return
+
+      try {
+        const { data } = await supabase
+          .from('actions')
+          .select('source_type')
+          .eq('project_id', id)
+
+        const total = data?.length || 0
+        const ai = data?.filter(a => a.source_type === 'ai_generated').length || 0
+        setActionCounts({ total, ai, manual: total - ai })
+      } catch (error) {
+        console.error('Error fetching action counts:', error)
+      }
+    }
+
+    fetchActionCounts()
   }, [id])
 
   // Warn on navigation with unsaved changes
@@ -298,6 +327,50 @@ export default function SettingsPage() {
     if (originalData) {
       setFormData(originalData)
       setTemplateFile(null)
+    }
+  }
+
+  const handleDeleteAIActions = async () => {
+    setIsDeleting(true)
+    try {
+      const { error } = await supabase
+        .from('actions')
+        .delete()
+        .eq('project_id', id)
+        .eq('source_type', 'ai_generated')
+
+      if (error) throw error
+
+      setToast({ message: `Deleted ${actionCounts.ai} AI-generated action${actionCounts.ai !== 1 ? 's' : ''}`, type: 'success' })
+      setShowDeleteAIModal(false)
+      // Refresh counts
+      setActionCounts(prev => ({ ...prev, total: prev.manual, ai: 0 }))
+    } catch (err) {
+      console.error('Error deleting AI actions:', err)
+      setToast({ message: 'Failed to delete actions', type: 'error' })
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const handleDeleteAllActions = async () => {
+    setIsDeleting(true)
+    try {
+      const { error } = await supabase
+        .from('actions')
+        .delete()
+        .eq('project_id', id)
+
+      if (error) throw error
+
+      setToast({ message: `Deleted ${actionCounts.total} action${actionCounts.total !== 1 ? 's' : ''}`, type: 'success' })
+      setShowDeleteAllModal(false)
+      setActionCounts({ total: 0, ai: 0, manual: 0 })
+    } catch (err) {
+      console.error('Error deleting all actions:', err)
+      setToast({ message: 'Failed to delete actions', type: 'error' })
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -528,7 +601,14 @@ export default function SettingsPage() {
           )}
 
           {/* Danger Zone */}
-          <DangerZone onArchive={handleArchive} onDelete={handleDelete} />
+          <DangerZone
+            projectId={Number(id)}
+            actionCounts={actionCounts}
+            onDeleteAIActions={() => setShowDeleteAIModal(true)}
+            onDeleteAllActions={() => setShowDeleteAllModal(true)}
+            onArchive={handleArchive}
+            onDelete={handleDelete}
+          />
         </div>
       </div>
 
@@ -598,6 +678,38 @@ export default function SettingsPage() {
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
+      )}
+
+      {/* Confirmation Modals */}
+      <ConfirmModal
+        isOpen={showDeleteAIModal}
+        onClose={() => setShowDeleteAIModal(false)}
+        onConfirm={handleDeleteAIActions}
+        title="Delete AI-Generated Actions?"
+        message={`This will permanently delete ${actionCounts.ai} AI-generated action${actionCounts.ai !== 1 ? 's' : ''}. Manually created actions will be preserved. This cannot be undone.`}
+        confirmText="Delete AI Actions"
+        confirmVariant="danger"
+        isLoading={isDeleting}
+      />
+
+      <ConfirmModal
+        isOpen={showDeleteAllModal}
+        onClose={() => setShowDeleteAllModal(false)}
+        onConfirm={handleDeleteAllActions}
+        title="Delete All Actions?"
+        message={`This will permanently delete all ${actionCounts.total} action${actionCounts.total !== 1 ? 's' : ''} from this project. This cannot be undone.`}
+        confirmText="Delete All Actions"
+        confirmVariant="danger"
+        isLoading={isDeleting}
+      />
+
+      {/* Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   )
@@ -1003,11 +1115,15 @@ function MetadataItem({ label, value }: { label: string; value: string }) {
 }
 
 interface DangerZoneProps {
+  projectId: number
+  actionCounts: { total: number; ai: number; manual: number }
+  onDeleteAIActions: () => void
+  onDeleteAllActions: () => void
   onArchive: () => void
   onDelete: () => void
 }
 
-function DangerZone({ onArchive, onDelete }: DangerZoneProps) {
+function DangerZone({ projectId, actionCounts, onDeleteAIActions, onDeleteAllActions, onArchive, onDelete }: DangerZoneProps) {
   return (
     <div style={{
       background: 'var(--white)',
@@ -1036,6 +1152,96 @@ function DangerZone({ onArchive, onDelete }: DangerZoneProps) {
         </span>
       </div>
       <div style={{ padding: '1.5rem' }}>
+        {/* Delete AI Actions */}
+        {actionCounts.ai > 0 && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '1rem 0',
+            borderBottom: '1px solid var(--border)',
+          }}>
+            <div>
+              <h4 style={{
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                color: 'var(--ink)',
+                marginBottom: '0.25rem',
+              }}>
+                Delete AI-generated actions
+              </h4>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Remove {actionCounts.ai} AI-generated action{actionCounts.ai !== 1 ? 's' : ''}. {actionCounts.manual} manual action{actionCounts.manual !== 1 ? 's' : ''} will be preserved.
+              </p>
+            </div>
+            <button
+              onClick={onDeleteAIActions}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                padding: '0.6rem 1rem',
+                borderRadius: '8px',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                background: 'var(--white)',
+                border: '1px solid rgba(220, 38, 38, 0.2)',
+                color: '#dc2626',
+              }}
+            >
+              Delete AI Actions
+            </button>
+          </div>
+        )}
+
+        {/* Delete All Actions */}
+        {actionCounts.total > 0 && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '1rem 0',
+            borderBottom: '1px solid var(--border)',
+          }}>
+            <div>
+              <h4 style={{
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                color: 'var(--ink)',
+                marginBottom: '0.25rem',
+              }}>
+                Delete all actions
+              </h4>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Remove all {actionCounts.total} action{actionCounts.total !== 1 ? 's' : ''} from this project. This cannot be undone.
+              </p>
+            </div>
+            <button
+              onClick={onDeleteAllActions}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                padding: '0.6rem 1rem',
+                borderRadius: '8px',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                background: 'var(--white)',
+                border: '1px solid rgba(220, 38, 38, 0.2)',
+                color: '#dc2626',
+              }}
+            >
+              Delete All Actions
+            </button>
+          </div>
+        )}
+
         <div style={{
           display: 'flex',
           alignItems: 'center',

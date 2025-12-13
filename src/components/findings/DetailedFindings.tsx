@@ -31,7 +31,15 @@ interface DetailedFindingsProps {
   assessments: Criterion[]
   expandedCriteria: number[]
   setExpandedCriteria: (ids: number[]) => void
-  onCreateAction?: (criterion: Criterion) => void
+  onCreateAction?: (context: {
+    criterionId: number
+    criterionCode: string
+    criterionTitle: string
+    caseCategory: string
+    finding: string
+    recommendation: string
+    ragRating: string
+  }) => void
 }
 
 type FilterType = 'all' | 'green' | 'amber' | 'red' | 'critical'

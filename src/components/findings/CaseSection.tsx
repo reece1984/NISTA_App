@@ -25,7 +25,15 @@ interface CaseSectionProps {
   criteria: Criterion[]
   expandedCriteria: number[]
   setExpandedCriteria: (ids: number[]) => void
-  onCreateAction?: (criterion: Criterion) => void
+  onCreateAction?: (context: {
+    criterionId: number
+    criterionCode: string
+    criterionTitle: string
+    caseCategory: string
+    finding: string
+    recommendation: string
+    ragRating: string
+  }) => void
 }
 
 export function CaseSection({
@@ -93,6 +101,7 @@ export function CaseSection({
               criterion={criterion}
               isExpanded={expandedCriteria.includes(criterion.id)}
               onToggle={() => handleCriterionToggle(criterion.id)}
+              caseCategory={caseCategory}
               onCreateAction={onCreateAction}
             />
           ))}

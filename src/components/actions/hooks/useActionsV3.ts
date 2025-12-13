@@ -16,7 +16,15 @@ export function useActionsV3({ projectId, filters }: UseActionsOptions) {
     queryFn: async () => {
       let query = supabase
         .from('actions')
-        .select('*')
+        .select(`
+          *,
+          criterion:assessment_criteria!criterion_id(
+            id,
+            criterion_code,
+            title,
+            category
+          )
+        `)
         .eq('project_id', projectId)
         .order('due_date', { ascending: true, nullsFirst: false })
 

@@ -76,7 +76,7 @@ export default function ActionRow({ action, isSelected, onSelect, onOpenDetail }
 
       {/* Criterion */}
       <td className="px-4 py-3">
-        <CriterionCell criterionId={action.criterion_id} />
+        <CriterionCell criterion={action.criterion} />
       </td>
 
       {/* Status */}

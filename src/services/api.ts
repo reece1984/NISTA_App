@@ -46,6 +46,12 @@ export interface Action {
     name: string;
     email: string;
   } | null;
+  criterion?: {
+    id: number;
+    criterion_code: string;
+    title: string;
+    category: string;
+  } | null;
   due_date: string | null;
   completed_at: string | null;
   created_at: string;
@@ -152,6 +158,7 @@ export const api = {
    * Get all actions for a project with optional filters
    */
   getActions: async (projectId: number, filters?: ActionFilters) => {
+    console.log('🔵 api.getActions called with projectId:', projectId, 'filters:', filters)
     const params = new URLSearchParams();
     if (filters?.status) params.append('status', filters.status);
     if (filters?.priority) params.append('priority', filters.priority);
@@ -159,6 +166,7 @@ export const api = {
 
     const queryString = params.toString();
     const endpoint = `/api/projects/${projectId}/actions${queryString ? `?${queryString}` : ''}`;
+    console.log('🔵 api.getActions calling endpoint:', `${API_BASE_URL}${endpoint}`)
 
     return callAPI<Action[]>(endpoint);
   },

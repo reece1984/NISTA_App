@@ -15,6 +15,12 @@ export interface Action {
     name: string
     email: string
   } | null
+  criterion: {
+    id: number
+    criterionCode: string
+    title: string
+    category: string
+  } | null
   dueDate: string | null
   completedAt: string | null
   commentCount: number
@@ -32,6 +38,7 @@ interface UseActionsOptions {
 }
 
 export function useActions({ projectId, filters }: UseActionsOptions) {
+  console.log('🔴 useActions HOOK CALLED with projectId:', projectId, 'filters:', filters)
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const [localFilters, setLocalFilters] = useState(filters || {})
@@ -45,12 +52,18 @@ export function useActions({ projectId, filters }: UseActionsOptions) {
   } = useQuery({
     queryKey: ['actions', projectId, localFilters],
     queryFn: async () => {
+      console.log('🔴 useActions queryFn executing...')
       const result = await n8nApi.getActions(projectId, localFilters)
+      console.log('useActions received from n8nApi:', result)
       // apiAdapter returns the actions array directly, not wrapped in { actions: [] }
-      return Array.isArray(result) ? result : (result.actions || [])
+      const actions = Array.isArray(result) ? result : (result.actions || [])
+      console.log('useActions returning actions:', actions)
+      return actions
     },
     enabled: !!projectId,
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+    gcTime: 0
   })
 
   // Update action mutation

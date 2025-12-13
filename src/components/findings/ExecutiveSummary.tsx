@@ -26,7 +26,15 @@ interface ExecutiveSummaryProps {
   isCollapsed: boolean
   onToggle: () => void
   onCriterionClick?: (criterionId: number) => void
-  onCreateAction?: (recommendation: any) => void
+  onCreateAction?: (context: {
+    criterionId: number
+    criterionCode: string
+    criterionTitle: string
+    caseCategory: string
+    finding: string
+    recommendation: string
+    ragRating: string
+  }) => void
   project?: any // Optional project data for gateway date
 }
 
@@ -306,14 +314,25 @@ export function ExecutiveSummary({
                 </p>
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {recommendations.map((rec, index) => (
-                  <RecommendationCard
-                    key={rec.id}
-                    recommendation={rec}
-                    number={index + 1}
-                    onCreateAction={() => onCreateAction?.(rec)}
-                  />
-                ))}
+                {recommendations.map((rec, index) => {
+                  const issue = criticalIssues.find(i => i.id === rec.id)
+                  return (
+                    <RecommendationCard
+                      key={rec.id}
+                      recommendation={rec}
+                      number={index + 1}
+                      onCreateAction={() => issue && onCreateAction?.({
+                        criterionId: issue.id,
+                        criterionCode: issue.criterion_code || 'N/A',
+                        criterionTitle: issue.title,
+                        caseCategory: issue.category || 'Strategic',
+                        finding: issue.finding || '',
+                        recommendation: rec.description,
+                        ragRating: issue.rating || 'RED',
+                      })}
+                    />
+                  )
+                })}
               </div>
             </div>
           )}

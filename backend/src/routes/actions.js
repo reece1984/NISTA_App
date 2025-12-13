@@ -35,6 +35,7 @@ router.get(
       .select(`
         *,
         assigned_user:users!assigned_to(id, name, email),
+        criterion:assessment_criteria!criterion_id(id, criterion_code, title, category, dimension),
         action_comments(id),
         action_assessments(
           assessment_id
@@ -68,6 +69,12 @@ router.get(
     const actions = data.map(action => ({
       ...action,
       assigned_to: action.assigned_user || null,
+      criterion: action.criterion ? {
+        id: action.criterion.id,
+        criterion_code: action.criterion.criterion_code,  // Will become criterionCode after toCamelCase
+        title: action.criterion.title,                     // Will stay title
+        category: action.criterion.category                // Will stay category
+      } : null,
       comment_count: action.action_comments?.length || 0,
       linked_findings: action.action_assessments?.map(aa => ({ assessment_id: aa.assessment_id })) || []
     }));

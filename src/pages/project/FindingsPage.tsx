@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import { ExecutiveSummary } from '../../components/findings/ExecutiveSummary'
 import { DetailedFindings } from '../../components/findings/DetailedFindings'
+import { CreateActionModal } from '../../components/actions/CreateActionModal'
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog'
 import Toast, { type ToastType } from '../../components/ui/Toast'
 import ExportReportModal from '../../components/ExportReportModal'
@@ -20,6 +21,25 @@ export default function FindingsPage() {
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null)
   const [summaryCollapsed, setSummaryCollapsed] = useState(true)
   const [expandedCriteria, setExpandedCriteria] = useState<number[]>([])
+  const [createActionModal, setCreateActionModal] = useState<{
+    isOpen: boolean
+    criterionId: number | null
+    criterionCode: string
+    criterionTitle: string
+    caseCategory: string
+    finding: string
+    recommendation: string
+    ragRating: string
+  }>({
+    isOpen: false,
+    criterionId: null,
+    criterionCode: '',
+    criterionTitle: '',
+    caseCategory: '',
+    finding: '',
+    recommendation: '',
+    ragRating: '',
+  })
 
   // Fetch project data with assessments
   const { data: projectData, isLoading, refetch } = useQuery({
@@ -169,9 +189,24 @@ export default function FindingsPage() {
     }, 100)
   }
 
-  const handleCreateAction = (recommendation: any) => {
-    console.log('Create action from recommendation:', recommendation)
-    setToast({ message: 'Action creation coming soon', type: 'info' })
+  const handleCreateAction = (context: {
+    criterionId: number
+    criterionCode: string
+    criterionTitle: string
+    caseCategory: string
+    finding: string
+    recommendation: string
+    ragRating: string
+  }) => {
+    setCreateActionModal({
+      isOpen: true,
+      ...context,
+    })
+  }
+
+  const handleActionCreated = (action: any) => {
+    setToast({ message: 'Action created successfully', type: 'success' })
+    // Optionally navigate to actions page or refresh data
   }
 
   if (isLoading) {
@@ -277,6 +312,24 @@ export default function FindingsPage() {
         onClose={() => setShowExportModal(false)}
         project={projectData}
       />
+
+      {/* Create Action Modal */}
+      {createActionModal.isOpen && createActionModal.criterionId && (
+        <CreateActionModal
+          isOpen={createActionModal.isOpen}
+          onClose={() => setCreateActionModal(prev => ({ ...prev, isOpen: false }))}
+          onSuccess={handleActionCreated}
+          projectId={Number(id)}
+          assessmentRunId={projectData?.currentAssessmentRun?.id || null}
+          criterionId={createActionModal.criterionId}
+          criterionCode={createActionModal.criterionCode}
+          criterionTitle={createActionModal.criterionTitle}
+          caseCategory={createActionModal.caseCategory}
+          finding={createActionModal.finding}
+          recommendation={createActionModal.recommendation}
+          ragRating={createActionModal.ragRating}
+        />
+      )}
 
       {/* Toast Notifications */}
       {toast && (

@@ -39,10 +39,19 @@ interface CriterionRowProps {
   criterion: Criterion
   isExpanded: boolean
   onToggle: () => void
-  onCreateAction?: (criterion: Criterion) => void
+  caseCategory?: string
+  onCreateAction?: (context: {
+    criterionId: number
+    criterionCode: string
+    criterionTitle: string
+    caseCategory: string
+    finding: string
+    recommendation: string
+    ragRating: string
+  }) => void
 }
 
-export function CriterionRow({ criterion, isExpanded, onToggle, onCreateAction }: CriterionRowProps) {
+export function CriterionRow({ criterion, isExpanded, onToggle, caseCategory, onCreateAction }: CriterionRowProps) {
   const code = criterion.code || criterion.criterion_code || criterion.assessment_criteria?.criterion_code || 'N/A'
   const title = criterion.title || criterion.assessment_criteria?.title || 'Untitled Criterion'
   const rating = criterion.rag_rating?.toUpperCase() || 'AMBER'
@@ -206,7 +215,15 @@ export function CriterionRow({ criterion, isExpanded, onToggle, onCreateAction }
                 </div>
                 {onCreateAction && (
                   <button
-                    onClick={() => onCreateAction(criterion)}
+                    onClick={() => onCreateAction({
+                      criterionId: criterion.id,
+                      criterionCode: code,
+                      criterionTitle: title,
+                      caseCategory: caseCategory || 'Strategic',
+                      finding: criterion.finding || '',
+                      recommendation: criterion.recommendation || '',
+                      ragRating: rating,
+                    })}
                     className="flex-shrink-0 bg-copper hover:bg-[#a85d32] text-white text-xs font-medium px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors"
                   >
                     <Plus className="w-3 h-3" />

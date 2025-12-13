@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
@@ -7,8 +7,6 @@ import ActionTableView from '../../components/ActionPlan/ActionTableView'
 import ActionDetailModal from '../../components/ActionPlan/ActionDetailModal'
 import ActionPlanDraftWorkspace from '../../components/ActionPlan/ActionPlanDraftWorkspace'
 import { useActions } from '../../hooks/useActions'
-import { useActionsV3 } from '../../components/actions/hooks/useActionsV3'
-import { useActionStats } from '../../components/actions/hooks/useActionStats'
 
 export default function ActionsPage() {
   const { id } = useParams<{ id: string }>()
@@ -17,20 +15,6 @@ export default function ActionsPage() {
   const [openActionPlanWorkspace, setOpenActionPlanWorkspace] = useState(false)
 
   const { actions, isLoading } = useActions({ projectId })
-
-  // TEST: V3 Hooks
-  const { actions: actionsV3, isLoading: isLoadingV3, error: errorV3 } = useActionsV3({ projectId })
-  const stats = useActionStats(actionsV3)
-
-  useEffect(() => {
-    console.group('🧪 V3 Hooks Test')
-    console.log('isLoading:', isLoadingV3)
-    console.log('error:', errorV3)
-    console.log('actions count:', actionsV3.length)
-    console.log('actions data:', actionsV3)
-    console.log('stats:', stats)
-    console.groupEnd()
-  }, [actionsV3, isLoadingV3, errorV3, stats])
 
   // Fetch the most recent assessment run
   const { data: latestAssessmentRun } = useQuery({

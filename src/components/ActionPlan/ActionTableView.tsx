@@ -19,6 +19,7 @@ const statusOrder = { not_started: 1, in_progress: 2, completed: 3, wont_fix: 4 
 
 export default function ActionTableView({ projectId, onActionClick }: ActionTableViewProps) {
   const { actions, isLoading, bulkUpdate } = useActions({ projectId })
+  console.log('ActionTableView received actions:', actions)
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [sortField, setSortField] = useState<SortField>('priority')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
@@ -195,6 +196,9 @@ export default function ActionTableView({ projectId, onActionClick }: ActionTabl
                   className="mt-1 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </th>
+              <th className="px-4 py-3 text-left w-32">
+                <span className="font-semibold text-sm text-gray-700">Criterion</span>
+              </th>
               <th className="px-4 py-3 text-left w-36">
                 <button
                   onClick={() => handleSort('assignedTo')}
@@ -282,6 +286,18 @@ export default function ActionTableView({ projectId, onActionClick }: ActionTabl
                   {action.description && (
                     <div className="text-sm text-gray-500 line-clamp-1">{action.description}</div>
                   )}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-700">
+                  {(() => {
+                    console.log('Rendering criterion for action:', action.id, 'criterion:', action.criterion)
+                    return action.criterion ? (
+                      <span className="font-mono text-xs text-slate-600">
+                        {action.criterion.criterionCode}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">—</span>
+                    )
+                  })()}
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-700">
                   {action.assignedTo ? (

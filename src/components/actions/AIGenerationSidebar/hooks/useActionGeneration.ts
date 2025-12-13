@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { GenerationResult, SuggestedAction } from '../../../../types/actions'
-import { supabase } from '../../../../lib/supabase'
 
 interface UseActionGenerationOptions {
   projectId: number
@@ -101,10 +100,10 @@ export function useActionGeneration({ projectId }: UseActionGenerationOptions) {
 
   const approveAction = useMutation({
     mutationFn: async (action: SuggestedAction) => {
-      const { data, error } = await supabase
-        .from('actions')
-        .insert({
-          project_id: projectId,
+      const response = await fetch(`http://localhost:3001/api/projects/${projectId}/actions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           title: action.title,
           description: action.description,
           action_status: 'not_started',
@@ -115,42 +114,46 @@ export function useActionGeneration({ projectId }: UseActionGenerationOptions) {
           source_type: 'ai_generated',
           due_date: action.suggested_due_date
         })
-        .select()
-        .single()
+      })
 
-      if (error) throw error
-      return data
+      if (!response.ok) throw new Error('Failed to create action')
+      return response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['actions-v3', projectId] })
+      queryClient.invalidateQueries({ queryKey: ['actions', projectId] })
     }
   })
 
   const approveAllActions = useMutation({
     mutationFn: async (actions: SuggestedAction[]) => {
-      const inserts = actions.map(action => ({
-        project_id: projectId,
-        title: action.title,
-        description: action.description,
-        action_status: 'not_started' as const,
-        priority: action.priority,
-        criterion_id: action.criterion_id,
-        case_category: action.case_category,
-        estimated_impact: action.estimated_impact,
-        source_type: 'ai_generated' as const,
-        due_date: action.suggested_due_date
-      }))
-
-      const { data, error } = await supabase
-        .from('actions')
-        .insert(inserts)
-        .select()
-
-      if (error) throw error
-      return data
+      const results = await Promise.all(
+        actions.map(action =>
+          fetch(`http://localhost:3001/api/projects/${projectId}/actions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: action.title,
+              description: action.description,
+              action_status: 'not_started',
+              priority: action.priority,
+              criterion_id: action.criterion_id,
+              case_category: action.case_category,
+              estimated_impact: action.estimated_impact,
+              source_type: 'ai_generated',
+              due_date: action.suggested_due_date
+            })
+          }).then(res => {
+            if (!res.ok) throw new Error('Failed to create action')
+            return res.json()
+          })
+        )
+      )
+      return results
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['actions-v3', projectId] })
+      queryClient.invalidateQueries({ queryKey: ['actions', projectId] })
     }
   })
 
